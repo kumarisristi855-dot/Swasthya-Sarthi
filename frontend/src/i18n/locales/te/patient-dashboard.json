@@ -1,0 +1,12 @@
+{
+  "nearbyFacilities": "దగ్గరలోని సదుపాయాలు",
+  "symptomChecker": "AI లక్షణాల చెకర్",
+  "browse": "బ్రౌజ్ చేయండి",
+  "searchHospitals": "భారతదేశంలో ఎక్కడైనా హాస్పిటల్స్ వెతకండి",
+  "searchLocation": "స్థానం వెతకండి",
+  "useMyLocation": "నా స్థానం వాడండి",
+  "hospitalDirectory": "హాస్పిటల్ డైరెక్టరీ",
+  "appointmentUpcoming": "రాబోయేవి",
+  "appointmentCancelled": "రద్దు",
+  "appointmentCompleted": "పూర్తి"
+}

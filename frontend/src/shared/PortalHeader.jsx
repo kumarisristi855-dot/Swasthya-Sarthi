@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Activity, Building2, ChevronDown, LogOut, Mail, Pencil, Phone, ShieldCheck } from 'lucide-react';
 import Avatar from './ui/Avatar';
+import LanguageSwitcher from '../i18n/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export default function PortalHeader({ role, userLabel, onLogout, context, profile, onEditProfile }) {
+  const { t } = useTranslation(['common', 'nav']);
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -32,13 +35,14 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
             </span>
           </div>
           <div>
-            <span className="block text-lg font-bold text-care-heading">Swasthya Sarthi</span>
+            <span className="block text-lg font-bold text-care-heading">{t('nav:brand')}</span>
             <span className="block text-[10px] font-semibold uppercase text-care-primary-hover">{role}</span>
           </div>
         </div>
 
         <div className="ml-auto flex min-w-0 items-center justify-end gap-3">
           {context}
+          <LanguageSwitcher compact />
           {profile ? (
             <div ref={menuRef} className="relative">
               <button
@@ -54,7 +58,7 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
                 </span>
                 <span className="hidden min-w-0 md:block">
                   <span className="block max-w-44 truncate text-sm font-semibold text-care-heading">{profile.name || userLabel}</span>
-                  <span className="mt-0.5 block text-[11px] font-medium text-care-primary-hover">{profile.label || 'Account profile'}</span>
+                  <span className="mt-0.5 block text-[11px] font-medium text-care-primary-hover">{profile.label || t('common:accountProfile')}</span>
                 </span>
                 <span className="hidden h-7 w-7 items-center justify-center rounded-md bg-care-neutral text-care-muted transition-colors group-hover:bg-care-surface group-hover:text-care-primary-hover sm:flex">
                   <ChevronDown className={`h-4 w-4 transition-transform ${menuOpen ? 'rotate-180' : ''}`} />
@@ -67,9 +71,9 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
                     <Avatar name={profile.name || userLabel} id={profile.id} src={profile.avatarUrl} />
                     <div className="min-w-0">
                       <p className="truncate font-bold text-care-heading">{profile.name || userLabel}</p>
-                      <p className="truncate text-xs text-care-muted">{profile.email || 'Email not available'}</p>
+                      <p className="truncate text-xs text-care-muted">{profile.email || t('common:emailNotAvailable')}</p>
                       <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-care-success">
-                        <ShieldCheck className="h-3.5 w-3.5" /> Signed in securely
+                        <ShieldCheck className="h-3.5 w-3.5" /> {t('common:signedInSecurely')}
                       </span>
                     </div>
                   </div>
@@ -77,15 +81,15 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
                   <div className="space-y-2.5 px-2 py-3 text-sm">
                     <div className="flex items-center gap-2 text-care-body">
                       <Building2 className="h-4 w-4 shrink-0 text-care-muted" />
-                      <span className="truncate">{profile.organization || 'Hospital assignment unavailable'}</span>
+                      <span className="truncate">{profile.organization || t('common:hospitalUnavailable')}</span>
                     </div>
                     <div className="flex items-center gap-2 text-care-body">
                       <Phone className="h-4 w-4 shrink-0 text-care-muted" />
-                      <span className="truncate">{profile.phone || 'Phone number not added'}</span>
+                      <span className="truncate">{profile.phone || t('common:phoneNotAdded')}</span>
                     </div>
                     <div className="flex items-center gap-2 text-care-body">
                       <Mail className="h-4 w-4 shrink-0 text-care-muted" />
-                      <span className="truncate">{profile.email || 'Email not available'}</span>
+                      <span className="truncate">{profile.email || t('common:emailNotAvailable')}</span>
                     </div>
                   </div>
 
@@ -96,7 +100,7 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
                       onClick={() => { setMenuOpen(false); onEditProfile(); }}
                       className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-care-heading transition-colors hover:bg-care-primary-subtle hover:text-care-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-primary"
                     >
-                      <Pencil className="h-4 w-4" /> Edit profile
+                      <Pencil className="h-4 w-4" /> {t('common:editProfile')}
                     </button>
                   )}
                   <button
@@ -105,7 +109,7 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
                     onClick={onLogout}
                     className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-care-danger transition-colors hover:bg-care-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-danger"
                   >
-                    <LogOut className="h-4 w-4" /> Sign out
+                    <LogOut className="h-4 w-4" /> {t('common:signOut')}
                   </button>
                 </div>
               )}
@@ -117,8 +121,8 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
                 type="button"
                 onClick={onLogout}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-care-muted hover:bg-care-primary-subtle hover:text-care-heading"
-                title="Sign out"
-                aria-label="Sign out"
+                title={t('common:signOut')}
+                aria-label={t('common:signOut')}
               >
                 <LogOut className="h-5 w-5" />
               </button>

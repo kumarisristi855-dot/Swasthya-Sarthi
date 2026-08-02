@@ -17,6 +17,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../modules/auth/AuthContext';
 import Avatar from './ui/Avatar';
 import Button from './ui/Button';
+import LanguageSwitcher from '../i18n/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const emptyForm = {
   fullName: '',
@@ -34,6 +36,7 @@ function valueList(value) {
 }
 
 export default function PatientPortalHeader() {
+  const { t } = useTranslation(['common', 'nav']);
   const { pathname } = useLocation();
   const { user, logout, updatePatientProfile } = useAuth();
   const menuRef = useRef(null);
@@ -103,7 +106,7 @@ export default function PatientPortalHeader() {
     <>
       <header className="patient-portal-header">
         <div className="patient-portal-navbar">
-          <Link to="/patient/dashboard" className="flex min-w-0 shrink-0 items-center gap-3" aria-label="Swasthya Sarthi patient dashboard">
+          <Link to="/patient/dashboard" className="flex min-w-0 shrink-0 items-center gap-3" aria-label={`${t('nav:brand')} ${t('nav:patientPortal')}`}>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-care-primary text-care-surface">
               <span className="relative h-6 w-6" aria-hidden="true">
                 <Activity className="care-logo-pulse-base absolute inset-0 h-6 w-6" strokeWidth={2.5} />
@@ -111,18 +114,19 @@ export default function PatientPortalHeader() {
               </span>
             </span>
             <span className="leading-none">
-              <span className="block text-lg font-bold leading-5 text-care-heading">Swasthya Sarthi</span>
-              <span className="mt-1 block text-[10px] font-semibold uppercase leading-3 text-care-primary-hover">Patient portal</span>
+              <span className="block text-lg font-bold leading-5 text-care-heading">{t('nav:brand')}</span>
+              <span className="mt-1 block text-[10px] font-semibold uppercase leading-3 text-care-primary-hover">{t('nav:patientPortal')}</span>
             </span>
           </Link>
 
           <nav className="ml-auto flex min-w-0 items-center gap-3 sm:gap-6 lg:gap-8" aria-label="Patient navigation">
             <Link to="/patient/appointments" className={navLinkClass('/patient/appointments')}>
-              My Appointments
+              {t('nav:myAppointments')}
             </Link>
             <Link to="/patient/delhi-doctors" className={`${navLinkClass('/patient/delhi-doctors')} hidden md:inline-flex`}>
-              Doctor Directory
+              {t('nav:doctorDirectory')}
             </Link>
+            <LanguageSwitcher compact />
 
             <div ref={menuRef} className="relative">
               <button
@@ -153,7 +157,7 @@ export default function PatientPortalHeader() {
                       <p className="truncate font-bold text-care-heading">{user?.full_name || 'Patient'}</p>
                       <p className="truncate text-xs text-care-muted">{user?.email || 'Email not available'}</p>
                       <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-care-success">
-                        <ShieldCheck className="h-3.5 w-3.5" /> Signed in securely
+                        <ShieldCheck className="h-3.5 w-3.5" /> {t('common:signedInSecurely')}
                       </span>
                     </div>
                   </div>
@@ -175,7 +179,7 @@ export default function PatientPortalHeader() {
                     onClick={openEditor}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-care-heading transition-colors hover:bg-care-primary-subtle hover:text-care-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-primary"
                   >
-                    <Pencil className="h-4 w-4" /> Edit profile
+                    <Pencil className="h-4 w-4" /> {t('common:editProfile')}
                   </button>
                   <button
                     type="button"
@@ -183,7 +187,7 @@ export default function PatientPortalHeader() {
                     onClick={logout}
                     className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-care-danger transition-colors hover:bg-care-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-danger"
                   >
-                    <LogOut className="h-4 w-4" /> Sign out
+                    <LogOut className="h-4 w-4" /> {t('common:signOut')}
                   </button>
                 </div>
               )}

@@ -20,11 +20,13 @@ import AuthCallback from './modules/auth/callback';
 import LegalPage from './modules/LegalPage';
 import PublicHospitalProfile from './modules/public/PublicHospitalProfile';
 import PublicDoctorProfile from './modules/public/PublicDoctorProfile';
+import I18nDocumentEffects from './i18n/I18nDocumentEffects';
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <I18nDocumentEffects />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />

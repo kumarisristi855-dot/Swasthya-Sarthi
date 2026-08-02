@@ -1,0 +1,6 @@
+{
+  "title": "AI Symptom Checker",
+  "describeSymptoms": "Describe your symptoms",
+  "generalPhysicianFallback": "Please consult a General Physician if the match is unclear.",
+  "safetyNotice": "Symptom checker translations require medical review before clinical use."
+}

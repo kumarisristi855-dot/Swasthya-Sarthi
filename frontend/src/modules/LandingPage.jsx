@@ -32,6 +32,8 @@ import HospitalOperatingHours from '../shared/HospitalOperatingHours';
 import { enrichHospitalsWithGoogleRatings } from '../lib/googleHospitalRatings';
 import diagnosticsImage from '../assets/care-diagnostics.jpg';
 import { API_URL } from '../lib/api';
+import LanguageSwitcher from '../i18n/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const LOCATION_SESSION_KEY = 'swasthya-sarthi-public-location';
 
@@ -210,6 +212,7 @@ function LocationPin({ position, onChange }) {
 }
 
 export default function LandingPage() {
+  const { t } = useTranslation(['common', 'nav']);
   const initialLocationRef = useRef(loadLocationSelection());
   const initialLocation = initialLocationRef.current;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -821,15 +824,16 @@ export default function LandingPage() {
         <div className="public-navbar-inner">
           <PublicLogo />
           <nav className="public-navbar-links" aria-label="Primary navigation">
-            <a href="#services" className="public-navbar-link">Services</a>
-            <a href="#search-results" className="public-navbar-link">Doctors</a>
-            <a href="#facilities" className="public-navbar-link">Hospitals</a>
-            <a href="#health-guides" className="public-navbar-link">Health guides</a>
-            <a href="#trust" className="public-navbar-link">Why Swasthya Sarthi</a>
+            <a href="#services" className="public-navbar-link">{t('nav:services')}</a>
+            <a href="#search-results" className="public-navbar-link">{t('nav:doctors')}</a>
+            <a href="#facilities" className="public-navbar-link">{t('nav:hospitals')}</a>
+            <a href="#health-guides" className="public-navbar-link">{t('nav:healthGuides')}</a>
+            <a href="#trust" className="public-navbar-link">{t('nav:whyBrand')}</a>
           </nav>
           <div className="public-navbar-actions">
-            <Link to="/login/patient" className="rounded-lg px-4 py-2.5 text-sm font-semibold text-care-body hover:bg-care-neutral">Sign in</Link>
-            <Link to="/signup/patient" className="rounded-lg bg-care-primary px-4 py-2.5 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">Create account</Link>
+            <LanguageSwitcher compact />
+            <Link to="/login/patient" className="rounded-lg px-4 py-2.5 text-sm font-semibold text-care-body hover:bg-care-neutral">{t('common:signIn')}</Link>
+            <Link to="/signup/patient" className="rounded-lg bg-care-primary px-4 py-2.5 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">{t('common:createAccount')}</Link>
           </div>
           <button type="button" onClick={() => setMobileMenuOpen(value => !value)} className="flex h-10 w-10 items-center justify-center rounded-lg border border-care-border text-care-body lg:hidden" aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}>
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -838,13 +842,14 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <nav className="border-t border-care-border bg-care-surface px-5 py-4 lg:hidden" aria-label="Mobile navigation">
             <div className="grid w-full gap-1 text-sm font-semibold text-care-body sm:grid-cols-2">
-              <a href="#services" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Services</a>
-              <a href="#search-results" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Doctors</a>
-              <a href="#facilities" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Hospitals</a>
-              <a href="#health-guides" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Health guides</a>
-              <a href="#trust" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Why Swasthya Sarthi</a>
-              <Link to="/login/patient" onClick={() => setMobileMenuOpen(false)} className="mt-2 rounded-lg border border-care-border px-3 py-3 text-center text-care-heading hover:bg-care-neutral sm:mt-0">Sign in</Link>
-              <Link to="/signup/patient" onClick={() => setMobileMenuOpen(false)} className="rounded-lg bg-care-primary px-3 py-3 text-center text-care-surface hover:bg-care-primary-hover">Create account</Link>
+              <div className="rounded-lg px-3 py-2.5"><LanguageSwitcher /></div>
+              <a href="#services" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:services')}</a>
+              <a href="#search-results" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:doctors')}</a>
+              <a href="#facilities" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:hospitals')}</a>
+              <a href="#health-guides" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:healthGuides')}</a>
+              <a href="#trust" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:whyBrand')}</a>
+              <Link to="/login/patient" onClick={() => setMobileMenuOpen(false)} className="mt-2 rounded-lg border border-care-border px-3 py-3 text-center text-care-heading hover:bg-care-neutral sm:mt-0">{t('common:signIn')}</Link>
+              <Link to="/signup/patient" onClick={() => setMobileMenuOpen(false)} className="rounded-lg bg-care-primary px-3 py-3 text-center text-care-surface hover:bg-care-primary-hover">{t('common:createAccount')}</Link>
             </div>
           </nav>
         )}

@@ -17,6 +17,7 @@
     --color-neutral-bg: #f4f8fb;
     --color-surface: #ffffff;
     --color-border: #dbe5ec;
+    --locale-font-family: inherit;
 
     /* Compatibility aliases for existing Swasthya Sarthi component styles. */
     --care-bg: var(--color-neutral-bg);
@@ -48,9 +49,17 @@
     overflow-x: clip;
     background: var(--color-neutral-bg);
     color: var(--color-text-body);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: var(--locale-font-family), Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  html[data-locale="hi"],
+  html[data-locale="bn"],
+  html[data-locale="ta"],
+  html[data-locale="te"],
+  html[data-locale="kn"] {
+    line-height: 1.58;
   }
 
   button,
@@ -342,6 +351,22 @@
 
   .public-navbar-actions {
     @apply ml-auto hidden shrink-0 items-center gap-2 sm:flex;
+  }
+
+  .language-switcher {
+    @apply inline-flex h-10 min-w-0 items-center gap-2 rounded-lg border border-care-border bg-care-surface px-3 text-sm font-semibold text-care-heading shadow-sm transition-colors hover:bg-care-primary-subtle;
+  }
+
+  .language-switcher select {
+    @apply min-w-0 cursor-pointer bg-transparent text-sm font-semibold text-care-heading outline-none;
+  }
+
+  .language-switcher-compact {
+    @apply h-9 px-2.5;
+  }
+
+  .language-switcher-compact select {
+    max-width: 8.75rem;
   }
 
   .public-header-scrolled {

@@ -1,0 +1,12 @@
+{
+  "nearbyFacilities": "அருகிலுள்ள வசதிகள்",
+  "symptomChecker": "AI அறிகுறி சரிபார்ப்பு",
+  "browse": "உலாவு",
+  "searchHospitals": "இந்தியாவில் எங்கும் மருத்துவமனைகளைத் தேடுங்கள்",
+  "searchLocation": "இடம் தேடு",
+  "useMyLocation": "என் இருப்பிடத்தைப் பயன்படுத்து",
+  "hospitalDirectory": "மருத்துவமனை டைரக்டரி",
+  "appointmentUpcoming": "வரவிருக்கும்",
+  "appointmentCancelled": "ரத்து",
+  "appointmentCompleted": "முடிந்தது"
+}

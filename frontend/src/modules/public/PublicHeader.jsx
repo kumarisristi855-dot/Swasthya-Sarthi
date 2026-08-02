@@ -1,8 +1,11 @@
 import React from 'react';
 import { Activity, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../i18n/LanguageSwitcher';
 
 export default function PublicHeader({ backLabel = 'Back to search' }) {
+  const { t } = useTranslation(['common', 'nav']);
   return (
     <header className="sticky top-0 z-30 border-b border-care-border bg-care-surface/95 backdrop-blur-md">
       <div className="flex w-full items-center justify-between gap-4 px-3 py-3 sm:px-5">
@@ -18,12 +21,13 @@ export default function PublicHeader({ backLabel = 'Back to search' }) {
           </Link>
           <Link to="/#search-results" className="inline-flex items-center gap-2 text-sm font-semibold text-care-muted hover:text-care-primary-hover">
             <ArrowLeft className="h-4 w-4" />
-            {backLabel}
+            {backLabel === 'Back to search' ? t('nav:backToSearch') : backLabel}
           </Link>
         </div>
         <div className="flex items-center gap-2">
-          <Link to="/login/patient" className="rounded-lg px-3 py-2 text-sm font-semibold text-care-heading hover:bg-care-neutral">Sign in</Link>
-          <Link to="/signup/patient" className="hidden rounded-lg bg-care-primary px-4 py-2 text-sm font-semibold text-care-surface hover:bg-care-primary-hover sm:inline">Create account</Link>
+          <LanguageSwitcher compact />
+          <Link to="/login/patient" className="rounded-lg px-3 py-2 text-sm font-semibold text-care-heading hover:bg-care-neutral">{t('common:signIn')}</Link>
+          <Link to="/signup/patient" className="hidden rounded-lg bg-care-primary px-4 py-2 text-sm font-semibold text-care-surface hover:bg-care-primary-hover sm:inline">{t('common:createAccount')}</Link>
         </div>
       </div>
     </header>
