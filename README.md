@@ -2,6 +2,12 @@
 
 A localized healthcare platform connecting **Patients**, **Doctors**, and **Hospital Admins**.
 
+## Live Deployment
+
+- Website: https://frontend-six-coral-82.vercel.app
+- Backend API: https://backend-woad-chi-26.vercel.app/api
+- GitHub repository: https://github.com/kumarisristi855-dot/Swasthya-Sarthi
+
 ## Repository Structure
 
 ```
