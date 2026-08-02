@@ -8,8 +8,10 @@ import PortalHeader from '../../shared/PortalHeader';
 import ProfilePhotoUploader from '../../shared/ProfilePhotoUploader';
 import Badge from '../../shared/ui/Badge';
 import { API_URL } from '../../lib/api';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminDashboard() {
+  const { t } = useTranslation(['hospital-admin', 'common']);
   const { user, token, logout, updateAdminProfile, uploadProfilePhoto, removeProfilePhoto } = useAuth();
   
   const [activeTab, setActiveTab] = useState('onboarding'); // 'onboarding', 'schedule', 'analytics'
@@ -42,9 +44,9 @@ export default function AdminDashboard() {
     setProfileSuccess('');
     try {
       await updateAdminProfile(profileForm);
-      setProfileSuccess('Your administrator profile has been updated.');
+      setProfileSuccess(t('hospital-admin:profileUpdated'));
     } catch (profileUpdateError) {
-      setProfileError(profileUpdateError.message || 'Could not update your profile.');
+      setProfileError(profileUpdateError.message || t('hospital-admin:profileUpdateFailed'));
     } finally {
       setProfileSaving(false);
     }
@@ -60,15 +62,15 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error?.message || 'Failed to fetch pending list');
+        throw new Error(data.error?.message || t('hospital-admin:failedPendingList'));
       }
       setPendingDoctors(data.doctors || []);
     } catch (err) {
-      setError(err.message || 'Failed to load pending doctors');
+      setError(err.message || t('hospital-admin:failedPendingDoctors'));
     } finally {
       setLoading(false);
     }
-  }, [user?.hospital_id, token]);
+  }, [user?.hospital_id, token, t]);
 
   const fetchSummary = useCallback(async () => {
     try {
@@ -79,13 +81,13 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error?.message || 'Failed to fetch dashboard summary');
+        throw new Error(data.error?.message || t('hospital-admin:failedDashboardSummary'));
       }
       setSummary(data);
     } catch (err) {
       console.warn('Failed to load hospital dashboard summary:', err);
     }
-  }, [user?.hospital_id, token]);
+  }, [user?.hospital_id, token, t]);
 
   useEffect(() => {
     if (user?.hospital_id) {
@@ -112,14 +114,14 @@ export default function AdminDashboard() {
       const data = await res.json();
       
       if (!res.ok) {
-        throw new Error(data.error?.message || 'Failed to send invitation');
+        throw new Error(data.error?.message || t('hospital-admin:failedInvitation'));
       }
 
-      setInviteSuccess('Doctor invited successfully!');
+      setInviteSuccess(t('hospital-admin:doctorInvited'));
       setInviteEmail('');
       fetchPending();
     } catch (err) {
-      setInviteError(err.message || 'Invitation failed');
+      setInviteError(err.message || t('hospital-admin:invitationFailed'));
     } finally {
       setInviteLoading(false);
     }
@@ -151,17 +153,17 @@ export default function AdminDashboard() {
     <div className="care-shell portal-dashboard flex flex-col justify-between">
       <div>
         <PortalHeader
-          role="Hospital portal"
-          userLabel={user?.full_name || 'Hospital administrator'}
+          role={t('hospital-admin:portalRole')}
+          userLabel={user?.full_name || t('hospital-admin:administratorFallback')}
           onLogout={logout}
-          context={<Badge variant="neutral" icon={Shield} className="hidden sm:inline-flex">Oversight mode</Badge>}
+          context={<Badge variant="neutral" icon={Shield} className="hidden sm:inline-flex">{t('hospital-admin:oversightMode')}</Badge>}
           profile={{
             id: user?.id,
-            name: user?.full_name || 'Hospital administrator',
-            label: 'Hospital administrator',
+            name: user?.full_name || t('hospital-admin:administratorFallback'),
+            label: t('hospital-admin:administratorFallback'),
             email: user?.email,
             phone: user?.phone,
-            organization: user?.hospital_name || 'Assigned hospital',
+            organization: user?.hospital_name || t('hospital-admin:assignedHospital'),
             avatarUrl: user?.avatar_url
           }}
           onEditProfile={openProfileEditor}
@@ -171,17 +173,17 @@ export default function AdminDashboard() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-7 sm:py-10">
           {/* Welcome Box */}
           <div className="portal-page-header">
-            <span className="care-eyebrow">Hospital operations</span>
-            <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-care-heading">Hospital operations</h1>
+            <span className="care-eyebrow">{t('hospital-admin:operationsEyebrow')}</span>
+            <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-care-heading">{t('hospital-admin:operationsTitle')}</h1>
             <p className="care-muted max-w-2xl leading-relaxed mt-2 mb-5">
-              Review clinic onboarding, doctor schedules, and physical appointment activity across the hospital.
+              {t('hospital-admin:operationsCopy')}
             </p>
             <div className="flex flex-wrap gap-2">
               <div className="px-3 py-2 bg-care-surface text-xs font-semibold rounded-lg text-care-muted border border-care-border">
-                Role: Hospital Admin
+                {t('hospital-admin:roleHospitalAdmin')}
               </div>
               <div className="px-3 py-2 bg-care-surface text-xs font-semibold rounded-lg text-care-muted border border-care-border">
-                Hospital ID: {user?.hospital_id}
+                {t('hospital-admin:hospitalId', { id: user?.hospital_id })}
               </div>
             </div>
           </div>
@@ -189,9 +191,9 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <div className="care-surface p-6 flex items-center justify-between">
               <div>
-                <span className="block text-xs font-semibold text-care-muted uppercase">Booked Patients</span>
+                <span className="block text-xs font-semibold text-care-muted uppercase">{t('hospital-admin:bookedPatients')}</span>
                 <span className="block text-3xl font-black text-care-heading mt-1">{summary?.totalBookedPatients ?? 0}</span>
-                <span className="block text-[10px] text-care-muted mt-1">{summary?.totalBookedAppointments ?? 0} booked appointments</span>
+                <span className="block text-[10px] text-care-muted mt-1">{t('hospital-admin:bookedAppointments', { count: summary?.totalBookedAppointments ?? 0 })}</span>
               </div>
               <div className="p-3 bg-care-primary-subtle text-care-primary border border-care-primary/20 rounded-lg">
                 <Users className="w-6 h-6" />
@@ -200,9 +202,9 @@ export default function AdminDashboard() {
 
             <div className="care-surface p-6 flex items-center justify-between">
               <div>
-                <span className="block text-xs font-semibold text-care-muted uppercase">Upcoming Bookings</span>
+                <span className="block text-xs font-semibold text-care-muted uppercase">{t('hospital-admin:upcomingBookings')}</span>
                 <span className="block text-3xl font-black text-care-heading mt-1">{summary?.upcomingBooked ?? 0}</span>
-                <span className="block text-[10px] text-care-muted mt-1">Awaiting in-person visit</span>
+                <span className="block text-[10px] text-care-muted mt-1">{t('hospital-admin:awaitingVisit')}</span>
               </div>
               <div className="p-3 bg-care-primary-subtle text-care-success border border-care-success/20 rounded-lg">
                 <Calendar className="w-6 h-6" />
@@ -211,9 +213,9 @@ export default function AdminDashboard() {
 
             <div className="care-surface p-6 flex items-center justify-between">
               <div>
-                <span className="block text-xs font-semibold text-care-muted uppercase">Active Doctors</span>
+                <span className="block text-xs font-semibold text-care-muted uppercase">{t('hospital-admin:activeDoctors')}</span>
                 <span className="block text-3xl font-black text-care-heading mt-1">{summary?.activeDoctors ?? 0}</span>
-                <span className="block text-[10px] text-care-muted mt-1">{summary?.pendingDoctors ?? 0} pending onboarding</span>
+                <span className="block text-[10px] text-care-muted mt-1">{t('hospital-admin:pendingOnboarding', { count: summary?.pendingDoctors ?? 0 })}</span>
               </div>
               <div className="p-3 bg-care-primary-subtle text-care-primary border border-care-primary/20 rounded-lg">
                 <ClipboardCheck className="w-6 h-6" />
@@ -227,28 +229,28 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('onboarding')}
               className={`care-segment ${activeTab === 'onboarding' ? 'care-segment-active' : ''}`}
             >
-              Onboarding Registry
+              {t('hospital-admin:onboardingRegistry')}
             </button>
             <button
               onClick={() => setActiveTab('schedule')}
               className={`care-segment ${activeTab === 'schedule' ? 'care-segment-active' : ''}`}
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>Schedule Oversight</span>
+              <span>{t('hospital-admin:scheduleOversight')}</span>
             </button>
             <button
               onClick={() => setActiveTab('doctors')}
               className={`care-segment ${activeTab === 'doctors' ? 'care-segment-active' : ''}`}
             >
               <UserCog className="w-3.5 h-3.5" />
-              <span>Doctor Profiles</span>
+              <span>{t('hospital-admin:doctorProfiles')}</span>
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
               className={`care-segment ${activeTab === 'analytics' ? 'care-segment-active' : ''}`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>Analytics Board</span>
+              <span>{t('hospital-admin:analyticsBoard')}</span>
             </button>
           </div>
 
@@ -261,10 +263,10 @@ export default function AdminDashboard() {
                   <div className="p-2 bg-care-primary-subtle text-care-primary rounded-lg border border-care-primary/20">
                     <UserPlus className="w-5 h-5" />
                   </div>
-                  <h3 className="text-lg font-bold">Invite Practitioner</h3>
+                  <h3 className="text-lg font-bold">{t('hospital-admin:invitePractitioner')}</h3>
                 </div>
                 <p className="text-xs text-care-muted mb-6 leading-relaxed">
-                  Send an invitation to a registered practitioner to request affiliation with your hospital.
+                  {t('hospital-admin:invitePractitionerCopy')}
                 </p>
 
                 {inviteError && (
@@ -283,7 +285,7 @@ export default function AdminDashboard() {
 
                 <form onSubmit={handleInvite} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-care-muted uppercase mb-1">Doctor Email</label>
+                    <label className="block text-xs font-semibold text-care-muted uppercase mb-1">{t('hospital-admin:doctorEmail')}</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 w-4.5 h-4.5 text-care-muted" />
                       <input
@@ -305,10 +307,10 @@ export default function AdminDashboard() {
                     {inviteLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Inviting...</span>
+                        <span>{t('hospital-admin:inviting')}</span>
                       </>
                     ) : (
-                      <span>Send Invitation</span>
+                      <span>{t('hospital-admin:sendInvitation')}</span>
                     )}
                   </button>
                 </form>
@@ -316,7 +318,7 @@ export default function AdminDashboard() {
 
               {/* Pending Approvals List */}
               <div className="lg:col-span-2 care-surface p-6">
-                <h3 className="text-lg font-bold mb-6">Onboarding Requests</h3>
+                <h3 className="text-lg font-bold mb-6">{t('hospital-admin:onboardingRequests')}</h3>
 
                 {error && (
                   <div className="mb-4 p-3 bg-care-neutral border border-care-danger/20 text-care-danger rounded-lg flex items-start text-xs">
@@ -328,11 +330,11 @@ export default function AdminDashboard() {
                 {loading ? (
                   <div className="py-12 flex flex-col items-center justify-center text-care-muted">
                     <Loader2 className="w-8 h-8 animate-spin mb-3 text-care-primary" />
-                    <span className="text-sm">Fetching pending practitioner profiles...</span>
+                    <span className="text-sm">{t('hospital-admin:fetchingPendingProfiles')}</span>
                   </div>
                 ) : pendingDoctors.length === 0 ? (
                   <div className="portal-empty-state">
-                    No pending onboarding requests found for your hospital.
+                    {t('hospital-admin:noPendingRequests')}
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -343,8 +345,8 @@ export default function AdminDashboard() {
                             <h4 className="font-bold text-care-body text-base leading-tight">{doctor.fullName}</h4>
                             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-care-muted">
                               <span className="text-care-primary-hover font-semibold">{doctor.specialization}</span>
-                              <span>Lic: {doctor.licenseNo}</span>
-                              <span>{doctor.yearsExperience} Years Exp</span>
+                              <span>{t('hospital-admin:license', { license: doctor.licenseNo })}</span>
+                              <span>{t('hospital-admin:yearsExperience', { years: doctor.yearsExperience })}</span>
                             </div>
                             {doctor.bio && (
                               <p className="text-xs text-care-muted mt-2 italic leading-relaxed">
@@ -352,7 +354,7 @@ export default function AdminDashboard() {
                               </p>
                             )}
                             <div className="text-xs text-care-muted mt-1 font-mono">
-                              Contact: {doctor.email} {doctor.phone && `| ${doctor.phone}`}
+                              {t('hospital-admin:contact')}: {doctor.email} {doctor.phone && `| ${doctor.phone}`}
                             </div>
                           </div>
 
@@ -360,14 +362,14 @@ export default function AdminDashboard() {
                             <button
                               onClick={() => handleAction(doctor.id, 'reject')}
                               className="p-2 bg-care-neutral hover:bg-care-primary-hover text-care-danger hover:text-care-surface rounded-lg border border-care-danger/20 hover:border-transparent transition-all"
-                              title="Reject Request"
+                              title={t('hospital-admin:rejectRequest')}
                             >
                               <X className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleAction(doctor.id, 'approve')}
                               className="p-2 bg-care-primary-subtle hover:bg-care-primary-hover text-care-success hover:text-care-surface rounded-lg border border-care-success/20 hover:border-transparent transition-all"
-                              title="Approve & Activate"
+                              title={t('hospital-admin:approveActivate')}
                             >
                               <Check className="w-4 h-4" />
                             </button>
@@ -398,7 +400,7 @@ export default function AdminDashboard() {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-neutral py-4 text-center text-xs text-care-muted">
-        &copy; 2026 Swasthya Sarthi Platform. Secure Administration Node.
+        {t('hospital-admin:footer')}
       </footer>
 
       {profileOpen && (
@@ -410,11 +412,11 @@ export default function AdminDashboard() {
                   <UserCog className="h-5 w-5" />
                 </span>
                 <div>
-                  <h2 id="admin-profile-title" className="text-xl font-bold text-care-heading">Edit administrator profile</h2>
-                  <p className="text-sm text-care-muted">Update your personal hospital account details.</p>
+                  <h2 id="admin-profile-title" className="text-xl font-bold text-care-heading">{t('hospital-admin:editProfileTitle')}</h2>
+                  <p className="text-sm text-care-muted">{t('hospital-admin:editProfileCopy')}</p>
                 </div>
               </div>
-              <button type="button" onClick={() => setProfileOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-lg text-care-muted transition-colors hover:bg-care-neutral hover:text-care-heading" aria-label="Close profile editor">
+              <button type="button" onClick={() => setProfileOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-lg text-care-muted transition-colors hover:bg-care-neutral hover:text-care-heading" aria-label={t('hospital-admin:closeProfileEditor')}>
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -426,18 +428,18 @@ export default function AdminDashboard() {
               <ProfilePhotoUploader user={user} onUpload={uploadProfilePhoto} onRemove={removeProfilePhoto} />
 
               <label className="block space-y-1.5 text-sm font-semibold text-care-heading">
-                Full name
+                {t('hospital-admin:fullName')}
                 <input required minLength={2} maxLength={100} value={profileForm.fullName} onChange={event => setProfileForm(current => ({ ...current, fullName: event.target.value }))} className="care-input font-normal" />
               </label>
               <label className="block space-y-1.5 text-sm font-semibold text-care-heading">
-                Email address
+                {t('hospital-admin:emailAddress')}
                 <span className="relative block">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-care-muted" />
                   <input disabled value={user?.email || ''} className="w-full cursor-not-allowed rounded-lg border border-care-border bg-care-neutral py-2.5 pl-10 pr-3 font-normal text-care-muted" />
                 </span>
               </label>
               <label className="block space-y-1.5 text-sm font-semibold text-care-heading">
-                Phone number
+                {t('hospital-admin:phoneNumber')}
                 <span className="relative block">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-care-muted" />
                   <input type="tel" placeholder="+91 98765 43210" value={profileForm.phone} onChange={event => setProfileForm(current => ({ ...current, phone: event.target.value }))} className="care-input pl-10 font-normal" />
@@ -445,16 +447,16 @@ export default function AdminDashboard() {
               </label>
 
               <div className="rounded-lg border border-care-border bg-care-neutral px-4 py-3">
-                <span className="block text-xs font-semibold uppercase text-care-muted">Assigned hospital</span>
-                <span className="mt-1 block font-semibold text-care-heading">{user?.hospital_name || 'Hospital assignment unavailable'}</span>
+                <span className="block text-xs font-semibold uppercase text-care-muted">{t('hospital-admin:assignedHospital')}</span>
+                <span className="mt-1 block font-semibold text-care-heading">{user?.hospital_name || t('common:hospitalUnavailable')}</span>
                 {user?.hospital_address && <span className="mt-1 block truncate text-xs text-care-muted">{user.hospital_address}</span>}
               </div>
 
               <div className="flex justify-end gap-3 border-t border-care-border pt-5">
-                <button type="button" onClick={() => setProfileOpen(false)} className="min-h-10 rounded-lg border border-care-border bg-care-surface px-4 text-sm font-semibold text-care-heading transition-colors hover:bg-care-neutral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">Cancel</button>
+                <button type="button" onClick={() => setProfileOpen(false)} className="min-h-10 rounded-lg border border-care-border bg-care-surface px-4 text-sm font-semibold text-care-heading transition-colors hover:bg-care-neutral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">{t('common:cancel')}</button>
                 <button type="submit" disabled={profileSaving} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-care-primary px-4 text-sm font-semibold text-care-surface transition-colors hover:bg-care-primary-hover disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2">
                   {profileSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                  {profileSaving ? 'Saving...' : 'Save changes'}
+                  {profileSaving ? t('hospital-admin:saving') : t('hospital-admin:saveChanges')}
                 </button>
               </div>
             </form>

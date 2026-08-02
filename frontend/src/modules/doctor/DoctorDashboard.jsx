@@ -6,6 +6,7 @@ import PortalHeader from '../../shared/PortalHeader';
 import ProfilePhotoUploader from '../../shared/ProfilePhotoUploader';
 import { StatusBadge } from '../../shared/ui/Badge';
 import { API_URL } from '../../lib/api';
+import { useTranslation } from 'react-i18next';
 
 function toLocalDateTimeInput(date) {
   const offset = date.getTimezoneOffset() * 60 * 1000;
@@ -13,6 +14,7 @@ function toLocalDateTimeInput(date) {
 }
 
 export default function DoctorDashboard() {
+  const { t } = useTranslation(['doctor-portal', 'common']);
   const { user, token, logout, uploadProfilePhoto, removeProfilePhoto } = useAuth();
   
   const [activeTab, setActiveTab] = useState('queue'); // 'queue', 'availability', 'timeoff'
@@ -397,16 +399,16 @@ export default function DoctorDashboard() {
     <div className="care-shell portal-dashboard flex flex-col justify-between">
       <div>
         <PortalHeader
-          role="Doctor portal"
+          role={t('doctor-portal:portalRole')}
           userLabel={`Dr. ${user?.full_name || ''}`}
           onLogout={logout}
           profile={{
             id: user?.id,
-            name: `Dr. ${user?.full_name || 'Doctor'}`,
-            label: 'Doctor profile',
+            name: `Dr. ${user?.full_name || t('doctor-portal:doctorFallback')}`,
+            label: t('doctor-portal:profile'),
             email: user?.email,
             phone: user?.phone,
-            organization: affiliates[0]?.name || 'Affiliated care network',
+            organization: affiliates[0]?.name || t('doctor-portal:affiliatedNetwork'),
             avatarUrl: user?.avatar_url
           }}
           onEditProfile={() => setProfileOpen(true)}
@@ -417,9 +419,9 @@ export default function DoctorDashboard() {
           <div className="portal-page-header">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <span className="care-eyebrow">Clinical workspace</span>
-                <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-care-heading">Today's care schedule</h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-care-muted">Review today's physical visits, publish weekly hours, and manage planned or emergency leave.</p>
+                <span className="care-eyebrow">{t('doctor-portal:clinicalWorkspace')}</span>
+                <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-care-heading">{t('doctor-portal:careScheduleTitle')}</h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-care-muted">{t('doctor-portal:careScheduleCopy')}</p>
               </div>
               <button
                 type="button"
@@ -427,7 +429,7 @@ export default function DoctorDashboard() {
                 disabled={Boolean(activeLeave)}
                 className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-care-danger bg-care-surface px-4 text-sm font-semibold text-care-danger shadow-sm transition-colors hover:bg-care-surface disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Siren className="h-4 w-4" /> {activeLeave ? 'Currently on leave' : 'Emergency leave'}
+                <Siren className="h-4 w-4" /> {activeLeave ? t('doctor-portal:currentlyOnLeave') : t('doctor-portal:emergencyLeave')}
               </button>
             </div>
             {emergencyLeaveMessage && (
@@ -438,12 +440,12 @@ export default function DoctorDashboard() {
                 <div className="flex items-start gap-3">
                 <Moon className="mt-0.5 h-5 w-5 shrink-0 text-care-warning" />
                 <div>
-                  <strong className="block text-sm">You are currently marked on leave</strong>
+                  <strong className="block text-sm">{t('doctor-portal:markedOnLeave')}</strong>
                   <p className="mt-1 text-xs leading-5">Until {new Date(activeLeave.end_datetime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}{activeLeave.reason ? ` · ${activeLeave.reason}` : ''}</p>
                 </div>
                 </div>
                 <button type="button" onClick={() => { setEndLeaveError(''); setEndLeaveOpen(true); }} className="inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-care-warning bg-care-surface px-3 text-xs font-semibold text-care-warning hover:bg-care-surface">
-                  <X className="h-3.5 w-3.5" /> End leave now
+                  <X className="h-3.5 w-3.5" /> {t('doctor-portal:endLeaveNow')}
                 </button>
               </div>
             )}
@@ -456,21 +458,21 @@ export default function DoctorDashboard() {
               className={`care-segment ${activeTab === 'queue' ? 'care-segment-active' : ''}`}
             >
               <User className="w-4 h-4" />
-              <span>Today's Appointments</span>
+              <span>{t('doctor-portal:todayAppointments')}</span>
             </button>
             <button
               onClick={() => setActiveTab('availability')}
               className={`care-segment ${activeTab === 'availability' ? 'care-segment-active' : ''}`}
             >
               <Clock className="w-4 h-4" />
-              <span>Weekly Availability</span>
+              <span>{t('doctor-portal:weeklyAvailability')}</span>
             </button>
             <button
               onClick={() => setActiveTab('timeoff')}
               className={`care-segment ${activeTab === 'timeoff' ? 'care-segment-active' : ''}`}
             >
               <Moon className="w-4 h-4" />
-              <span>Blocked Leave</span>
+              <span>{t('doctor-portal:blockedLeave')}</span>
             </button>
           </div>
 
@@ -481,7 +483,7 @@ export default function DoctorDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="care-surface p-6 relative overflow-hidden flex items-center justify-between">
                   <div className="space-y-1">
-                    <span className="text-xs font-semibold text-care-muted uppercase block">Today's Total Patients</span>
+                    <span className="text-xs font-semibold text-care-muted uppercase block">{t('doctor-portal:todayTotalPatients')}</span>
                     <span className="text-4xl font-black text-care-heading block">{totalPatientsCount}</span>
                   </div>
                   <div className="p-3 bg-care-primary-subtle text-care-success border border-care-success/20 rounded-lg">
@@ -491,7 +493,7 @@ export default function DoctorDashboard() {
 
                 <div className="care-surface p-6 relative overflow-hidden flex items-center justify-between">
                   <div className="space-y-1">
-                    <span className="text-xs font-semibold text-care-muted uppercase block">Remaining Appointments</span>
+                    <span className="text-xs font-semibold text-care-muted uppercase block">{t('doctor-portal:remainingAppointments')}</span>
                     <span className="text-4xl font-black text-care-heading block">{remainingPatientsCount}</span>
                   </div>
                   <div className="p-3 bg-care-primary-subtle text-care-primary border border-care-primary/20 rounded-lg">
@@ -504,16 +506,16 @@ export default function DoctorDashboard() {
               <div className="care-surface p-6 md:p-8">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="portal-panel-title text-lg font-bold">In-Person Appointment Queue</h3>
-                    <p className="mt-1 text-xs text-care-muted">Patients attend at the hospital or clinic shown below.</p>
+                    <h3 className="portal-panel-title text-lg font-bold">{t('doctor-portal:appointmentQueue')}</h3>
+                    <p className="mt-1 text-xs text-care-muted">{t('doctor-portal:appointmentQueueCopy')}</p>
                   </div>
                   <button
                     onClick={fetchQueue}
                     className="care-button-ghost care-button-sm"
-                    title="Refresh Queue"
+                    title={t('doctor-portal:refreshQueue')}
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Refresh</span>
+                    <span>{t('doctor-portal:refresh')}</span>
                   </button>
                 </div>
 
@@ -527,11 +529,11 @@ export default function DoctorDashboard() {
                 {queueLoading ? (
                   <div className="py-16 flex flex-col items-center justify-center text-care-muted">
                     <Loader2 className="w-8 h-8 animate-spin text-care-success mb-3" />
-                    <span className="text-sm">Fetching queue directory...</span>
+                    <span className="text-sm">{t('doctor-portal:fetchingQueue')}</span>
                   </div>
                 ) : queue.length === 0 ? (
                   <div className="portal-empty-state">
-                    No in-person appointments scheduled for today.
+                    {t('doctor-portal:noAppointmentsToday')}
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -539,10 +541,10 @@ export default function DoctorDashboard() {
                       <div key={app.id} className="care-card care-card-hover p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="space-y-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h4 className="font-bold text-care-body text-base">{app.patient?.fullName || 'Anonymous Patient'}</h4>
+                            <h4 className="font-bold text-care-body text-base">{app.patient?.fullName || t('doctor-portal:anonymousPatient')}</h4>
                             {app.appointmentType === 'emergency' && (
                               <span className="inline-flex items-center gap-1 rounded-md border border-care-danger bg-care-surface px-2 py-1 text-[10px] font-bold uppercase text-care-danger">
-                                <Siren className="h-3 w-3" /> Emergency priority
+                                <Siren className="h-3 w-3" /> {t('doctor-portal:emergencyPriority')}
                               </span>
                             )}
                           </div>
@@ -560,7 +562,7 @@ export default function DoctorDashboard() {
                         <div className="flex items-center space-x-6 shrink-0 self-end md:self-center">
                           <div className="text-right">
                             <span className="block text-sm font-extrabold text-care-muted">{formatSlotTime(app.appointmentTime)}</span>
-                            <span className="block text-[9px] font-semibold text-care-muted uppercase mt-0.5">Today</span>
+                            <span className="block text-[9px] font-semibold text-care-muted uppercase mt-0.5">{t('doctor-portal:today')}</span>
                           </div>
                           
                           {app.status === 'booked' ? (
@@ -569,7 +571,7 @@ export default function DoctorDashboard() {
                                 onClick={() => fetchPatientHistory(app.patient)}
                                 disabled={!app.patient?.id}
                                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-care-border bg-care-surface text-care-muted hover:border-care-primary hover:bg-care-primary-subtle hover:text-care-heading"
-                                title="Patient History"
+                                title={t('doctor-portal:patientHistory')}
                               >
                                 <BookOpen className="w-4 h-4" />
                               </button>
@@ -577,7 +579,7 @@ export default function DoctorDashboard() {
                                 onClick={() => setSelectedConsult(app)}
                                 className="py-1.5 px-3 bg-care-primary hover:bg-care-primary-hover text-care-surface text-xs font-semibold rounded-lg shadow-md shadow-care-primary/10 active:scale-95 transition-all"
                               >
-                                Record Visit
+                                {t('doctor-portal:recordVisit')}
                               </button>
                             </div>
                           ) : (
@@ -1031,23 +1033,23 @@ export default function DoctorDashboard() {
                   <User className="h-5 w-5" />
                 </span>
                 <div>
-                  <h2 id="doctor-profile-title" className="text-xl font-bold text-care-heading">Doctor profile picture</h2>
-                  <p className="text-sm text-care-muted">Add a clear professional photo for your Swasthya Sarthi profile.</p>
+                  <h2 id="doctor-profile-title" className="text-xl font-bold text-care-heading">{t('doctor-portal:profilePictureTitle')}</h2>
+                  <p className="text-sm text-care-muted">{t('doctor-portal:profilePictureCopy')}</p>
                 </div>
               </div>
-              <button type="button" onClick={() => setProfileOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-lg text-care-muted transition-colors hover:bg-care-neutral hover:text-care-heading" aria-label="Close profile editor">
+              <button type="button" onClick={() => setProfileOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-lg text-care-muted transition-colors hover:bg-care-neutral hover:text-care-heading" aria-label={t('doctor-portal:closeProfileEditor')}>
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div className="space-y-5 p-6">
               <ProfilePhotoUploader user={user} onUpload={uploadProfilePhoto} onRemove={removeProfilePhoto} />
               <div className="rounded-lg border border-care-border bg-care-neutral px-4 py-3">
-                <span className="block text-xs font-semibold uppercase text-care-muted">Signed-in practitioner</span>
-                <span className="mt-1 block font-semibold text-care-heading">Dr. {user?.full_name || 'Doctor'}</span>
-                <span className="mt-1 block truncate text-xs text-care-muted">{user?.email || 'Email not available'}</span>
+                <span className="block text-xs font-semibold uppercase text-care-muted">{t('doctor-portal:signedInPractitioner')}</span>
+                <span className="mt-1 block font-semibold text-care-heading">Dr. {user?.full_name || t('doctor-portal:doctorFallback')}</span>
+                <span className="mt-1 block truncate text-xs text-care-muted">{user?.email || t('common:emailNotAvailable')}</span>
               </div>
               <div className="flex justify-end border-t border-care-border pt-5">
-                <button type="button" onClick={() => setProfileOpen(false)} className="min-h-10 rounded-lg bg-care-primary px-4 text-sm font-semibold text-care-surface transition-colors hover:bg-care-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2">Done</button>
+                <button type="button" onClick={() => setProfileOpen(false)} className="min-h-10 rounded-lg bg-care-primary px-4 text-sm font-semibold text-care-surface transition-colors hover:bg-care-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2">{t('doctor-portal:done')}</button>
               </div>
             </div>
           </div>
@@ -1065,14 +1067,14 @@ export default function DoctorDashboard() {
             <button
               type="button"
               onClick={() => setPatientHistory(null)}
-              aria-label="Close patient history"
+              aria-label={t('doctor-portal:closePatientHistory')}
               className="absolute top-4 right-4 text-care-muted hover:text-care-heading transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="mb-6">
-              <h3 id="patient-history-title" className="text-xl font-bold text-care-heading">Patient History</h3>
+              <h3 id="patient-history-title" className="text-xl font-bold text-care-heading">{t('doctor-portal:patientHistory')}</h3>
               <p className="text-xs text-care-muted mt-1">{patientHistory.patient?.fullName} · {patientHistory.patient?.email}</p>
             </div>
 
@@ -1085,11 +1087,11 @@ export default function DoctorDashboard() {
             {patientHistoryLoading ? (
               <div className="py-12 flex flex-col items-center justify-center text-care-muted">
                 <Loader2 className="w-6 h-6 animate-spin text-care-success mb-2" />
-                <span className="text-xs">Loading history...</span>
+                <span className="text-xs">{t('doctor-portal:loadingHistory')}</span>
               </div>
             ) : patientHistory.history.length === 0 ? (
               <div className="py-12 text-center border border-care-border rounded-lg text-care-muted text-sm">
-                No previous visits found with this patient.
+                {t('doctor-portal:noPreviousVisits')}
               </div>
             ) : (
               <div className="space-y-4">
@@ -1129,7 +1131,7 @@ export default function DoctorDashboard() {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-neutral py-4 text-center text-xs text-care-muted">
-        &copy; 2026 Swasthya Sarthi Platform. Verified Practitioner Administration.
+        {t('doctor-portal:footer')}
       </footer>
     </div>
   );
