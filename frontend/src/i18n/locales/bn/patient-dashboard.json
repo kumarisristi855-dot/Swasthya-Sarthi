@@ -17,5 +17,39 @@
   "footer": "Swasthya Sarthi Platform. AI ডায়াগনস্টিক ও লোকেশন নোড.",
   "appointmentUpcoming": "আসন্ন",
   "appointmentCancelled": "বাতিল",
-  "appointmentCompleted": "সম্পূর্ণ"
+  "appointmentCompleted": "সম্পূর্ণ",
+  "symptomFinderTitle": "AI উপসর্গ ফাইন্ডার",
+  "symptomFinderCopy": "আপনার শারীরিক উপসর্গ বিস্তারিত লিখুন। ট্রায়াজ ইঞ্জিন বিশেষজ্ঞ সুপারিশ করবে এবং জরুরিতা মূল্যায়ন করবে।",
+  "symptomPlaceholder": "উপসর্গ লিখুন (যেমন ২ দিন ধরে ত্বকে র‍্যাশ, বা বুকে ব্যথা...)",
+  "tryExample": "একটি উদাহরণ চেষ্টা করুন",
+  "matchingSpecialty": "বিশেষত্ব মিলানো হচ্ছে...",
+  "analyzeSymptoms": "উপসর্গ বিশ্লেষণ করুন",
+  "howItWorks": "এটি কীভাবে কাজ করে",
+  "stepLabel": "ধাপ {{step}}",
+  "exampleSymptoms": {
+    "feverBodyAches": "জ্বর ও শরীর ব্যথা",
+    "persistentHeadache": "ক্রমাগত মাথাব্যথা",
+    "itchySkinRash": "চুলকানিযুক্ত ত্বকের র‍্যাশ",
+    "chestPain": "বুকে ব্যথা",
+    "stomachPain": "পেট ব্যথা",
+    "coughBreathlessness": "কাশি ও শ্বাসকষ্ট"
+  },
+  "howSteps": {
+    "describe": {
+      "title": "উপসর্গ লিখুন",
+      "text": "সময়কাল, তীব্রতা এবং কোথায় অস্বস্তি হচ্ছে তা লিখুন।"
+    },
+    "match": {
+      "title": "সঠিক চিকিৎসা মেলান",
+      "text": "Swasthya Sarthi আপনার বিবরণকে যাচাইকৃত বিশেষত্বের সঙ্গে মেলায়।"
+    },
+    "choose": {
+      "title": "প্রদানকারী বেছে নিন",
+      "text": "বুকিংয়ের আগে কাছাকাছি ডাক্তার ও হাসপাতাল পর্যালোচনা করুন।"
+    }
+  },
+  "viewFacilityProfile": "সুবিধার প্রোফাইল দেখুন",
+  "getDirections": "দিকনির্দেশ পান",
+  "showMore": "আরও দেখুন",
+  "showingFacilities": "{{total}}টির মধ্যে {{visible}}টি সুবিধা দেখানো হচ্ছে"
 }

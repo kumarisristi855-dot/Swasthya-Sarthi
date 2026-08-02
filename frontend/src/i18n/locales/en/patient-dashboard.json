@@ -17,5 +17,39 @@
   "footer": "Swasthya Sarthi Platform. AI Diagnostic & Location Node.",
   "appointmentUpcoming": "Upcoming",
   "appointmentCancelled": "Cancelled",
-  "appointmentCompleted": "Completed"
+  "appointmentCompleted": "Completed",
+  "symptomFinderTitle": "AI Symptom Finder",
+  "symptomFinderCopy": "Describe your physical symptoms in detail. The triage engine will recommend specialists and evaluate urgency.",
+  "symptomPlaceholder": "Describe symptoms (e.g. skin rash for 2 days, or chest pain...)",
+  "tryExample": "Try an example",
+  "matchingSpecialty": "Matching Specialty...",
+  "analyzeSymptoms": "Analyze Symptoms",
+  "howItWorks": "How it works",
+  "stepLabel": "STEP {{step}}",
+  "exampleSymptoms": {
+    "feverBodyAches": "Fever and body aches",
+    "persistentHeadache": "Persistent headache",
+    "itchySkinRash": "Itchy skin rash",
+    "chestPain": "Chest pain",
+    "stomachPain": "Stomach pain",
+    "coughBreathlessness": "Cough and breathlessness"
+  },
+  "howSteps": {
+    "describe": {
+      "title": "Describe symptoms",
+      "text": "Include duration, severity, and where you feel discomfort."
+    },
+    "match": {
+      "title": "Match the right care",
+      "text": "Swasthya Sarthi maps your description to a verified specialty."
+    },
+    "choose": {
+      "title": "Choose a provider",
+      "text": "Review nearby doctors and hospitals before booking."
+    }
+  },
+  "viewFacilityProfile": "View Facility Profile",
+  "getDirections": "Get directions",
+  "showMore": "Show more",
+  "showingFacilities": "Showing {{visible}} of {{total}} facilities"
 }

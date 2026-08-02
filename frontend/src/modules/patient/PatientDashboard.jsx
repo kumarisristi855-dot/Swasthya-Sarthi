@@ -162,13 +162,13 @@ const specializationAliases = {
   Nephrologist: ['nephrology', 'kidney', 'renal']
 };
 
-const exampleSymptoms = [
-  'Fever and body aches',
-  'Persistent headache',
-  'Itchy skin rash',
-  'Chest pain',
-  'Stomach pain',
-  'Cough and breathlessness'
+const exampleSymptomKeys = [
+  'feverBodyAches',
+  'persistentHeadache',
+  'itchySkinRash',
+  'chestPain',
+  'stomachPain',
+  'coughBreathlessness'
 ];
 
 function stateForLocation(locationName) {
@@ -1292,7 +1292,7 @@ export default function PatientDashboard() {
                               to={`/patient/hospital/${h.id}`}
                               className={buttonStyles({ block: true, size: 'sm' })}
                             >
-                              View Facility Profile
+                              {t('viewFacilityProfile')}
                             </Link>
                             {hospitalDirectionsUrl(h) && (
                               <a
@@ -1302,7 +1302,7 @@ export default function PatientDashboard() {
                                 className={buttonStyles({ variant: 'secondary', block: true, size: 'sm' })}
                               >
                                 <Navigation className="h-4 w-4" />
-                                Get directions
+                                {t('getDirections')}
                                 <ExternalLink className="h-3.5 w-3.5" />
                               </a>
                             )}
@@ -1314,14 +1314,14 @@ export default function PatientDashboard() {
                     {!loading && visibleHospitalCount < filteredHospitals.length && (
                       <div className="flex items-center justify-between gap-4 border-t border-care-border pt-4">
                         <span className="text-xs care-muted">
-                          Showing {visibleHospitals.length} of {filteredHospitals.length} facilities
+                          {t('showingFacilities', { visible: visibleHospitals.length, total: filteredHospitals.length })}
                         </span>
                         <button
                           type="button"
                           onClick={() => setVisibleHospitalCount(count => count + 24)}
                           className="care-button-secondary"
                         >
-                          Show more
+                          {t('showMore')}
                         </button>
                       </div>
                     )}
@@ -1333,9 +1333,9 @@ export default function PatientDashboard() {
               {activeTab === 'symptoms' && (
                 <div className="care-tab-panel space-y-6">
                   <div className="space-y-1">
-                    <h3 className="text-xl font-bold text-care-heading">AI Symptom Finder</h3>
+                    <h3 className="text-xl font-bold text-care-heading">{t('symptomFinderTitle')}</h3>
                     <p className="text-xs text-care-muted leading-relaxed">
-                      Describe your physical symptoms in detail. The triage engine will recommend specialists and evaluate urgency.
+                      {t('symptomFinderCopy')}
                     </p>
                   </div>
 
@@ -1345,26 +1345,29 @@ export default function PatientDashboard() {
                       rows={3}
                       value={symptomInput}
                       onChange={(e) => setSymptomInput(e.target.value)}
-                      placeholder="Describe symptoms (e.g. skin rash for 2 days, or chest pain...)"
+                      placeholder={t('symptomPlaceholder')}
                       className="patient-input w-full rounded-lg p-3 text-sm resize-none"
                     />
 
                     <div>
-                      <span className="mb-2 block text-xs font-semibold text-care-muted">Try an example</span>
+                      <span className="mb-2 block text-xs font-semibold text-care-muted">{t('tryExample')}</span>
                       <div className="flex flex-wrap gap-2">
-                        {exampleSymptoms.map(example => (
-                          <button
-                            key={example}
-                            type="button"
-                            onClick={() => {
-                              setSymptomInput(example);
-                              setAiError('');
-                            }}
-                            className="patient-chip rounded-md border px-3 py-2 text-xs font-semibold"
-                          >
-                            {example}
-                          </button>
-                        ))}
+                        {exampleSymptomKeys.map(exampleKey => {
+                          const example = t(`exampleSymptoms.${exampleKey}`);
+                          return (
+                            <button
+                              key={exampleKey}
+                              type="button"
+                              onClick={() => {
+                                setSymptomInput(example);
+                                setAiError('');
+                              }}
+                              className="patient-chip rounded-md border px-3 py-2 text-xs font-semibold"
+                            >
+                              {example}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -1383,12 +1386,12 @@ export default function PatientDashboard() {
                       {aiLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Matching Specialty...</span>
+                          <span>{t('matchingSpecialty')}</span>
                         </>
                       ) : (
                         <>
                           <Stethoscope className="w-4 h-4" />
-                          <span>Analyze Symptoms</span>
+                          <span>{t('analyzeSymptoms')}</span>
                         </>
                       )}
                     </button>
@@ -1396,19 +1399,19 @@ export default function PatientDashboard() {
 
                   {!aiResult && (
                     <Card className="mt-2">
-                      <h4 className="text-base font-bold text-care-heading">How it works</h4>
+                      <h4 className="text-base font-bold text-care-heading">{t('howItWorks')}</h4>
                       <div className="mt-5 grid gap-5 sm:grid-cols-3">
                         {[
-                          { icon: ClipboardList, step: '1', title: 'Describe symptoms', text: 'Include duration, severity, and where you feel discomfort.' },
-                          { icon: UserRoundSearch, step: '2', title: 'Match the right care', text: 'Swasthya Sarthi maps your description to a verified specialty.' },
-                          { icon: CheckCircle2, step: '3', title: 'Choose a provider', text: 'Review nearby doctors and hospitals before booking.' }
+                          { icon: ClipboardList, step: '1', title: t('howSteps.describe.title'), text: t('howSteps.describe.text') },
+                          { icon: UserRoundSearch, step: '2', title: t('howSteps.match.title'), text: t('howSteps.match.text') },
+                          { icon: CheckCircle2, step: '3', title: t('howSteps.choose.title'), text: t('howSteps.choose.text') }
                         ].map(item => (
                           <div key={item.step} className="flex gap-3 sm:block">
                             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-care-primary bg-care-primary-subtle text-care-primary-hover">
                               {React.createElement(item.icon, { className: 'h-5 w-5' })}
                             </span>
                             <div className="sm:mt-3">
-                              <span className="text-[11px] font-bold text-care-primary-hover">STEP {item.step}</span>
+                              <span className="text-[11px] font-bold text-care-primary-hover">{t('stepLabel', { step: item.step })}</span>
                               <h5 className="mt-1 text-sm font-bold text-care-heading">{item.title}</h5>
                               <p className="mt-1 text-xs leading-5 text-care-muted">{item.text}</p>
                             </div>

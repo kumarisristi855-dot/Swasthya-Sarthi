@@ -17,5 +17,39 @@
   "footer": "Swasthya Sarthi Platform. AI கண்டறிதல் மற்றும் இட ந node.",
   "appointmentUpcoming": "வரவிருக்கும்",
   "appointmentCancelled": "ரத்து செய்யப்பட்டது",
-  "appointmentCompleted": "முடிந்தது"
+  "appointmentCompleted": "முடிந்தது",
+  "symptomFinderTitle": "AI அறிகுறி கண்டுபிடிப்பான்",
+  "symptomFinderCopy": "உங்கள் உடல் அறிகுறிகளை விரிவாக விவரிக்கவும். ட்ரையாஜ் இயந்திரம் நிபுணர்களை பரிந்துரைத்து அவசரத்தன்மையை மதிப்பிடும்.",
+  "symptomPlaceholder": "அறிகுறிகளை எழுதுங்கள் (எ.கா. 2 நாட்களாக தோல் சிரங்கு, அல்லது நெஞ்சு வலி...)",
+  "tryExample": "ஒரு உதாரணத்தை முயற்சிக்கவும்",
+  "matchingSpecialty": "சிறப்புத் துறை பொருத்தப்படுகிறது...",
+  "analyzeSymptoms": "அறிகுறிகளை பகுப்பாய்வு செய்க",
+  "howItWorks": "இது எப்படி செயல்படுகிறது",
+  "stepLabel": "படி {{step}}",
+  "exampleSymptoms": {
+    "feverBodyAches": "காய்ச்சல் மற்றும் உடல் வலி",
+    "persistentHeadache": "தொடர்ச்சியான தலைவலி",
+    "itchySkinRash": "அரிப்பான தோல் சிரங்கு",
+    "chestPain": "நெஞ்சு வலி",
+    "stomachPain": "வயிற்று வலி",
+    "coughBreathlessness": "இருமல் மற்றும் மூச்சுத்திணறல்"
+  },
+  "howSteps": {
+    "describe": {
+      "title": "அறிகுறிகளை விவரிக்கவும்",
+      "text": "காலம், தீவிரம் மற்றும் எங்கு சிரமம் உள்ளது என்பதை சேர்க்கவும்."
+    },
+    "match": {
+      "title": "சரியான பராமரிப்பை பொருத்தவும்",
+      "text": "Swasthya Sarthi உங்கள் விளக்கத்தை சரிபார்க்கப்பட்ட சிறப்புத் துறையுடன் பொருத்துகிறது."
+    },
+    "choose": {
+      "title": "வழங்குநரைத் தேர்வுசெய்க",
+      "text": "பதிவு செய்வதற்கு முன் அருகிலுள்ள மருத்துவர்கள் மற்றும் மருத்துவமனைகளை பார்க்கவும்."
+    }
+  },
+  "viewFacilityProfile": "வசதி சுயவிவரத்தைப் பார்க்கவும்",
+  "getDirections": "வழித்தடம் பெறவும்",
+  "showMore": "மேலும் காண்க",
+  "showingFacilities": "{{total}} வசதிகளில் {{visible}} காட்டப்படுகிறது"
 }

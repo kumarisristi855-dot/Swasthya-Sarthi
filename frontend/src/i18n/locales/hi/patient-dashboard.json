@@ -17,5 +17,39 @@
   "footer": "Swasthya Sarthi Platform. AI डायग्नोस्टिक और लोकेशन नोड.",
   "appointmentUpcoming": "आगामी",
   "appointmentCancelled": "रद्द",
-  "appointmentCompleted": "पूर्ण"
+  "appointmentCompleted": "पूर्ण",
+  "symptomFinderTitle": "AI लक्षण फाइंडर",
+  "symptomFinderCopy": "अपने शारीरिक लक्षणों का विस्तार से वर्णन करें। ट्रायज इंजन विशेषज्ञ सुझाएगा और तात्कालिकता का आकलन करेगा।",
+  "symptomPlaceholder": "लक्षण लिखें (जैसे 2 दिन से त्वचा पर दाने, या छाती में दर्द...)",
+  "tryExample": "उदाहरण आज़माएं",
+  "matchingSpecialty": "विशेषता मिलाई जा रही है...",
+  "analyzeSymptoms": "लक्षणों का विश्लेषण करें",
+  "howItWorks": "यह कैसे काम करता है",
+  "stepLabel": "चरण {{step}}",
+  "exampleSymptoms": {
+    "feverBodyAches": "बुखार और बदन दर्द",
+    "persistentHeadache": "लगातार सिरदर्द",
+    "itchySkinRash": "खुजली वाले त्वचा दाने",
+    "chestPain": "छाती में दर्द",
+    "stomachPain": "पेट में दर्द",
+    "coughBreathlessness": "खांसी और सांस फूलना"
+  },
+  "howSteps": {
+    "describe": {
+      "title": "लक्षण बताएं",
+      "text": "अवधि, गंभीरता और दिक्कत कहां है, यह शामिल करें।"
+    },
+    "match": {
+      "title": "सही देखभाल मिलाएं",
+      "text": "Swasthya Sarthi आपके विवरण को सत्यापित विशेषता से मिलाता है।"
+    },
+    "choose": {
+      "title": "प्रदाता चुनें",
+      "text": "बुकिंग से पहले नज़दीकी डॉक्टरों और अस्पतालों की समीक्षा करें।"
+    }
+  },
+  "viewFacilityProfile": "सुविधा प्रोफाइल देखें",
+  "getDirections": "दिशा-निर्देश पाएं",
+  "showMore": "और दिखाएं",
+  "showingFacilities": "{{total}} में से {{visible}} सुविधाएं दिख रही हैं"
 }

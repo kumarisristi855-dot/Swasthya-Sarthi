@@ -17,5 +17,39 @@
   "footer": "Swasthya Sarthi Platform. AI ಡಯಾಗ್ನೋಸ್ಟಿಕ್ ಮತ್ತು ಸ್ಥಳ ನೊಡ್.",
   "appointmentUpcoming": "ಮುಂಬರುವ",
   "appointmentCancelled": "ರದ್ದು",
-  "appointmentCompleted": "ಪೂರ್ಣಗೊಂಡಿದೆ"
+  "appointmentCompleted": "ಪೂರ್ಣಗೊಂಡಿದೆ",
+  "symptomFinderTitle": "AI ಲಕ್ಷಣ ಹುಡುಕಾಟ",
+  "symptomFinderCopy": "ನಿಮ್ಮ ದೈಹಿಕ ಲಕ್ಷಣಗಳನ್ನು ವಿವರವಾಗಿ ಬರೆಯಿರಿ. ಟ್ರಿಯಾಜ್ ಎಂಜಿನ್ ತಜ್ಞರನ್ನು ಶಿಫಾರಸು ಮಾಡಿ ತುರ್ತುತನವನ್ನು ಅಂದಾಜಿಸುತ್ತದೆ.",
+  "symptomPlaceholder": "ಲಕ್ಷಣಗಳನ್ನು ಬರೆಯಿರಿ (ಉದಾ. 2 ದಿನಗಳಿಂದ ಚರ್ಮದ ರ್ಯಾಶ್, ಅಥವಾ ಎದೆ ನೋವು...)",
+  "tryExample": "ಒಂದು ಉದಾಹರಣೆ ಪ್ರಯತ್ನಿಸಿ",
+  "matchingSpecialty": "ವಿಶೇಷತೆ ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ...",
+  "analyzeSymptoms": "ಲಕ್ಷಣಗಳನ್ನು ವಿಶ್ಲೇಷಿಸಿ",
+  "howItWorks": "ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+  "stepLabel": "ಹಂತ {{step}}",
+  "exampleSymptoms": {
+    "feverBodyAches": "ಜ್ವರ ಮತ್ತು ದೇಹ ನೋವು",
+    "persistentHeadache": "ನಿರಂತರ ತಲೆನೋವು",
+    "itchySkinRash": "ಕೊರೆಯುವ ಚರ್ಮದ ರ್ಯಾಶ್",
+    "chestPain": "ಎದೆ ನೋವು",
+    "stomachPain": "ಹೊಟ್ಟೆ ನೋವು",
+    "coughBreathlessness": "ಕೆಮ್ಮು ಮತ್ತು ಉಸಿರಾಟದ ತೊಂದರೆ"
+  },
+  "howSteps": {
+    "describe": {
+      "title": "ಲಕ್ಷಣಗಳನ್ನು ವಿವರಿಸಿ",
+      "text": "ಅವಧಿ, ತೀವ್ರತೆ ಮತ್ತು ಅಸೌಕರ್ಯ ಇರುವ ಸ್ಥಳವನ್ನು ಸೇರಿಸಿ."
+    },
+    "match": {
+      "title": "ಸರಿಯಾದ ಆರೈಕೆಯನ್ನು ಹೊಂದಿಸಿ",
+      "text": "Swasthya Sarthi ನಿಮ್ಮ ವಿವರಣೆಯನ್ನು ಪರಿಶೀಲಿತ ವಿಶೇಷತೆಗೆ ಹೊಂದಿಸುತ್ತದೆ."
+    },
+    "choose": {
+      "title": "ಪೂರೈಕೆದಾರರನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+      "text": "ಬುಕಿಂಗ್ ಮಾಡುವ ಮೊದಲು ಹತ್ತಿರದ ವೈದ್ಯರು ಮತ್ತು ಆಸ್ಪತ್ರೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ."
+    }
+  },
+  "viewFacilityProfile": "ಸೌಲಭ್ಯ ಪ್ರೊಫೈಲ್ ನೋಡಿ",
+  "getDirections": "ದಿಕ್ಕುಗಳನ್ನು ಪಡೆಯಿರಿ",
+  "showMore": "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
+  "showingFacilities": "{{total}} ಸೌಲಭ್ಯಗಳಲ್ಲಿ {{visible}} ತೋರಿಸಲಾಗುತ್ತಿದೆ"
 }

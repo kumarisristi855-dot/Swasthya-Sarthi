@@ -17,5 +17,39 @@
   "footer": "Swasthya Sarthi Platform. AI డయాగ్నస్టిక్ మరియు లోకేషన్ నోడ్.",
   "appointmentUpcoming": "రాబోయే",
   "appointmentCancelled": "రద్దు",
-  "appointmentCompleted": "పూర్తి"
+  "appointmentCompleted": "పూర్తి",
+  "symptomFinderTitle": "AI లక్షణాల ఫైండర్",
+  "symptomFinderCopy": "మీ శారీరక లక్షణాలను వివరంగా వర్ణించండి. ట్రయాజ్ ఇంజిన్ నిపుణులను సూచించి అత్యవసరతను అంచనా వేస్తుంది.",
+  "symptomPlaceholder": "లక్షణాలు రాయండి (ఉదా. 2 రోజులుగా చర్మంపై దద్దుర్లు, లేదా ఛాతి నొప్పి...)",
+  "tryExample": "ఒక ఉదాహరణ ప్రయత్నించండి",
+  "matchingSpecialty": "స్పెషాలిటీ సరిపోల్చుతోంది...",
+  "analyzeSymptoms": "లక్షణాలను విశ్లేషించండి",
+  "howItWorks": "ఇది ఎలా పనిచేస్తుంది",
+  "stepLabel": "దశ {{step}}",
+  "exampleSymptoms": {
+    "feverBodyAches": "జ్వరం మరియు శరీర నొప్పులు",
+    "persistentHeadache": "నిరంతర తలనొప్పి",
+    "itchySkinRash": "దురదతో కూడిన చర్మ దద్దుర్లు",
+    "chestPain": "ఛాతి నొప్పి",
+    "stomachPain": "కడుపు నొప్పి",
+    "coughBreathlessness": "దగ్గు మరియు శ్వాస తీసుకోవడంలో ఇబ్బంది"
+  },
+  "howSteps": {
+    "describe": {
+      "title": "లక్షణాలను వివరించండి",
+      "text": "వ్యవధి, తీవ్రత మరియు ఎక్కడ అసౌకర్యం ఉందో చేర్చండి."
+    },
+    "match": {
+      "title": "సరైన సంరక్షణను సరిపోల్చండి",
+      "text": "Swasthya Sarthi మీ వివరణను ధృవీకరించిన స్పెషాలిటీతో సరిపోల్చుతుంది."
+    },
+    "choose": {
+      "title": "ప్రొవైడర్‌ను ఎంచుకోండి",
+      "text": "బుకింగ్‌కు ముందు సమీప వైద్యులు మరియు ఆసుపత్రులను పరిశీలించండి."
+    }
+  },
+  "viewFacilityProfile": "సదుపాయం ప్రొఫైల్ చూడండి",
+  "getDirections": "దిశలు పొందండి",
+  "showMore": "మరిన్ని చూపించు",
+  "showingFacilities": "{{total}} సదుపాయాలలో {{visible}} చూపిస్తున్నాం"
 }
