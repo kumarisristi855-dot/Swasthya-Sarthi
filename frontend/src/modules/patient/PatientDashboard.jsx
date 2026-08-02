@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext';
 import { Activity, MapPin, Search, ShieldAlert, Loader2, Navigation, Compass, Award, Stethoscope, AlertTriangle, SlidersHorizontal, ExternalLink, Building2, CalendarPlus, Crosshair, X, ArrowLeft, ClipboardList, UserRoundSearch, CheckCircle2 } from 'lucide-react';
 import { Circle, MapContainer, TileLayer, Marker, Popup, Tooltip, ZoomControl, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import PublicAvailability from '../../shared/PublicAvailability';
 import HospitalOperatingHours from '../../shared/HospitalOperatingHours';
 import OutbreakAlert from '../../shared/OutbreakAlert';
@@ -177,8 +178,23 @@ function nearestSupportedState(latitude, longitude) {
 function ChangeMapView({ center, zoom = 11, focusVersion = 0 }) {
   const map = useMap();
   useEffect(() => {
+    map.invalidateSize();
     map.setView(center, zoom);
   }, [center, focusVersion, map, zoom]);
+  return null;
+}
+
+function MapSizeInvalidator() {
+  const map = useMap();
+
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      map.invalidateSize();
+      window.setTimeout(() => map.invalidateSize(), 150);
+    });
+    return () => window.cancelAnimationFrame(frameId);
+  }, [map]);
+
   return null;
 }
 
@@ -2048,6 +2064,7 @@ export default function PatientDashboard() {
                 center={mapCenter}
                 focusVersion={mapFocusVersion}
               />
+              <MapSizeInvalidator />
             </MapContainer>
             <div className="absolute bottom-6 left-4 z-20 space-y-2 rounded-lg border border-care-border bg-care-surface/95 px-3 py-2 text-xs text-care-body shadow-xl">
               <span className="flex items-center gap-2">
