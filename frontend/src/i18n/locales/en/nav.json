@@ -1,9 +1,11 @@
 {
   "brand": "Swasthya Sarthi",
+  "findDoctors": "Find doctors",
   "services": "Services",
   "doctors": "Doctors",
   "hospitals": "Hospitals",
   "healthGuides": "Health guides",
+  "howItWorks": "How it works",
   "whyBrand": "Why Swasthya Sarthi",
   "myAppointments": "My Appointments",
   "doctorDirectory": "Doctor Directory",

@@ -1,9 +1,11 @@
 {
   "brand": "Swasthya Sarthi",
+  "findDoctors": "மருத்துவர்களைக் கண்டறியுங்கள்",
   "services": "சேவைகள்",
   "doctors": "மருத்துவர்கள்",
   "hospitals": "மருத்துவமனைகள்",
   "healthGuides": "சுகாதார வழிகாட்டிகள்",
+  "howItWorks": "இது எப்படி செயல்படுகிறது",
   "whyBrand": "ஏன் Swasthya Sarthi",
   "myAppointments": "என் அப்பாயிண்ட்மெண்ட்கள்",
   "doctorDirectory": "மருத்துவர் டைரக்டரி",

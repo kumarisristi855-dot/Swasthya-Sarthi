@@ -78,7 +78,9 @@ export default function PublicDoctorProfile() {
               <div className="flex flex-wrap items-center gap-2"><h1 className="text-2xl font-bold text-care-heading sm:text-3xl">{doctor.fullName}</h1><Badge variant={doctor.directoryOnly ? 'info' : 'success'}>{doctor.directoryOnly ? 'Verified directory' : 'Swasthya Sarthi active'}</Badge></div>
               <p className="mt-2 font-semibold text-care-primary-hover">{doctor.specialization}</p>
               <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-care-muted">
-                <span className="inline-flex items-center gap-2"><Award className="h-4 w-4 text-care-muted" /> {doctor.yearsExperience || 0} years experience</span>
+                {Number(doctor.yearsExperience) > 0 && (
+                  <span className="inline-flex items-center gap-2"><Award className="h-4 w-4 text-care-muted" /> {doctor.yearsExperience} years experience</span>
+                )}
                 <DoctorRatingSummary ratingAvg={doctor.ratingAvg} ratingCount={doctor.ratingCount} />
                 {doctor.licenseNo && <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-care-muted" /> Registration {doctor.licenseNo}</span>}
               </div>

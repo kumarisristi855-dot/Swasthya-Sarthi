@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useLocation, useParams, Link } from 'react-router-dom';
 import {
   Building2,
   CalendarPlus,
@@ -22,7 +22,9 @@ import { API_URL } from '../../lib/api';
 
 export default function PublicHospitalProfile() {
   const { id } = useParams();
-  const [hospital, setHospital] = useState(null);
+  const location = useLocation();
+  const linkedHospital = location.state?.hospital;
+  const [hospital, setHospital] = useState(() => linkedHospital || null);
   const [doctors, setDoctors] = useState([]);
   const [bookableDoctors, setBookableDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,9 +45,17 @@ export default function PublicHospitalProfile() {
             // Facility details remain available without Google Places enrichment.
           });
       })
-      .catch(err => setError(err.message || 'Could not load facility'))
+      .catch(err => {
+        if (linkedHospital && assertProductionSafe(linkedHospital)) {
+          setHospital(linkedHospital);
+          setDoctors(productionSafe(linkedHospital.doctors || []));
+          setBookableDoctors(productionSafe(linkedHospital.bookableDoctors || []));
+          return;
+        }
+        setError(err.message || 'Could not load facility');
+      })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, linkedHospital]);
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center gap-3 bg-care-neutral text-care-muted"><Loader2 className="h-6 w-6 animate-spin text-care-primary" /> Loading facility information...</div>;

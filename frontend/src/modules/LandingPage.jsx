@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CircleMarker, MapContainer, TileLayer, useMapEvents } from 'react-leaflet';
 import {
   Activity,
   AlertTriangle,
@@ -9,9 +8,10 @@ import {
   Building2,
   CalendarCheck2,
   Cross,
+  ExternalLink,
+  Filter,
   FlaskConical,
   HeartPulse,
-  Languages,
   Loader2,
   LocateFixed,
   MapPin,
@@ -19,6 +19,8 @@ import {
   Navigation,
   PhoneCall,
   Search,
+  SearchX,
+  ArrowUpDown,
   ShieldCheck,
   Sparkles,
   Stethoscope,
@@ -29,13 +31,25 @@ import heroImage from '../assets/swasthya-sarthi-clinic-hero.jpg';
 import consultationImage from '../assets/care-consultation.jpg';
 import { DoctorRatingSummary, HospitalRatingSummary } from '../shared/HospitalRating';
 import HospitalOperatingHours from '../shared/HospitalOperatingHours';
+import { CardSkeleton } from '../shared/ui/Skeleton';
 import { enrichHospitalsWithGoogleRatings } from '../lib/googleHospitalRatings';
 import diagnosticsImage from '../assets/care-diagnostics.jpg';
 import { API_URL } from '../lib/api';
+import { trackInteraction } from '../lib/analytics';
 import LanguageSwitcher from '../i18n/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
 const LOCATION_SESSION_KEY = 'swasthya-sarthi-public-location';
+const publicNavItems = [
+  { id: 'search-results', labelKey: 'findDoctors' },
+  { id: 'facilities', labelKey: 'hospitals' },
+  { id: 'services', labelKey: 'services' },
+  { id: 'health-guides', labelKey: 'healthGuides' },
+  { id: 'trust', labelKey: 'howItWorks' },
+];
+const DEFAULT_PUBLIC_LOCATION = 'Chas, Bokaro, Jharkhand';
+const searchModeOrder = ['all', 'doctors', 'hospitals', 'symptoms'];
+const LocationMapPicker = lazy(() => import('../shared/LocationMapPicker'));
 
 function loadLocationSelection() {
   try {
@@ -182,7 +196,7 @@ function ResultBadge({ children, tone = 'teal' }) {
     : tone === 'amber'
       ? 'border-care-warning bg-care-surface text-care-warning'
       : 'border-care-primary bg-care-primary-subtle text-care-primary-hover';
-  return <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold ${classes}`}>{children}</span>;
+  return <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold ${classes}`}>{children}</span>;
 }
 
 function hospitalDoctorCount(hospital) {
@@ -216,20 +230,144 @@ function formatFacilityType(type, t) {
     : type || t('landing:facilityTypes.healthcareFacility');
 }
 
-function LocationPin({ position, onChange }) {
-  useMapEvents({
-    click(event) {
-      onChange([event.latlng.lat, event.latlng.lng]);
-    },
-  });
+function hasPublishedOperatingHours(hospital) {
+  return hospital.operatingHours?.status === 'published' && Boolean(
+    hospital.operatingHours?.text ||
+    hospital.operatingHours?.label ||
+    Object.values(hospital.operatingHours?.weekly || {}).some(Boolean)
+  );
+}
 
-  return position ? (
-    <CircleMarker
-      center={position}
-      radius={9}
-      pathOptions={{ color: 'var(--color-surface)', fillColor: 'var(--color-primary)', fillOpacity: 1, weight: 3 }}
-    />
-  ) : null;
+function hasPublishedGoogleRating(hospital) {
+  return Number(hospital.googleRating?.rating) > 0 && Number(hospital.googleRating?.ratingCount) > 0;
+}
+
+function facilityDirectionsUrl(hospital) {
+  if (hospital.googleRating?.googleMapsUrl) return hospital.googleRating.googleMapsUrl;
+  if (!Number.isFinite(Number(hospital.latitude)) || !Number.isFinite(Number(hospital.longitude))) return null;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${hospital.latitude},${hospital.longitude}`)}`;
+}
+
+function formatUpdatedDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+}
+
+function FacilityVerificationBadge({ hospital }) {
+  const { t } = useTranslation(['landing']);
+  const status = hospital.verificationStatus;
+  const key = status === 'verified'
+    ? 'providerVerified'
+    : status === 'community-mapped'
+      ? 'communityMapped'
+      : status === 'pending'
+        ? 'verificationPending'
+        : 'publicSourceVerified';
+  const explanation = t(`landing:facilityCard.${key}Explanation`);
+
+  return (
+    <span
+      className="inline-flex min-h-7 items-center gap-1.5 rounded-md border border-care-border bg-care-neutral px-2 py-1 text-xs font-semibold text-care-body"
+      title={explanation}
+      aria-label={`${t(`landing:facilityCard.${key}`)}. ${explanation}`}
+    >
+      <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-care-primary-hover" aria-hidden="true" />
+      {t(`landing:facilityCard.${key}`)}
+    </span>
+  );
+}
+
+function PublicDoctorCard({ doctor, directoryOnly = false }) {
+  const { t } = useTranslation(['landing']);
+  const hospital = doctor.hospital || doctor.hospitals?.[0] || null;
+  const distance = doctor.distance ?? hospital?.distance;
+  const availableSlots = (doctor.nextAvailableSlots || []).filter(Boolean);
+  const languages = Array.isArray(doctor.languages) ? doctor.languages.filter(Boolean) : [];
+  const hasRating = Number(doctor.ratingAvg) > 0 && Number(doctor.ratingCount) > 0;
+  const updatedDate = formatUpdatedDate(doctor.verifiedAt || doctor.updatedAt);
+
+  return (
+    <article className="care-hover flex min-h-[360px] flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm focus-within:ring-2 focus-within:ring-care-primary">
+      <div className="flex items-start gap-4">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover"><Stethoscope className="h-6 w-6" aria-hidden="true" /></span>
+        <div className="min-w-0">
+          <h4 className="font-bold text-care-heading">{doctor.fullName}</h4>
+          {doctor.credentials && <p className="mt-1 text-xs font-semibold text-care-body">{doctor.credentials}</p>}
+          {doctor.specialization && <p className="mt-1 text-sm font-semibold text-care-primary-hover">{doctor.specialization}</p>}
+          {hospital?.name && <p className="mt-1 line-clamp-2 text-xs leading-5 text-care-muted">{hospital.name}</p>}
+          {hasRating && <DoctorRatingSummary ratingAvg={doctor.ratingAvg} ratingCount={doctor.ratingCount} className="mt-2" />}
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {!directoryOnly && <ResultBadge><BadgeCheck className="h-3 w-3" aria-hidden="true" /> {t('landing:directory.activeProvider')}</ResultBadge>}
+        {distance != null && <ResultBadge tone="blue">{Number(distance).toFixed(1)} km</ResultBadge>}
+        {hospital && <ResultBadge tone="blue">{t('landing:doctorCard.inPerson')}</ResultBadge>}
+        {Number(doctor.consultationFee) > 0 && <ResultBadge tone="amber">INR {Number(doctor.consultationFee).toLocaleString('en-IN')}</ResultBadge>}
+        {Number(doctor.yearsExperience) > 0 && <ResultBadge tone="blue">{t('landing:doctorCard.experience', { count: doctor.yearsExperience })}</ResultBadge>}
+      </div>
+
+      {languages.length > 0 && (
+        <p className="mt-4 text-xs text-care-muted">{t('landing:doctorCard.languages', { languages: languages.join(', ') })}</p>
+      )}
+
+      {availableSlots.length > 0 && (
+        <div className="mt-5 border-t border-care-border pt-4">
+          <span className="text-xs font-bold text-care-muted">{t('landing:directory.nextAvailable')}</span>
+          <p className="mt-2 text-sm font-semibold text-care-primary-hover">{t('landing:directory.tomorrowSlot', { slot: formatSlot(availableSlots[0]) })}</p>
+        </div>
+      )}
+
+      {directoryOnly && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <ResultBadge><BadgeCheck className="h-3 w-3" aria-hidden="true" /> {t('landing:directory.source', { source: doctor.sourceName || t('landing:directory.verifiedDirectory') })}</ResultBadge>
+          {updatedDate && <span className="text-xs text-care-muted">{t('landing:facilityCard.updated', { date: updatedDate })}</span>}
+        </div>
+      )}
+
+      <div className="mt-auto flex flex-col gap-2 pt-5">
+        <Link to={`/doctor/${doctor.id}`} onClick={() => trackInteraction('doctor_result_opened', { listingType: directoryOnly ? 'public_directory' : 'bookable' })} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-care-primary px-4 text-sm font-semibold text-white hover:bg-care-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2">
+          {t('landing:directory.viewProfile')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+        {!directoryOnly && (
+          <Link to={`/doctor/${doctor.id}#availability`} onClick={() => trackInteraction('appointment_availability_checked', { listingType: 'doctor' })} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-care-border px-4 text-sm font-semibold text-care-heading hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">
+            <CalendarCheck2 className="h-4 w-4" aria-hidden="true" /> {t('landing:doctorCard.checkAvailability')}
+          </Link>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function DirectoryEmptyState({ icon: Icon, title, copy, actions = [] }) {
+  return (
+    <div className="rounded-lg border border-dashed border-care-border bg-care-surface px-5 py-10 text-center">
+      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover">
+        <Icon className="h-6 w-6" aria-hidden="true" />
+      </span>
+      <h4 className="mt-4 text-base font-bold text-care-heading">{title}</h4>
+      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-care-muted">{copy}</p>
+      {actions.length > 0 && (
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          {actions.map((action, index) => (
+            <button
+              key={action.label}
+              type="button"
+              onClick={() => {
+                trackInteraction('empty_state_recovery_clicked', { recoveryAction: action.eventName || 'recovery' });
+                action.onClick();
+              }}
+              className={`inline-flex min-h-10 items-center justify-center rounded-md px-4 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2 ${index === 0 ? 'bg-care-primary text-white hover:bg-care-primary-hover' : 'border border-care-border text-care-heading hover:bg-care-primary-subtle'}`}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function LandingPage() {
@@ -238,9 +376,10 @@ export default function LandingPage() {
   const initialLocation = initialLocationRef.current;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [activeNavSection, setActiveNavSection] = useState(publicNavItems[0].id);
   const [searchMode, setSearchMode] = useState('all');
   const [query, setQuery] = useState('');
-  const [location, setLocation] = useState(initialLocation?.location || 'Delhi');
+  const [location, setLocation] = useState(initialLocation?.location || DEFAULT_PUBLIC_LOCATION);
   const [coordinates, setCoordinates] = useState(initialLocation?.coordinates || null);
   const [locationLabel, setLocationLabel] = useState(initialLocation?.locationLabel || t('landing:search.chooseOrEnter'));
   const [locationStatus, setLocationStatus] = useState(initialLocation?.locationStatus || 'prompt');
@@ -252,6 +391,8 @@ export default function LandingPage() {
   const [specializations, setSpecializations] = useState([]);
   const [hospitals, setHospitals] = useState([]);
   const [showAllHospitals, setShowAllHospitals] = useState(false);
+  const [facilityFilter, setFacilityFilter] = useState('all');
+  const [facilitySort, setFacilitySort] = useState('name');
   const [doctors, setDoctors] = useState([]);
   const [directoryDoctors, setDirectoryDoctors] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -261,7 +402,13 @@ export default function LandingPage() {
   const [locationSuggestionOpen, setLocationSuggestionOpen] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [searchSummary, setSearchSummary] = useState(t('landing:directory.headingAround', { location: t('landing:location.india') }));
+  const [verificationDetailsOpen, setVerificationDetailsOpen] = useState(false);
   const locationInputRef = useRef(null);
+  const locationPromptRef = useRef(null);
+  const mapDialogRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
+  const searchTabRefs = useRef({});
   const tomorrow = useMemo(formatTomorrow, []);
 
   useEffect(() => {
@@ -270,6 +417,100 @@ export default function LandingPage() {
     window.addEventListener('scroll', updateHeader, { passive: true });
     return () => window.removeEventListener('scroll', updateHeader);
   }, []);
+
+  useEffect(() => {
+    const updateActiveSection = () => {
+      const visibleSection = publicNavItems
+        .map(item => {
+          const element = document.getElementById(item.id);
+          if (!element) return null;
+          return { id: item.id, top: Math.abs(element.getBoundingClientRect().top - 96) };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.top - b.top)[0];
+
+      if (visibleSection) setActiveNavSection(visibleSection.id);
+    };
+
+    updateActiveSection();
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+    window.addEventListener('hashchange', updateActiveSection);
+    return () => {
+      window.removeEventListener('scroll', updateActiveSection);
+      window.removeEventListener('hashchange', updateActiveSection);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined;
+
+    const menu = mobileMenuRef.current;
+    const focusableSelector = 'a[href], button:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusableElements = menu ? [...menu.querySelectorAll(focusableSelector)] : [];
+    focusableElements[0]?.focus();
+
+    const handleKeyDown = event => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false);
+        mobileMenuButtonRef.current?.focus();
+        return;
+      }
+
+      if (event.key !== 'Tab' || focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    const dialog = mapPickerOpen ? mapDialogRef.current : locationPromptOpen ? locationPromptRef.current : null;
+    if (!dialog) return undefined;
+
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusableElements = [...dialog.querySelectorAll(focusableSelector)];
+    focusableElements[0]?.focus();
+    document.body.style.overflow = 'hidden';
+
+    const handleDialogKeyDown = event => {
+      if (event.key === 'Escape') {
+        if (mapPickerOpen) setMapPickerOpen(false);
+        else setLocationPromptOpen(false);
+        return;
+      }
+      if (event.key !== 'Tab' || focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleDialogKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleDialogKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus?.();
+    };
+  }, [locationPromptOpen, mapPickerOpen]);
 
   useEffect(() => {
     const elements = [...document.querySelectorAll('.care-reveal')];
@@ -438,7 +679,8 @@ export default function LandingPage() {
       const summaryLocation = requestedLocation || (requestedCoordinates ? t('landing:search.currentLocation', { defaultValue: 'your current location' }) : t('landing:location.india'));
       setSearchSummary(`${t(requestedCoordinates ? 'landing:directory.headingNear' : 'landing:directory.headingAround', { location: summaryLocation })}${matchedSpecialty}`);
     } catch (error) {
-      setSearchError(error.message || t('landing:directory.searchUnavailable'));
+      console.error('Public directory search failed', error);
+      setSearchError(t('landing:directory.searchUnavailable'));
     } finally {
       setSearching(false);
     }
@@ -456,7 +698,7 @@ export default function LandingPage() {
       runSearch({
         requestedMode: 'all',
         requestedQuery: '',
-        requestedLocation: initialLocation?.location || 'Delhi',
+        requestedLocation: initialLocation?.location || DEFAULT_PUBLIC_LOCATION,
         requestedCoordinates: initialLocation?.coordinates || null,
       });
     }
@@ -590,6 +832,7 @@ export default function LandingPage() {
   };
 
   const selectLocationSuggestion = async suggestion => {
+    trackInteraction('location_selected', { locationMethod: 'suggestion' });
     setLocationLoading(true);
     setSearchError('');
     try {
@@ -602,7 +845,8 @@ export default function LandingPage() {
         window.setTimeout(() => document.querySelector('#search-results')?.scrollIntoView({ behavior: 'smooth' }), 100);
       }
     } catch (error) {
-      setSearchError(error.message || 'Could not use that location. Try typing a nearby area.');
+      console.error('Location selection failed', error);
+      setSearchError(t('landing:search.manualLocationFailed'));
     } finally {
       setLocationLoading(false);
     }
@@ -612,6 +856,13 @@ export default function LandingPage() {
     event.preventDefault();
     let requestedCoordinates = coordinates;
     let requestedLocation = normalizeLocationInput(location);
+
+    if (!requestedLocation && !requestedCoordinates) {
+      setSearchError(t('landing:search.locationRequired'));
+      setLocationLabel(t('landing:search.enterExactArea'));
+      locationInputRef.current?.focus();
+      return;
+    }
 
     if (requestedLocation) {
       setLocationLoading(true);
@@ -626,21 +877,21 @@ export default function LandingPage() {
       }
     }
 
+    trackInteraction('search_submitted', {
+      mode: searchMode,
+      locationMethod: requestedCoordinates ? 'coordinates' : 'manual',
+    });
     await runSearch({ requestedLocation, requestedCoordinates });
     window.setTimeout(() => document.querySelector('#search-results')?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
-  const requestLocation = useCallback(({ fallbackToDelhi = false } = {}) => {
+  const requestLocation = useCallback(() => {
+    trackInteraction('use_my_location_clicked', { locationMethod: 'gps' });
     if (!navigator.geolocation) {
       setLocationStatus('unavailable');
       setLocationLabel(t('landing:search.locationUnsupported'));
       setLocationLoading(false);
       setSearchError(t('landing:search.locationUnsupportedBrowser'));
-      if (fallbackToDelhi) {
-        setLocation('Delhi');
-        setLocationLabel('Delhi');
-        runSearch({ requestedLocation: 'Delhi', requestedCoordinates: null });
-      }
       return;
     }
 
@@ -686,14 +937,14 @@ export default function LandingPage() {
         setLocationLoading(false);
         setLocationAccuracy(null);
         const message = error.code === error.PERMISSION_DENIED
-          ? 'Location permission was denied. Enter any city or locality instead.'
+          ? t('landing:search.permissionDenied')
           : error.code === error.TIMEOUT
-            ? 'Location detection took too long. Retry or enter another locality.'
-            : 'Your live location is unavailable. Enter a city or locality instead.';
+            ? t('landing:search.locationTimeout')
+            : t('landing:search.liveLocationUnavailable');
 
         setLocationLoading(true);
         setLocationStatus('approximate-loading');
-        setLocationLabel('Exact location is blocked. Finding your approximate city...');
+        setLocationLabel(t('landing:search.findingApproximate'));
 
         try {
           const response = await fetch(`${API_URL}/geolocation/approximate`);
@@ -720,15 +971,6 @@ export default function LandingPage() {
           setLocationStatus(error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable');
           setLocationLabel(message);
           setSearchError(message);
-          if (fallbackToDelhi) {
-            setLocation('Delhi');
-            runSearch({
-              requestedMode: 'all',
-              requestedQuery: '',
-              requestedLocation: 'Delhi',
-              requestedCoordinates: null,
-            });
-          }
         }
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
@@ -757,6 +999,7 @@ export default function LandingPage() {
       // Coordinates remain usable even if the address label cannot be resolved.
     }
 
+    trackInteraction('location_selected', { locationMethod: 'map' });
     setCoordinates(selectedCoordinates);
     setLocation(selectedLabel);
     setLocationLabel(selectedLabel);
@@ -777,20 +1020,77 @@ export default function LandingPage() {
     document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleSearchTabKeyDown = (event, value) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+
+    const currentIndex = searchModeOrder.indexOf(value);
+    const lastIndex = searchModeOrder.length - 1;
+    const nextIndex = event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? lastIndex
+        : event.key === 'ArrowRight'
+          ? (currentIndex + 1) % searchModeOrder.length
+          : (currentIndex - 1 + searchModeOrder.length) % searchModeOrder.length;
+    const nextMode = searchModeOrder[nextIndex];
+
+    setSearchMode(nextMode);
+    searchTabRefs.current[nextMode]?.focus();
+  };
+
   const alert = alerts[0];
   const resultCount = hospitals.length + doctors.length + directoryDoctors.length;
+  const publicDoctorCount = useMemo(() => {
+    const seenDoctors = new Set();
+    [...doctors, ...directoryDoctors].forEach(doctor => {
+      seenDoctors.add(doctor.id || `${doctor.name || doctor.fullName}-${doctor.hospitalName || doctor.hospital}`);
+    });
+    return seenDoctors.size;
+  }, [directoryDoctors, doctors]);
   const activeLocationName = coordinates ? locationLabel : location || t('landing:location.india');
   const directoryHeading = searchSummary.includes(activeLocationName)
     ? searchSummary
     : t(coordinates ? 'landing:directory.headingNear' : 'landing:directory.headingAround', { location: activeLocationName });
-  const visibleHospitals = showAllHospitals ? hospitals : hospitals.slice(0, 8);
-  const hiddenHospitalCount = Math.max(hospitals.length - visibleHospitals.length, 0);
+  const filteredHospitals = useMemo(() => {
+    const filtered = hospitals.filter(hospital => {
+      if (facilityFilter === 'withDoctors') return hospitalDoctorCount(hospital) > 0;
+      if (facilityFilter === 'publishedHours') return hospital.operatingHours?.status === 'published';
+      return true;
+    });
+
+    return [...filtered].sort((left, right) => {
+      if (facilitySort === 'nearest') {
+        const leftDistance = Number.isFinite(Number(left.distance)) ? Number(left.distance) : Number.POSITIVE_INFINITY;
+        const rightDistance = Number.isFinite(Number(right.distance)) ? Number(right.distance) : Number.POSITIVE_INFINITY;
+        return leftDistance - rightDistance || String(left.name || '').localeCompare(String(right.name || ''));
+      }
+      return String(left.name || '').localeCompare(String(right.name || ''));
+    });
+  }, [facilityFilter, facilitySort, hospitals]);
+  const visibleHospitals = showAllHospitals ? filteredHospitals : filteredHospitals.slice(0, 8);
+  const hiddenHospitalCount = Math.max(filteredHospitals.length - visibleHospitals.length, 0);
+  const hasHospitalDistances = hospitals.some(hospital => Number.isFinite(Number(hospital.distance)));
+  const currentYear = new Date().getFullYear();
+  const trustSummaryItems = useMemo(() => [
+    hospitals.length > 0
+      ? { key: 'hospitals', icon: Building2, text: t('landing:trustSummary.hospitalsNear', { count: hospitals.length, location: activeLocationName }) }
+      : null,
+    publicDoctorCount > 0
+      ? { key: 'doctors', icon: Stethoscope, text: t('landing:trustSummary.doctorsAvailable', { count: publicDoctorCount }) }
+      : null,
+    { key: 'sources', icon: ShieldCheck, text: t('landing:trustSummary.sourceShown') },
+    { key: 'browse', icon: User, text: t('landing:trustSummary.noAccount') },
+  ].filter(Boolean), [activeLocationName, hospitals.length, publicDoctorCount, t]);
 
   return (
     <div className="min-h-screen bg-care-surface text-care-body">
+      <a href="#main-content" className="fixed left-4 top-2 z-[110] -translate-y-20 rounded-md bg-care-heading px-4 py-3 text-sm font-bold text-white shadow-lg focus:translate-y-0">
+        {t('landing:accessibility.skipToMain')}
+      </a>
       {locationPromptOpen && (
         <div className="care-modal-backdrop fixed inset-0 z-[80] flex items-center justify-center px-5" role="dialog" aria-modal="true" aria-labelledby="location-permission-title">
-          <div className="w-full max-w-md rounded-lg border border-care-border bg-care-surface p-6 shadow-2xl">
+          <div ref={locationPromptRef} className="w-full max-w-md rounded-lg border border-care-border bg-care-surface p-6 shadow-2xl">
             <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover">
               <LocateFixed className="h-6 w-6" />
             </span>
@@ -810,68 +1110,87 @@ export default function LandingPage() {
       )}
       {mapPickerOpen && (
         <div className="care-modal-backdrop-strong fixed inset-0 z-[90] flex items-center justify-center px-4 py-6" role="dialog" aria-modal="true" aria-labelledby="map-location-title">
-          <div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-care-border bg-care-surface shadow-2xl">
+          <div ref={mapDialogRef} className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-care-border bg-care-surface shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-care-border px-5 py-4">
               <div>
-                <h2 id="map-location-title" className="text-xl font-bold text-care-heading">Set your exact search point</h2>
-                <p className="mt-1 text-sm text-care-muted">Move the map and click your road, building, or neighbourhood to place the marker.</p>
+                <h2 id="map-location-title" className="text-xl font-bold text-care-heading">{t('landing:mapPicker.title')}</h2>
+                <p className="mt-1 text-sm text-care-muted">{t('landing:mapPicker.copy')}</p>
               </div>
-              <button type="button" onClick={() => setMapPickerOpen(false)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-care-border text-care-muted hover:bg-care-neutral" aria-label="Close location map">
+              <button type="button" onClick={() => setMapPickerOpen(false)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-care-border text-care-muted hover:bg-care-neutral" aria-label={t('landing:mapPicker.close')}>
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div className="h-[52vh] min-h-80 w-full bg-care-neutral">
-              <MapContainer center={mapPickerPosition} zoom={14} className="h-full w-full" zoomControl={true}>
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <LocationPin position={mapPickerPosition} onChange={setMapPickerPosition} />
-              </MapContainer>
+              <Suspense fallback={<div className="flex h-full items-center justify-center text-sm text-care-muted" role="status">{t('landing:mapPicker.loading')}</div>}>
+                <LocationMapPicker position={mapPickerPosition} onChange={setMapPickerPosition} />
+              </Suspense>
             </div>
             <div className="flex flex-col gap-3 border-t border-care-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-care-muted">Selected coordinates: {mapPickerPosition[0].toFixed(5)}, {mapPickerPosition[1].toFixed(5)}</p>
+              <p className="text-xs text-care-muted">{t('landing:mapPicker.selectedCoordinates')}: {mapPickerPosition[0].toFixed(5)}, {mapPickerPosition[1].toFixed(5)}</p>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setMapPickerOpen(false)} className="h-10 rounded-lg border border-care-border px-4 text-sm font-semibold text-care-body hover:bg-care-neutral">Cancel</button>
-                <button type="button" onClick={confirmMapLocation} disabled={mapPickerLoading} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-care-primary px-5 text-sm font-bold text-care-surface hover:bg-care-primary-hover disabled:opacity-60">
+                <button type="button" onClick={() => setMapPickerOpen(false)} className="min-h-11 rounded-lg border border-care-border px-4 text-sm font-semibold text-care-body hover:bg-care-neutral">{t('landing:mapPicker.cancel')}</button>
+                <button type="button" onClick={confirmMapLocation} disabled={mapPickerLoading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-care-primary px-5 text-sm font-bold text-care-surface hover:bg-care-primary-hover disabled:opacity-60">
                   {mapPickerLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
-                  Use this point
+                  {t('landing:mapPicker.usePoint')}
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
-      <header className={`public-header-motion sticky top-0 z-40 border-b border-care-border bg-care-surface/95 backdrop-blur-md ${headerScrolled ? 'public-header-scrolled' : ''}`}>
+      <header className={`public-header-motion public-site-header sticky top-0 z-40 ${headerScrolled ? 'public-header-scrolled' : ''}`}>
         <div className="public-navbar-inner">
           <PublicLogo />
           <nav className="public-navbar-links" aria-label="Primary navigation">
-            <a href="#services" className="public-navbar-link">{t('nav:services')}</a>
-            <a href="#search-results" className="public-navbar-link">{t('nav:doctors')}</a>
-            <a href="#facilities" className="public-navbar-link">{t('nav:hospitals')}</a>
-            <a href="#health-guides" className="public-navbar-link">{t('nav:healthGuides')}</a>
-            <a href="#trust" className="public-navbar-link">{t('nav:whyBrand')}</a>
+            {publicNavItems.map(item => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                onClick={() => setActiveNavSection(item.id)}
+                className={`public-navbar-link ${activeNavSection === item.id ? 'public-navbar-link-active' : ''}`}
+                aria-current={activeNavSection === item.id ? 'page' : undefined}
+              >
+                {t(`nav:${item.labelKey}`)}
+              </a>
+            ))}
           </nav>
           <div className="public-navbar-actions">
             <LanguageSwitcher compact />
-            <Link to="/login/patient" className="rounded-lg px-4 py-2.5 text-sm font-semibold text-care-body hover:bg-care-neutral">{t('common:signIn')}</Link>
-            <Link to="/signup/patient" className="rounded-lg bg-care-primary px-4 py-2.5 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">{t('common:createAccount')}</Link>
+            <Link to="/login/patient" className="public-navbar-action-link">{t('common:signIn')}</Link>
+            <Link to="/signup/patient" className="public-navbar-cta">{t('common:createAccount')}</Link>
           </div>
-          <button type="button" onClick={() => setMobileMenuOpen(value => !value)} className="flex h-10 w-10 items-center justify-center rounded-lg border border-care-border text-care-body lg:hidden" aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}>
+          <button
+            ref={mobileMenuButtonRef}
+            type="button"
+            onClick={() => setMobileMenuOpen(value => !value)}
+            className="public-mobile-menu-trigger"
+            aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}
+            aria-controls="public-mobile-menu"
+            aria-expanded={mobileMenuOpen}
+          >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
         {mobileMenuOpen && (
-          <nav className="border-t border-care-border bg-care-surface px-5 py-4 lg:hidden" aria-label="Mobile navigation">
-            <div className="grid w-full gap-1 text-sm font-semibold text-care-body sm:grid-cols-2">
-              <div className="rounded-lg px-3 py-2.5"><LanguageSwitcher /></div>
-              <a href="#services" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:services')}</a>
-              <a href="#search-results" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:doctors')}</a>
-              <a href="#facilities" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:hospitals')}</a>
-              <a href="#health-guides" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:healthGuides')}</a>
-              <a href="#trust" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">{t('nav:whyBrand')}</a>
-              <Link to="/login/patient" onClick={() => setMobileMenuOpen(false)} className="mt-2 rounded-lg border border-care-border px-3 py-3 text-center text-care-heading hover:bg-care-neutral sm:mt-0">{t('common:signIn')}</Link>
-              <Link to="/signup/patient" onClick={() => setMobileMenuOpen(false)} className="rounded-lg bg-care-primary px-3 py-3 text-center text-care-surface hover:bg-care-primary-hover">{t('common:createAccount')}</Link>
+          <nav id="public-mobile-menu" ref={mobileMenuRef} className="public-mobile-menu lg:hidden" aria-label="Mobile navigation">
+            <div className="grid w-full gap-2 text-sm font-semibold text-care-body sm:grid-cols-2">
+              {publicNavItems.map(item => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={() => {
+                    setActiveNavSection(item.id);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`public-mobile-menu-link ${activeNavSection === item.id ? 'public-mobile-menu-link-active' : ''}`}
+                  aria-current={activeNavSection === item.id ? 'page' : undefined}
+                >
+                  {t(`nav:${item.labelKey}`)}
+                </a>
+              ))}
+              <div className="rounded-lg px-1 py-1"><LanguageSwitcher /></div>
+              <Link to="/login/patient" onClick={() => setMobileMenuOpen(false)} className="public-mobile-menu-secondary">{t('common:signIn')}</Link>
+              <Link to="/signup/patient" onClick={() => setMobileMenuOpen(false)} className="public-mobile-menu-cta">{t('common:createAccount')}</Link>
             </div>
           </nav>
         )}
@@ -887,19 +1206,21 @@ export default function LandingPage() {
         </div>
       )}
 
-      <main>
-        <section className="relative min-h-[760px] overflow-visible bg-care-heading sm:min-h-[660px]">
-          <img src={heroImage} alt="Doctor discussing care with a patient" className="public-hero-image absolute inset-0 h-full w-full object-cover object-[65%_center]" />
+      <main id="main-content" tabIndex="-1">
+        <section className="public-hero-section relative overflow-visible bg-care-heading">
+          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+            <img src={heroImage} alt="" width="1600" height="900" fetchPriority="high" decoding="async" className="public-hero-image absolute inset-0 h-full w-full object-cover object-[65%_center]" />
+          </div>
           <div className="care-hero-overlay absolute inset-0" />
-          <div className="relative mx-auto flex min-h-[760px] max-w-7xl items-start px-5 pb-96 pt-24 sm:min-h-[660px] sm:items-center sm:px-8 sm:pb-36 sm:pt-16">
-            <div className="public-hero-content max-w-2xl">
-              <span className="mb-5 inline-flex items-center gap-2 rounded-lg border border-care-border/25 bg-care-surface/10 px-3 py-2 text-xs font-semibold text-care-primary-subtle">
+          <div className="public-hero-container relative mx-auto flex max-w-7xl items-start px-5 sm:items-center sm:px-8">
+            <div className="public-hero-content max-w-[42rem]">
+              <span className="mb-5 inline-flex items-center gap-2 rounded-lg border border-care-surface/30 bg-care-heading/35 px-3 py-2 text-xs font-semibold text-care-surface shadow-sm">
                 <ShieldCheck className="h-4 w-4" />
                 {t('landing:hero.badge')}
               </span>
-              <h1 className="text-4xl font-bold leading-[1.08] text-care-surface sm:text-5xl lg:text-6xl">{t('landing:hero.title')}</h1>
-              <p className="mt-5 max-w-xl text-lg leading-8 text-care-primary-subtle">{t('landing:hero.copy')}</p>
-              <div className="mt-8 hidden flex-wrap gap-4 text-sm text-care-primary-subtle sm:flex">
+              <h1 className="max-w-[13ch] text-4xl font-bold leading-[1.08] text-care-surface sm:text-5xl lg:text-[3.6rem]">{t('landing:hero.title')}</h1>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-care-surface/90">{t('landing:hero.copy')}</p>
+              <div className="mt-7 hidden flex-wrap gap-4 text-sm text-care-surface/90 sm:flex">
                 <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-care-primary" /> {t('landing:hero.sourceLabelled')}</span>
                 <span className="inline-flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-care-primary" /> {t('landing:hero.availability')}</span>
                 <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-care-primary" /> {t('landing:hero.locationAware')}</span>
@@ -909,59 +1230,68 @@ export default function LandingPage() {
 
           <div id="care-search" className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-7xl px-5 sm:px-8">
             <form onSubmit={handleSearch} className="public-search-dock overflow-visible rounded-lg border border-care-border bg-care-surface p-5 shadow-xl sm:p-8">
-              <div className="grid gap-3 lg:grid-cols-[minmax(280px,1.08fr)_minmax(280px,1.08fr)_minmax(250px,0.94fr)]">
-                <label className="relative">
-                  <span className="sr-only">{t('landing:search.doctorSr')}</span>
-                  <Search className="pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-care-heading" />
+              <div className="grid gap-4 lg:grid-cols-[minmax(280px,1.05fr)_minmax(320px,1.1fr)_minmax(210px,0.7fr)] lg:items-end">
+                <div className="space-y-2">
+                  <label htmlFor="public-care-query" className="block text-sm font-bold text-care-heading">
+                    {t('landing:search.careLabel')}
+                  </label>
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-care-heading" />
                   <input
+                    id="public-care-query"
                     value={query}
                     onChange={event => setQuery(event.target.value)}
                     placeholder={searchMode === 'symptoms' ? t('landing:search.symptomPlaceholder') : t('landing:search.doctorPlaceholder')}
-                    className="h-16 w-full rounded-md border border-care-border bg-care-surface pl-14 pr-4 text-base text-care-body outline-none placeholder:text-care-muted focus:border-care-primary focus:ring-4 focus:ring-care-primary"
+                    className="h-14 w-full rounded-md border border-care-border bg-care-surface pl-12 pr-4 text-base text-care-body outline-none placeholder:text-care-muted focus:border-care-primary focus:ring-4 focus:ring-care-primary"
                   />
-                </label>
-                <label className="relative">
-                  <span className="sr-only">{t('landing:search.locationSr')}</span>
-                  <MapPin className="pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-care-heading" />
-                  <input
-                    ref={locationInputRef}
-                    value={location}
-                    onFocus={() => setLocationSuggestionOpen(true)}
-                    onBlur={() => window.setTimeout(() => setLocationSuggestionOpen(false), 120)}
-                    onChange={event => {
-                      const nextLocation = event.target.value;
-                      setLocation(nextLocation);
-                      setCoordinates(null);
-                      setLocationAccuracy(null);
-                      setLocationStatus('manual');
-                      setLocationLabel(nextLocation || t('landing:search.enterExactArea'));
-                      setLocationSuggestionOpen(true);
-                    }}
-                    placeholder={t('landing:search.locationPlaceholder')}
-                    className="h-16 w-full rounded-md border border-care-border bg-care-surface pl-14 pr-12 text-base text-care-body outline-none placeholder:text-care-muted focus:border-care-primary focus:ring-4 focus:ring-care-primary"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => requestLocation()}
-                    disabled={locationLoading}
-                    className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center text-care-heading hover:text-care-primary-hover disabled:opacity-50"
-                    aria-label={locationStatus === 'granted' ? t('landing:search.refreshLocation') : t('landing:search.useLocation')}
-                    title={locationStatus === 'granted' ? t('landing:search.refreshLocation') : t('landing:search.useLocation')}
-                  >
-                    {locationLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <LocateFixed className="h-5 w-5" />}
-                  </button>
-                </label>
-                <button type="submit" disabled={searching} className="inline-flex h-16 min-w-52 items-center justify-center gap-2 rounded-md bg-care-primary px-7 text-base font-bold text-care-surface hover:bg-care-primary-hover disabled:opacity-60">
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="public-care-location" className="block text-sm font-bold text-care-heading">
+                    {t('landing:search.locationLabel')}
+                  </label>
+                  <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                    <div className="relative">
+                      <MapPin className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-care-heading" />
+                      <input
+                        id="public-care-location"
+                        ref={locationInputRef}
+                        value={location}
+                        onFocus={() => setLocationSuggestionOpen(true)}
+                        onBlur={() => window.setTimeout(() => setLocationSuggestionOpen(false), 120)}
+                        onChange={event => {
+                          const nextLocation = event.target.value;
+                          setLocation(nextLocation);
+                          setCoordinates(null);
+                          setLocationAccuracy(null);
+                          setLocationStatus('manual');
+                          setLocationLabel(nextLocation || t('landing:search.enterExactArea'));
+                          setLocationSuggestionOpen(true);
+                        }}
+                        placeholder={t('landing:search.locationPlaceholder')}
+                        required
+                        aria-describedby={searchError ? 'public-search-error' : 'public-location-help'}
+                        className="h-14 w-full rounded-md border border-care-border bg-care-surface pl-12 pr-4 text-base text-care-body outline-none placeholder:text-care-muted focus:border-care-primary focus:ring-4 focus:ring-care-primary"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => requestLocation()}
+                      disabled={locationLoading}
+                      className="inline-flex h-14 items-center justify-center gap-2 rounded-md border border-care-border bg-care-surface px-4 text-sm font-bold text-care-heading transition-colors hover:bg-care-primary-subtle hover:text-care-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2 focus-visible:ring-offset-care-surface disabled:opacity-60"
+                    >
+                      {locationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
+                      {locationStatus === 'granted' ? t('landing:search.refreshLocationShort') : t('landing:search.useLocationShort')}
+                    </button>
+                  </div>
+                </div>
+                <button type="submit" disabled={searching || locationLoading} className="inline-flex h-14 w-full min-w-52 items-center justify-center gap-2 rounded-md bg-care-primary px-7 text-base font-bold text-care-surface transition-colors hover:bg-care-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2 focus-visible:ring-offset-care-surface disabled:opacity-60 lg:w-auto">
                   {searching && <Loader2 className="h-5 w-5 animate-spin" />}
-                  {searchMode === 'hospitals'
-                    ? t('landing:search.findHospitals')
-                    : searchMode === 'symptoms'
-                      ? t('landing:search.checkSymptoms')
-                      : t('landing:search.bookAppointment')}
+                  {t('landing:search.searchCare')}
                 </button>
               </div>
               <div className="mt-4 flex flex-col gap-3 border-t border-care-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-wrap gap-1" role="tablist" aria-label="Search type">
+                <div className="flex flex-wrap gap-1" role="tablist" aria-label={t('landing:search.searchType')}>
                   {[
                     ['all', t('landing:search.allCare')],
                     ['doctors', t('nav:doctors')],
@@ -970,13 +1300,16 @@ export default function LandingPage() {
                   ].map(([value, label]) => (
                     <button
                       key={value}
+                      ref={element => { searchTabRefs.current[value] = element; }}
                       type="button"
                       role="tab"
                       aria-selected={searchMode === value}
+                      tabIndex={searchMode === value ? 0 : -1}
                       onClick={() => setSearchMode(value)}
-                      className={`h-9 rounded-md px-3 text-xs font-semibold transition-colors ${
+                      onKeyDown={event => handleSearchTabKeyDown(event, value)}
+                      className={`min-h-11 rounded-md px-3 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2 focus-visible:ring-offset-care-surface ${
                         searchMode === value
-                          ? 'bg-care-primary-subtle text-care-primary-hover'
+                          ? 'bg-care-primary-subtle text-care-primary-hover shadow-[inset_0_-3px_0_var(--color-primary)]'
                           : 'text-care-muted hover:bg-care-neutral'
                       }`}
                     >
@@ -984,21 +1317,32 @@ export default function LandingPage() {
                     </button>
                   ))}
                 </div>
-                <div className="flex min-w-0 items-center gap-3 text-xs text-care-muted">
+                <div id="public-location-help" className="flex min-w-0 items-center gap-3 text-xs text-care-muted">
                   <Navigation className="h-4 w-4 shrink-0 text-care-primary-hover" />
                   <span className="min-w-0 truncate">{locationLabel}</span>
                   <button
                     type="button"
                     onClick={() => setMapPickerOpen(true)}
-                    className="shrink-0 font-semibold text-care-primary-hover hover:underline"
+                    className="inline-flex min-h-11 shrink-0 items-center rounded-md px-2 font-semibold text-care-primary-hover hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary"
                   >
                     {t('landing:search.setOnMap')}
                   </button>
                 </div>
               </div>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-care-border pt-4" aria-label={t('landing:trustSummary.label')}>
+                {trustSummaryItems.map(item => {
+                  const Icon = item.icon;
+                  return (
+                    <span key={item.key} className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-care-border bg-care-neutral px-3 text-xs font-semibold text-care-body">
+                      <Icon className="h-4 w-4 shrink-0 text-care-primary-hover" />
+                      {item.text}
+                    </span>
+                  );
+                })}
+              </div>
               {locationSuggestionOpen && normalizeLocationInput(location).length >= 2 && (
                 <div className="relative z-[90] mt-2 overflow-hidden rounded-lg border border-care-primary bg-care-surface shadow-2xl ring-1 ring-care-border">
-                  <div className="border-b border-care-border bg-care-primary-subtle px-4 py-2 text-xs font-bold uppercase text-care-primary-hover">
+                  <div className="border-b border-care-border bg-care-primary-subtle px-4 py-2 text-xs font-bold text-care-primary-hover">
                     {t('landing:search.selectLocation')}
                   </div>
                   {locationSuggestions.length ? (
@@ -1042,31 +1386,36 @@ export default function LandingPage() {
         </section>
 
         <section id="services" className="border-b border-care-border bg-care-surface">
-          <div className="care-reveal mx-auto max-w-7xl px-5 py-16 sm:px-8">
-            <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div className="care-reveal mx-auto max-w-7xl px-5 py-14 sm:px-8">
+            <div className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
               <div>
                 <span className="text-xs font-bold text-care-primary-hover">{t('landing:services.eyebrow')}</span>
                 <h2 className="mt-2 text-3xl font-bold text-care-heading">{t('landing:services.title')}</h2>
               </div>
               <p className="max-w-xl text-sm leading-6 text-care-muted">{t('landing:services.copy')}</p>
             </div>
-            <div className="care-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="care-stagger grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {quickServices.map(service => {
                 const Icon = service.icon;
                 const content = (
                   <>
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover"><Icon className="h-5 w-5" /></span>
-                    <span className="min-w-0 flex-1">
-                      <strong className="block text-sm text-care-heading">{t(`landing:${service.titleKey}`)}</strong>
-                      <span className="mt-1 block text-xs leading-5 text-care-muted">{t(`landing:${service.copyKey}`)}</span>
+                    <span className="flex w-full items-start justify-between gap-4">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover transition-colors group-hover:bg-care-primary group-hover:text-white">
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-care-muted transition-transform group-hover:translate-x-1 group-hover:text-care-primary-hover" aria-hidden="true" />
                     </span>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-care-muted" />
+                    <span className="mt-5 block min-w-0">
+                      <strong className="block text-base font-bold text-care-heading">{t(`landing:${service.titleKey}`)}</strong>
+                      <span className="mt-2 block text-sm leading-6 text-care-muted">{t(`landing:${service.copyKey}`)}</span>
+                    </span>
                   </>
                 );
+                const cardClassName = 'group care-action care-hover flex min-h-40 h-full w-full flex-col rounded-lg border border-care-border bg-care-surface p-5 text-left shadow-sm transition-all hover:-translate-y-1 hover:border-care-primary hover:bg-care-primary-subtle/30 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2';
                 return service.href ? (
-                  <a key={service.titleKey} href={service.href} className="care-action care-hover flex items-center gap-4 rounded-lg border border-care-border p-4 text-left hover:border-care-primary hover:bg-care-primary-subtle/40">{content}</a>
+                  <a key={service.titleKey} href={service.href} className={cardClassName}>{content}</a>
                 ) : (
-                  <button key={service.titleKey} type="button" onClick={() => chooseService(service)} className="care-action care-hover flex items-center gap-4 rounded-lg border border-care-border p-4 text-left hover:border-care-primary hover:bg-care-primary-subtle/40">{content}</button>
+                  <button key={service.titleKey} type="button" onClick={() => chooseService(service)} className={cardClassName}>{content}</button>
                 );
               })}
             </div>
@@ -1079,7 +1428,7 @@ export default function LandingPage() {
               <div>
                 <span className="text-xs font-bold text-care-primary-hover">{t('landing:directory.eyebrow')}</span>
                 <h2 className="mt-2 text-3xl font-bold text-care-heading">{directoryHeading}</h2>
-                <p className="mt-2 text-sm text-care-muted">
+                <p className="mt-2 text-sm text-care-muted" role="status" aria-live="polite" aria-atomic="true">
                   {searching
                     ? t('landing:directory.checking')
                     : t('landing:directory.resultSummary', { count: resultCount, location: activeLocationName })}
@@ -1092,14 +1441,19 @@ export default function LandingPage() {
             </div>
 
             {searchError && (
-              <div role="alert" className="mb-6 flex items-start gap-3 rounded-lg border border-care-danger bg-care-surface p-4 text-sm text-care-danger">
+              <div id="public-search-error" role="alert" className="mb-6 flex items-start gap-3 rounded-lg border border-care-danger bg-care-surface p-4 text-sm text-care-danger">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                {searchError}
+                <div className="flex-1">
+                  <p>{searchError}</p>
+                  <button type="button" onClick={() => runSearch()} className="mt-3 min-h-10 rounded-md border border-care-danger px-4 font-semibold hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-care-danger">
+                    {t('landing:directory.retry')}
+                  </button>
+                </div>
               </div>
             )}
 
             {searching ? (
-              <div className="flex min-h-52 items-center justify-center gap-3 text-care-muted"><Loader2 className="h-6 w-6 animate-spin text-care-primary" /> {t('landing:directory.searching')}</div>
+              <CardSkeleton count={6} label={t('landing:directory.searching')} />
             ) : (
               <div className="space-y-14">
                 {(searchMode === 'all' || searchMode === 'doctors' || searchMode === 'symptoms') && (
@@ -1111,120 +1465,208 @@ export default function LandingPage() {
                     {doctors.length || directoryDoctors.length ? (
                       <div className="care-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                         {doctors.slice(0, 6).map(doctor => (
-                          <article key={`bookable-${doctor.id}`} className="care-hover flex flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm">
-                            <div className="flex items-start gap-4">
-                              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-heading"><Stethoscope className="h-6 w-6" /></span>
-                              <div className="min-w-0">
-                                <h4 className="font-bold text-care-heading">{doctor.fullName}</h4>
-                                <p className="mt-1 text-sm font-semibold text-care-primary-hover">{doctor.specialization}</p>
-                                <p className="mt-1 truncate text-xs text-care-muted">{doctor.hospital?.name || t('landing:directory.affiliatedClinic')}</p>
-                                <DoctorRatingSummary
-                                  ratingAvg={doctor.ratingAvg}
-                                  ratingCount={doctor.ratingCount}
-                                  className="mt-2"
-                                />
-                              </div>
-                            </div>
-                            <div className="mt-4 flex flex-wrap gap-2">
-                              <ResultBadge><BadgeCheck className="h-3 w-3" /> {t('landing:directory.activeProvider')}</ResultBadge>
-                              {doctor.distance != null && <ResultBadge tone="blue">{doctor.distance.toFixed(1)} km</ResultBadge>}
-                              {doctor.consultationFee > 0 && <ResultBadge tone="amber">INR {doctor.consultationFee}</ResultBadge>}
-                            </div>
-                            <div className="mt-5 border-t border-care-border pt-4">
-                              <span className="text-[11px] font-bold text-care-muted">{t('landing:directory.nextAvailable')}</span>
-                              <div className="mt-2 flex min-h-8 flex-wrap gap-2">
-                                {doctor.nextAvailableSlots?.length ? doctor.nextAvailableSlots.map((slot, index) => (
-                                  <span key={`${doctor.id}-${index}`} className="rounded-md bg-care-primary-subtle px-2 py-1 text-xs font-semibold text-care-primary-hover">{t('landing:directory.tomorrowSlot', { slot: formatSlot(slot) })}</span>
-                                )) : <span className="text-xs text-care-muted">{t('landing:directory.contactClinic')}</span>}
-                              </div>
-                            </div>
-                            <Link to={`/doctor/${doctor.id}`} className="care-action mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-care-primary text-sm font-semibold text-care-surface hover:bg-care-primary-hover">
-                              {t('landing:directory.viewProfileSlots')} <ArrowRight className="h-4 w-4" />
-                            </Link>
-                          </article>
+                          <PublicDoctorCard key={`bookable-${doctor.id}`} doctor={doctor} />
                         ))}
                         {doctors.length === 0 && directoryDoctors.slice(0, 6).map(doctor => (
-                          <article key={`directory-${doctor.id}`} className="care-hover flex flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm">
-                            <div className="flex items-start gap-4">
-                              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover"><User className="h-6 w-6" /></span>
-                              <div>
-                                <h4 className="font-bold text-care-heading">{doctor.fullName}</h4>
-                                <p className="mt-1 text-sm font-semibold text-care-primary-hover">{doctor.specialization}</p>
-                                <p className="mt-1 text-xs text-care-muted">{doctor.hospital?.name}</p>
-                                <DoctorRatingSummary
-                                  ratingAvg={doctor.ratingAvg}
-                                  ratingCount={doctor.ratingCount}
-                                  className="mt-2"
-                                />
-                              </div>
-                            </div>
-                            <div className="mt-4"><ResultBadge><BadgeCheck className="h-3 w-3" /> {t('landing:directory.source', { source: doctor.sourceName || t('landing:directory.verifiedDirectory') })}</ResultBadge></div>
-                            <Link to={`/doctor/${doctor.id}`} className="mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-care-heading text-sm font-semibold text-care-heading hover:bg-care-primary-subtle">
-                              {t('landing:directory.viewProfile')} <ArrowRight className="h-4 w-4" />
-                            </Link>
-                          </article>
+                          <PublicDoctorCard key={`directory-${doctor.id}`} doctor={doctor} directoryOnly />
                         ))}
                       </div>
                     ) : (
-                      <div className="rounded-lg border border-dashed border-care-border bg-care-surface p-10 text-center text-sm text-care-muted">{t('landing:directory.noDoctors')}</div>
+                      <DirectoryEmptyState
+                        icon={Stethoscope}
+                        title={t('landing:emptyStates.noDoctorsTitle')}
+                        copy={t('landing:emptyStates.noDoctorsCopy', { location: activeLocationName })}
+                        actions={[
+                          {
+                            label: t('landing:emptyStates.changeLocation'),
+                            eventName: 'change_location',
+                            onClick: () => {
+                              document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' });
+                              window.setTimeout(() => locationInputRef.current?.focus(), 250);
+                            },
+                          },
+                          {
+                            label: t('landing:emptyStates.viewHospitals'),
+                            eventName: 'view_hospitals',
+                            onClick: () => {
+                              setSearchMode('hospitals');
+                              runSearch({ requestedMode: 'hospitals' });
+                            },
+                          },
+                          query.trim() ? {
+                            label: t('landing:emptyStates.clearSearch'),
+                            eventName: 'clear_search',
+                            onClick: () => {
+                              setQuery('');
+                              runSearch({ requestedMode: 'doctors', requestedQuery: '' });
+                            },
+                          } : null,
+                        ].filter(Boolean)}
+                      />
                     )}
                   </div>
                 )}
 
                 {(searchMode === 'all' || searchMode === 'hospitals' || searchMode === 'symptoms') && (
                   <div id="facilities">
-                    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="mb-5 flex flex-col gap-4">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <h3 className="text-xl font-bold text-care-heading">{t('landing:directory.hospitalsTitle')}</h3>
                         {hospitals.length > 0 && (
-                          <p className="mt-1 text-sm text-care-muted">{t('landing:directory.facilitySummary', { visible: visibleHospitals.length, total: hospitals.length, location: activeLocationName })}</p>
+                          <p className="mt-1 text-sm text-care-muted">
+                            {t('landing:directory.facilitySummary', { visible: visibleHospitals.length, total: filteredHospitals.length, location: activeLocationName })}
+                            {coordinates && <span> · {t('landing:directory.searchRadius', { radius: 150 })}</span>}
+                          </p>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-3">
                         {hiddenHospitalCount > 0 && (
-                          <button type="button" onClick={() => setShowAllHospitals(true)} className="inline-flex items-center gap-2 text-sm font-semibold text-care-heading hover:underline">
-                            {t('landing:directory.showAll', { count: hospitals.length })}
+                            <button type="button" onClick={() => setShowAllHospitals(true)} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-care-border bg-care-surface px-3 text-sm font-semibold text-care-heading hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">
+                            {t('landing:directory.showAll', { count: filteredHospitals.length })}
                           </button>
                         )}
-                        {showAllHospitals && hospitals.length > 8 && (
-                          <button type="button" onClick={() => setShowAllHospitals(false)} className="inline-flex items-center gap-2 text-sm font-semibold text-care-heading hover:underline">
+                          {showAllHospitals && filteredHospitals.length > 8 && (
+                            <button type="button" onClick={() => setShowAllHospitals(false)} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-care-border bg-care-surface px-3 text-sm font-semibold text-care-heading hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">
                             {t('landing:directory.showLess')}
                           </button>
                         )}
-                        <button type="button" onClick={requestLocation} className="inline-flex items-center gap-2 text-sm font-semibold text-care-primary-hover hover:underline"><Navigation className="h-4 w-4" /> {t('landing:directory.findNearest')}</button>
+                          <button type="button" onClick={requestLocation} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-care-primary px-3 text-sm font-semibold text-care-primary-hover hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary"><Navigation className="h-4 w-4" /> {t('landing:directory.findNearest')}</button>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-3 rounded-lg border border-care-border bg-care-surface p-3 sm:flex-row sm:items-center">
+                        <label className="flex min-w-0 flex-1 items-center gap-2 text-sm font-semibold text-care-heading">
+                          <Filter className="h-4 w-4 shrink-0 text-care-primary-hover" aria-hidden="true" />
+                          <span className="sr-only">{t('landing:directory.filter')}</span>
+                          <select
+                            value={facilityFilter}
+                            onChange={event => { setFacilityFilter(event.target.value); setShowAllHospitals(false); }}
+                            className="min-h-10 w-full rounded-md border border-care-border bg-care-surface px-3 text-sm text-care-body focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary"
+                          >
+                            <option value="all">{t('landing:directory.allFacilities')}</option>
+                            <option value="withDoctors">{t('landing:directory.withDoctors')}</option>
+                            <option value="publishedHours">{t('landing:directory.withPublishedHours')}</option>
+                          </select>
+                        </label>
+                        <label className="flex min-w-0 flex-1 items-center gap-2 text-sm font-semibold text-care-heading">
+                          <ArrowUpDown className="h-4 w-4 shrink-0 text-care-primary-hover" aria-hidden="true" />
+                          <span className="sr-only">{t('landing:directory.sort')}</span>
+                          <select
+                            value={facilitySort}
+                            onChange={event => setFacilitySort(event.target.value)}
+                            className="min-h-10 w-full rounded-md border border-care-border bg-care-surface px-3 text-sm text-care-body focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary"
+                          >
+                            {hasHospitalDistances && <option value="nearest">{t('landing:directory.sortNearest')}</option>}
+                            <option value="name">{t('landing:directory.sortName')}</option>
+                          </select>
+                        </label>
+                        {facilityFilter !== 'all' && (
+                          <button type="button" onClick={() => setFacilityFilter('all')} className="min-h-10 rounded-md px-3 text-sm font-semibold text-care-primary-hover hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">
+                            {t('landing:directory.clearFilter')}
+                          </button>
+                        )}
                       </div>
                     </div>
                     {hospitals.length ? (
                       <div className="care-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                         {visibleHospitals.map(hospital => (
-                          <article key={hospital.id} className="care-hover flex flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm">
-                            <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-care-primary-subtle text-care-heading"><Building2 className="h-5 w-5" /></span>
-                            <h4 className="font-bold leading-6 text-care-heading">{hospital.name}</h4>
-                            <p className="mt-2 line-clamp-2 text-xs leading-5 text-care-muted">{hospital.address || `${hospital.district || hospital.city}, ${hospital.state}`}</p>
-                            <HospitalRatingSummary
-                              ratingAvg={hospital.ratingAvg}
-                              ratingCount={hospital.ratingCount}
-                              googleRating={hospital.googleRating}
-                              className="mt-3"
-                            />
-                            <HospitalOperatingHours operatingHours={hospital.operatingHours} compact className="mt-3" />
-                            <div className="mt-4 flex flex-wrap gap-2">
-                              <ResultBadge tone={hospital.verificationStatus === 'verified' ? 'teal' : 'blue'}>
-                                <BadgeCheck className="h-3 w-3" /> {hospital.verificationStatus === 'verified' ? t('landing:facilityCard.verified') : hospital.verificationStatus === 'community-mapped' ? t('landing:facilityCard.communityMapped') : t('landing:facilityCard.publicDirectory')}
-                              </ResultBadge>
-                              {hospital.distance != null && <ResultBadge tone="blue">{hospital.distance.toFixed(1)} km</ResultBadge>}
-                              <ResultBadge tone="blue">
-                                <Stethoscope className="h-3 w-3" />
-                                {t(hospitalDoctorCount(hospital) === 1 ? 'landing:facilityCard.doctorListed' : 'landing:facilityCard.doctorsListed', { count: hospitalDoctorCount(hospital) })}
-                              </ResultBadge>
+                          <article key={hospital.id} className="care-hover flex min-h-[390px] flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm focus-within:ring-2 focus-within:ring-care-primary">
+                            <div className="flex items-start justify-between gap-3">
+                              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-heading"><Building2 className="h-5 w-5" aria-hidden="true" /></span>
+                              {hospital.distance != null && <ResultBadge tone="blue">{Number(hospital.distance).toFixed(1)} km</ResultBadge>}
                             </div>
-                            <p className="mt-4 text-xs text-care-muted">{formatFacilityType(hospital.hospitalType || hospital.careType, t)}</p>
-                            <Link to={`/hospital/${hospital.id}`} className="mt-auto pt-5 text-sm font-semibold text-care-primary-hover hover:underline">{t('landing:facilityCard.viewFacilityDoctors')} <ArrowRight className="ml-1 inline h-4 w-4" /></Link>
+                            <h4 className="mt-4 text-base font-bold leading-6 text-care-heading">{hospital.name}</h4>
+                            <p className="mt-2 line-clamp-3 text-sm leading-5 text-care-muted">{hospital.address || `${hospital.district || hospital.city}, ${hospital.state}`}</p>
+                            <p className="mt-3 text-xs font-semibold text-care-muted">{formatFacilityType(hospital.hospitalType || hospital.careType, t)}</p>
+
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {hasPublishedGoogleRating(hospital) && (
+                                <HospitalRatingSummary googleRating={hospital.googleRating} />
+                              )}
+                              {hasPublishedOperatingHours(hospital) && (
+                                <HospitalOperatingHours operatingHours={hospital.operatingHours} compact />
+                              )}
+                              {hospitalDoctorCount(hospital) > 0 && (
+                                <ResultBadge tone="blue">
+                                  <Stethoscope className="h-3 w-3" aria-hidden="true" />
+                                  {t(hospitalDoctorCount(hospital) === 1 ? 'landing:facilityCard.doctorListed' : 'landing:facilityCard.doctorsListed', { count: hospitalDoctorCount(hospital) })}
+                                </ResultBadge>
+                              )}
+                              {(hospital.emergencyAvailable === true || hospital.emergencyServices === true) && (
+                                <ResultBadge tone="amber"><Cross className="h-3 w-3" aria-hidden="true" /> {t('landing:facilityCard.emergencyAvailable')}</ResultBadge>
+                              )}
+                              {(hospital.bookableDoctors || []).length > 0 && (
+                                <ResultBadge><CalendarCheck2 className="h-3 w-3" aria-hidden="true" /> {t('landing:facilityCard.bookingAvailable')}</ResultBadge>
+                              )}
+                            </div>
+
+                            {(!hasPublishedGoogleRating(hospital) || !hasPublishedOperatingHours(hospital) || hospitalDoctorCount(hospital) === 0) && (
+                              <p className="mt-4 text-xs leading-5 text-care-muted">{t('landing:facilityCard.partialData')}</p>
+                            )}
+
+                            <div className="mt-4 flex flex-wrap items-center gap-2">
+                              <FacilityVerificationBadge hospital={hospital} />
+                              {formatUpdatedDate(hospital.sourceLastUpdated || hospital.verifiedAt || hospital.updatedAt) && (
+                                <span className="text-xs text-care-muted">{t('landing:facilityCard.updated', { date: formatUpdatedDate(hospital.sourceLastUpdated || hospital.verifiedAt || hospital.updatedAt) })}</span>
+                              )}
+                            </div>
+
+                            <div className="mt-auto flex flex-col gap-2 pt-5">
+                              <Link
+                                to={`/hospital/${hospital.id}`}
+                                state={{ hospital }}
+                                onClick={() => trackInteraction('hospital_result_opened', { sourceType: hospital.sourceType || hospital.source_type || 'directory' })}
+                                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-care-primary px-4 text-sm font-semibold text-white hover:bg-care-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2"
+                              >
+                                {t(hospitalDoctorCount(hospital) > 0 ? 'landing:facilityCard.viewFacilityDoctors' : 'landing:facilityCard.viewHospital')}
+                                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                              </Link>
+                              {facilityDirectionsUrl(hospital) && (
+                                <a
+                                  href={facilityDirectionsUrl(hospital)}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  onClick={() => trackInteraction('directions_clicked', { listingType: 'hospital' })}
+                                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-care-border px-4 text-sm font-semibold text-care-heading hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary"
+                                >
+                                  <Navigation className="h-4 w-4" aria-hidden="true" /> {t('landing:facilityCard.getDirections')} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                                </a>
+                              )}
+                            </div>
                           </article>
                         ))}
                       </div>
+                    ) : hospitals.length > 0 ? (
+                      <DirectoryEmptyState
+                        icon={Filter}
+                        title={t('landing:emptyStates.noFilterTitle')}
+                        copy={t('landing:directory.noFilteredFacilities')}
+                        actions={[{ label: t('landing:directory.clearFilter'), eventName: 'clear_filter', onClick: () => setFacilityFilter('all') }]}
+                      />
                     ) : (
-                      <div className="rounded-lg border border-dashed border-care-border bg-care-surface p-10 text-center text-sm text-care-muted">{t('landing:directory.noFacilities')}</div>
+                      <DirectoryEmptyState
+                        icon={SearchX}
+                        title={t('landing:emptyStates.noFacilitiesTitle')}
+                        copy={t('landing:emptyStates.noFacilitiesCopy', { location: activeLocationName })}
+                        actions={[
+                          {
+                            label: t('landing:emptyStates.changeLocation'),
+                            eventName: 'change_location',
+                            onClick: () => {
+                              document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' });
+                              window.setTimeout(() => locationInputRef.current?.focus(), 250);
+                            },
+                          },
+                          query.trim() ? {
+                            label: t('landing:emptyStates.clearSearch'),
+                            eventName: 'clear_search',
+                            onClick: () => {
+                              setQuery('');
+                              runSearch({ requestedMode: 'hospitals', requestedQuery: '' });
+                            },
+                          } : null,
+                        ].filter(Boolean)}
+                      />
                     )}
                   </div>
                 )}
@@ -1234,24 +1676,25 @@ export default function LandingPage() {
         </section>
 
         <section id="trust" className="bg-care-surface">
-          <div className="care-reveal mx-auto grid max-w-7xl gap-10 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:items-center">
-            <div className="relative">
-              <img src={consultationImage} alt="Doctor discussing a care plan with an older patient" className="aspect-[4/3] w-full rounded-lg object-cover" />
-              <div className="absolute bottom-4 left-4 right-4 rounded-lg border border-care-border/70 bg-care-surface/95 p-4 shadow-lg sm:right-auto sm:max-w-xs">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="h-7 w-7 text-care-primary-hover" />
-                  <div><strong className="block text-sm text-care-heading">{t('landing:trust.cardTitle')}</strong><span className="text-xs text-care-muted">{t('landing:trust.cardCopy')}</span></div>
+          <div className="care-reveal mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 lg:grid-cols-2 lg:items-center">
+            <div>
+              <img src={consultationImage} alt={t('landing:trust.imageAlt')} width="1200" height="900" loading="lazy" decoding="async" className="aspect-[4/3] w-full rounded-lg object-cover" />
+              <div className="mt-4 flex items-start gap-3">
+                <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-care-primary-hover" aria-hidden="true" />
+                <div>
+                  <strong className="block text-sm text-care-heading">{t('landing:trust.cardTitle')}</strong>
+                  <span className="mt-1 block text-sm leading-6 text-care-muted">{t('landing:trust.cardCopy')}</span>
                 </div>
               </div>
             </div>
             <div>
               <span className="text-xs font-bold text-care-primary-hover">{t('landing:trust.eyebrow')}</span>
-              <h2 className="mt-3 text-3xl font-bold leading-tight text-care-heading sm:text-4xl">{t('landing:trust.title')}</h2>
-              <p className="mt-5 text-base leading-7 text-care-muted">{t('landing:trust.copy')}</p>
+              <h2 className="mt-3 text-3xl font-bold leading-tight text-care-heading">{t('landing:trust.title')}</h2>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-care-muted">{t('landing:trust.copy')}</p>
               <div className="mt-8 grid gap-5 sm:grid-cols-2">
                 {[
                   [t('landing:trust.verifiedTitle'), t('landing:trust.verifiedCopy')],
-                  [t('landing:trust.availabilityTitle'), t('landing:trust.availabilityCopy')],
+                  [t('landing:trust.sourcesTitle'), t('landing:trust.sourcesCopy')],
                   [t('landing:trust.privacyTitle'), t('landing:trust.privacyCopy')],
                   [t('landing:trust.discoveryTitle'), t('landing:trust.discoveryCopy')],
                 ].map(([title, copy]) => (
@@ -1261,35 +1704,82 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <a href="#search-results" className="mt-8 inline-flex items-center gap-2 rounded-lg bg-care-primary px-5 py-3 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">{t('landing:trust.cta')} <ArrowRight className="h-4 w-4" /></a>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!verificationDetailsOpen) trackInteraction('verification_explanation_opened');
+                  setVerificationDetailsOpen(value => !value);
+                }}
+                aria-expanded={verificationDetailsOpen}
+                aria-controls="verification-details"
+                className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-lg bg-care-primary px-5 text-sm font-semibold text-care-surface hover:bg-care-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2"
+              >
+                {t('landing:trust.cta')} <ArrowRight className={`h-4 w-4 transition-transform ${verificationDetailsOpen ? 'rotate-90' : ''}`} aria-hidden="true" />
+              </button>
+              {verificationDetailsOpen && (
+                <div id="verification-details" className="mt-5 space-y-3 border-l-2 border-care-primary pl-4 text-sm leading-6 text-care-muted">
+                  <p><strong className="text-care-heading">{t('landing:facilityCard.providerVerified')}:</strong> {t('landing:facilityCard.providerVerifiedExplanation')}</p>
+                  <p><strong className="text-care-heading">{t('landing:facilityCard.publicSourceVerified')}:</strong> {t('landing:facilityCard.publicSourceVerifiedExplanation')}</p>
+                  <p><strong className="text-care-heading">{t('landing:facilityCard.communityMapped')}:</strong> {t('landing:facilityCard.communityMappedExplanation')}</p>
+                </div>
+              )}
             </div>
           </div>
         </section>
 
         <section className="bg-care-neutral">
-          <div className="care-reveal mx-auto max-w-7xl px-5 py-20 sm:px-8">
-            <div className="mx-auto mb-10 max-w-2xl text-center">
+          <div className="care-reveal mx-auto max-w-7xl px-5 py-16 sm:px-8">
+            <div className="mx-auto mb-8 max-w-2xl text-center">
               <span className="text-xs font-bold text-care-primary-hover">{t('landing:more.eyebrow')}</span>
               <h2 className="mt-3 text-3xl font-bold text-care-heading">{t('landing:more.title')}</h2>
             </div>
-            <div className="care-stagger grid gap-5 md:grid-cols-3">
-              <article className="care-hover overflow-hidden rounded-lg border border-care-border bg-care-surface">
-                <img src={diagnosticsImage} alt="Clinical team reviewing diagnostic results" className="aspect-[16/10] w-full object-cover" />
-                <div className="p-5"><FlaskConical className="h-5 w-5 text-care-primary-hover" /><h3 className="mt-3 font-bold text-care-heading">{t('landing:more.diagnosticsTitle')}</h3><p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:more.diagnosticsCopy')}</p><button type="button" onClick={() => { setSearchMode('hospitals'); setQuery('diagnostic'); document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-4 text-sm font-semibold text-care-primary-hover">{t('landing:more.findDiagnostics')} <ArrowRight className="ml-1 inline h-4 w-4" /></button></div>
+            <div className="care-stagger grid items-stretch gap-5 md:grid-cols-3">
+              <article className="care-hover flex h-full flex-col overflow-hidden rounded-lg border border-care-border bg-care-surface">
+                <img src={diagnosticsImage} alt={t('landing:more.diagnosticsAlt')} width="1200" height="900" className="h-40 w-full object-cover" loading="lazy" decoding="async" />
+                <div className="flex flex-1 flex-col p-5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover"><FlaskConical className="h-5 w-5" aria-hidden="true" /></span>
+                  <h3 className="mt-4 text-lg font-bold text-care-heading">{t('landing:more.diagnosticsTitle')}</h3>
+                  <p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:more.diagnosticsCopy')}</p>
+                  <button type="button" onClick={() => { setSearchMode('hospitals'); setQuery('diagnostic'); document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-care-border px-4 text-sm font-semibold text-care-heading hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">
+                    {t('landing:more.findDiagnostics')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
               </article>
-              <article className="care-hover overflow-hidden rounded-lg border border-care-border bg-care-surface">
-                <img src={heroImage} alt="Doctor meeting a patient at a clinic" className="aspect-[16/10] w-full object-cover object-[70%_center]" />
-                <div className="p-5"><CalendarCheck2 className="h-5 w-5 text-care-primary-hover" /><h3 className="mt-3 font-bold text-care-heading">{t('landing:more.appointmentsTitle')}</h3><p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:more.appointmentsCopy')}</p><button type="button" onClick={() => { setSearchMode('doctors'); document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-4 text-sm font-semibold text-care-primary-hover">{t('landing:more.findAppointment')} <ArrowRight className="ml-1 inline h-4 w-4" /></button></div>
+              <article className="care-hover flex h-full flex-col overflow-hidden rounded-lg border border-care-border bg-care-surface">
+                <img src={heroImage} alt={t('landing:more.appointmentsAlt')} width="1600" height="900" className="h-40 w-full object-cover object-[70%_center]" loading="lazy" decoding="async" />
+                <div className="flex flex-1 flex-col p-5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover"><CalendarCheck2 className="h-5 w-5" aria-hidden="true" /></span>
+                  <h3 className="mt-4 text-lg font-bold text-care-heading">{t('landing:more.appointmentsTitle')}</h3>
+                  <p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:more.appointmentsCopy')}</p>
+                  <button type="button" onClick={() => { setSearchMode('doctors'); document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-care-border px-4 text-sm font-semibold text-care-heading hover:bg-care-primary-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">
+                    {t('landing:more.findAppointment')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
               </article>
-              <article id="emergency" className="care-hover flex flex-col justify-between rounded-lg border border-care-heading bg-care-heading p-6 text-care-surface">
+              <article id="emergency" className="flex h-full flex-col justify-between rounded-lg border border-care-danger border-l-4 bg-care-surface p-6 text-care-heading">
                 <div>
-                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-care-surface/12"><PhoneCall className="h-5 w-5" /></span>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-red-50 text-care-danger"><PhoneCall className="h-5 w-5" aria-hidden="true" /></span>
                   <h3 className="mt-6 text-xl font-bold">{t('landing:more.urgentTitle')}</h3>
-                  <p className="mt-3 text-sm leading-6 text-care-primary-subtle">{t('landing:more.urgentCopy')}</p>
+                  <p className="mt-3 text-sm leading-6 text-care-body">{t('landing:more.urgentCopy')}</p>
                 </div>
                 <div className="mt-8 space-y-3">
-                  <button type="button" onClick={() => { setSearchMode('hospitals'); setQuery('emergency'); requestLocation(); }} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-care-surface px-4 py-3 text-sm font-bold text-care-heading"><Cross className="h-4 w-4" /> {t('landing:more.findEmergency')}</button>
-                  <p className="text-center text-xs text-care-primary-subtle">{t('landing:more.emergencyNote')}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackInteraction('emergency_care_action_clicked');
+                      setSearchMode('hospitals');
+                      setQuery('emergency');
+                      runSearch({ requestedMode: 'hospitals', requestedQuery: 'emergency' });
+                      document.querySelector('#search-results')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-care-danger px-4 text-sm font-bold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-care-danger focus-visible:ring-offset-2"
+                  >
+                    <Cross className="h-4 w-4" aria-hidden="true" /> {t('landing:more.findEmergency')}
+                  </button>
+                  <a href="tel:112" onClick={() => trackInteraction('emergency_call_clicked')} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-care-danger px-4 text-sm font-bold text-care-danger hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-care-danger focus-visible:ring-offset-2">
+                    <PhoneCall className="h-4 w-4" aria-hidden="true" /> {t('landing:more.callEmergency')}
+                  </a>
+                  <p className="text-center text-xs leading-5 text-care-muted">{t('landing:more.emergencyNote')}</p>
                 </div>
               </article>
             </div>
@@ -1297,8 +1787,8 @@ export default function LandingPage() {
         </section>
 
         <section id="health-guides" className="bg-care-surface">
-          <div className="care-reveal mx-auto max-w-7xl px-5 py-20 sm:px-8">
-            <div className="mb-9 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div className="care-reveal mx-auto max-w-7xl px-5 py-16 sm:px-8">
+            <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
               <div><span className="text-xs font-bold text-care-primary-hover">{t('landing:guides.eyebrow')}</span><h2 className="mt-3 text-3xl font-bold text-care-heading">{t('landing:guides.title')}</h2></div>
               <div className="inline-flex items-center gap-2 text-xs text-care-muted"><ShieldCheck className="h-4 w-4 text-care-primary-hover" /> {t('landing:guides.reviewNote')}</div>
             </div>
@@ -1316,12 +1806,29 @@ export default function LandingPage() {
         </section>
 
         <section className="border-y border-care-border bg-care-neutral">
-          <div className="care-reveal mx-auto flex max-w-7xl flex-col gap-7 px-5 py-12 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl"><span className="text-xs font-bold text-care-primary-hover">{t('landing:teams.eyebrow')}</span><h2 className="mt-2 text-2xl font-bold text-care-heading">{t('landing:teams.title')}</h2><p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:teams.copy')}</p></div>
-            <div className="flex flex-wrap gap-2">
-              <Link to="/login/patient" className="rounded-lg border border-care-border bg-care-surface px-4 py-2.5 text-sm font-semibold text-care-heading hover:bg-care-neutral">{t('landing:teams.patientPortal')}</Link>
-              <Link to="/login/doctor" className="rounded-lg border border-care-border bg-care-surface px-4 py-2.5 text-sm font-semibold text-care-heading hover:bg-care-neutral">{t('landing:teams.doctorPortal')}</Link>
-              <Link to="/login/admin" className="rounded-lg bg-care-primary px-4 py-2.5 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">{t('landing:teams.hospitalPortal')}</Link>
+          <div className="care-reveal mx-auto max-w-7xl px-5 py-12 sm:px-8">
+            <div className="max-w-2xl">
+              <span className="text-xs font-bold text-care-primary-hover">{t('landing:teams.eyebrow')}</span>
+              <h2 className="mt-2 text-2xl font-bold text-care-heading">{t('landing:teams.title')}</h2>
+              <p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:teams.copy')}</p>
+            </div>
+            <div className="mt-6 grid gap-3 md:grid-cols-3">
+              {[
+                { to: '/login/patient', icon: User, title: t('landing:teams.patientPortal'), copy: t('landing:teams.patientCopy') },
+                { to: '/login/doctor', icon: Stethoscope, title: t('landing:teams.doctorPortal'), copy: t('landing:teams.doctorCopy') },
+                { to: '/login/admin', icon: Building2, title: t('landing:teams.hospitalPortal'), copy: t('landing:teams.hospitalCopy') },
+              ].map(portal => {
+                const Icon = portal.icon;
+                return (
+                  <Link key={portal.to} to={portal.to} className="group flex min-h-32 items-start gap-4 rounded-lg border border-care-border bg-care-surface p-4 text-left hover:-translate-y-0.5 hover:border-care-primary hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover"><Icon className="h-5 w-5" aria-hidden="true" /></span>
+                    <span>
+                      <strong className="block text-sm text-care-heading">{portal.title}</strong>
+                      <span className="mt-2 block text-sm leading-6 text-care-muted">{portal.copy}</span>
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -1333,10 +1840,10 @@ export default function LandingPage() {
             <div><PublicLogo light /><p className="mt-4 max-w-sm text-sm leading-6 text-care-primary-subtle">{t('landing:footer.copy')}</p></div>
             <div><h3 className="text-sm font-bold">{t('landing:footer.findCare')}</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#search-results">{t('nav:doctors')}</a><a href="#facilities">{t('nav:hospitals')}</a><a href="#services">{t('nav:services')}</a><a href="#emergency">{t('landing:footer.emergencyGuidance')}</a></div></div>
             <div><h3 className="text-sm font-bold">Swasthya Sarthi</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#trust">{t('landing:footer.verification')}</a><a href="#health-guides">{t('nav:healthGuides')}</a><Link to="/login/doctor">{t('landing:footer.forDoctors')}</Link><Link to="/login/admin">{t('landing:footer.forHospitals')}</Link></div></div>
-            <div><h3 className="text-sm font-bold">{t('landing:footer.language')}</h3><div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-care-border/20 px-3 py-2 text-sm text-care-primary-subtle"><Languages className="h-4 w-4" /> {t('landing:footer.localeName')}</div></div>
+            <div><h3 className="text-sm font-bold">{t('landing:footer.language')}</h3><div className="mt-4"><LanguageSwitcher /></div></div>
           </div>
           <div className="mt-10 flex flex-col gap-4 border-t border-care-border/15 pt-6 text-xs text-care-primary-subtle sm:flex-row sm:items-center sm:justify-between">
-            <span>{t('landing:footer.disclaimer')}</span>
+            <span>{t('landing:footer.disclaimer', { year: currentYear })}</span>
             <nav className="flex gap-5" aria-label={t('landing:footer.legal')}><Link to="/legal/privacy">{t('landing:footer.privacy')}</Link><Link to="/legal/terms">{t('landing:footer.terms')}</Link><Link to="/legal/security">{t('landing:footer.security')}</Link></nav>
           </div>
         </div>

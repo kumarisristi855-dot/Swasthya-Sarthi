@@ -5,9 +5,9 @@ export function SkeletonLine({ className = '' }) {
   return <span className={`block h-3 animate-pulse rounded bg-care-neutral ${className}`} aria-hidden="true" />;
 }
 
-export function CardSkeleton({ count = 3 }) {
+export function CardSkeleton({ count = 3, label = 'Loading results' }) {
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3" role="status" aria-label="Loading results">
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3" role="status" aria-label={label}>
       {Array.from({ length: count }, (_, index) => (
         <Card key={index} className="space-y-4">
           <div className="flex items-center gap-3">
@@ -22,7 +22,7 @@ export function CardSkeleton({ count = 3 }) {
           <span className="block h-10 animate-pulse rounded-lg bg-care-neutral" />
         </Card>
       ))}
-      <span className="sr-only">Loading healthcare results...</span>
+      <span className="sr-only">{label}</span>
     </div>
   );
 }

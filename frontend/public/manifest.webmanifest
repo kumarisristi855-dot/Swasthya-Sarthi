@@ -1,0 +1,17 @@
+{
+  "name": "Swasthya Sarthi",
+  "short_name": "Swasthya Sarthi",
+  "description": "Find source-labelled doctors, hospitals and clinics near you.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f8fb",
+  "theme_color": "#18a889",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

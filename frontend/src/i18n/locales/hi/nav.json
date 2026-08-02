@@ -1,9 +1,11 @@
 {
   "brand": "Swasthya Sarthi",
+  "findDoctors": "डॉक्टर खोजें",
   "services": "सेवाएं",
   "doctors": "डॉक्टर",
   "hospitals": "अस्पताल",
   "healthGuides": "स्वास्थ्य गाइड",
+  "howItWorks": "यह कैसे काम करता है",
   "whyBrand": "Swasthya Sarthi क्यों",
   "myAppointments": "मेरी अपॉइंटमेंट्स",
   "doctorDirectory": "डॉक्टर डायरेक्टरी",
