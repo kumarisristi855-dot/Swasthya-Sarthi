@@ -1,0 +1,754 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --color-primary: #18a889;
+    --color-primary-hover: #148e74;
+    --color-primary-subtle: #e7f7f2;
+    --color-text-heading: #12304a;
+    --color-text-body: #163149;
+    --color-text-muted: #637b8d;
+    --color-warning-accent: #f59e0b;
+    --color-danger: #be123c;
+    --color-success: #18a889;
+    --color-neutral-bg: #f4f8fb;
+    --color-surface: #ffffff;
+    --color-border: #dbe5ec;
+
+    /* Compatibility aliases for existing CareSync component styles. */
+    --care-bg: var(--color-neutral-bg);
+    --care-surface: var(--color-surface);
+    --care-surface-raised: var(--color-surface);
+    --care-border: var(--color-border);
+    --care-border-strong: color-mix(in srgb, var(--color-border) 78%, var(--color-text-heading));
+    --care-text: var(--color-text-body);
+    --care-muted: var(--color-text-muted);
+    --care-primary: var(--color-primary);
+    --care-primary-hover: var(--color-primary-hover);
+  }
+
+  * {
+    box-sizing: border-box;
+    letter-spacing: 0 !important;
+  }
+
+  html {
+    min-width: 320px;
+    background: var(--color-neutral-bg);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: clip;
+    background: var(--color-neutral-bg);
+    color: var(--color-text-body);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  a {
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease,
+      opacity 160ms ease,
+      transform 160ms ease;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  input,
+  textarea,
+  select {
+    color-scheme: light;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-primary) 30%, transparent);
+    color: var(--color-surface);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-neutral-bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-text-muted);
+    border: 2px solid var(--color-neutral-bg);
+    border-radius: 8px;
+  }
+}
+
+@layer components {
+  .care-shell {
+    @apply min-h-screen;
+    background: var(--care-bg);
+    color: var(--care-text);
+  }
+
+  .care-header {
+    @apply sticky top-0 z-30 border-b backdrop-blur-md;
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+    border-color: var(--care-border);
+    box-shadow: 0 8px 28px color-mix(in srgb, var(--color-text-heading) 6%, transparent);
+  }
+
+  .care-navbar-inner {
+    @apply mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8;
+  }
+
+  .patient-portal-header {
+    @apply sticky top-0 z-30 w-full;
+    height: 80px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .patient-portal-navbar {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding-left: 32px;
+    padding-right: 32px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .care-surface {
+    @apply rounded-lg border;
+    background: var(--care-surface);
+    border-color: var(--care-border);
+  }
+
+  .care-surface-raised {
+    @apply rounded-lg border shadow-xl;
+    background: var(--care-surface-raised);
+    border-color: var(--care-border-strong);
+    box-shadow: 0 18px 50px color-mix(in srgb, var(--color-text-heading) 10%, transparent);
+  }
+
+  .care-card {
+    @apply rounded-lg border;
+    background: var(--color-surface);
+    border-color: var(--care-border);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--color-text-heading) 5.5%, transparent);
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .care-card-hover:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+    box-shadow: 0 14px 30px color-mix(in srgb, var(--color-text-heading) 10%, transparent);
+  }
+
+  .care-card-hover:focus-within {
+    border-color: var(--care-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 13%, transparent), 0 14px 30px color-mix(in srgb, var(--color-text-heading) 8%, transparent);
+  }
+
+  .care-badge {
+    @apply inline-flex min-h-6 w-fit items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-semibold leading-none;
+  }
+
+  .care-badge-success {
+    color: var(--color-primary-hover);
+    background: var(--color-primary-subtle);
+    border-color: color-mix(in srgb, var(--color-success) 35%, var(--color-border));
+  }
+
+  .care-badge-danger {
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--color-danger) 30%, var(--color-border));
+  }
+
+  .care-badge-warning {
+    color: color-mix(in srgb, var(--color-warning-accent) 62%, var(--color-text-heading));
+    background: color-mix(in srgb, var(--color-warning-accent) 11%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--color-warning-accent) 36%, var(--color-border));
+  }
+
+  .care-badge-info,
+  .care-badge-neutral {
+    color: var(--color-text-body);
+    background: var(--color-neutral-bg);
+    border-color: var(--color-border);
+  }
+
+  .care-label {
+    @apply mb-1.5 block text-xs font-semibold;
+    color: var(--color-text-muted);
+  }
+
+  .care-input {
+    @apply w-full rounded-lg border px-3 py-2.5 text-sm outline-none;
+    color: var(--color-text-body);
+    background: var(--color-surface);
+    border-color: var(--care-border-strong);
+  }
+
+  .care-input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .care-input:hover {
+    border-color: color-mix(in srgb, var(--color-text-heading) 35%, var(--color-border));
+  }
+
+  .care-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent);
+  }
+
+  .care-button-primary {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50;
+    background: var(--care-primary);
+  }
+
+  .care-button-primary:hover:not(:disabled) {
+    background: var(--care-primary-hover);
+    transform: translateY(-1px);
+  }
+
+  .care-button-secondary {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold;
+    color: var(--color-text-heading);
+    background: var(--color-surface);
+    border-color: var(--care-border-strong);
+  }
+
+  .care-button-secondary:hover {
+    color: var(--color-primary-hover);
+    background: var(--color-primary-subtle);
+    border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
+  }
+
+  .care-button-ghost {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50;
+    color: var(--color-text-body);
+    background: transparent;
+  }
+
+  .care-button-ghost:hover:not(:disabled) {
+    color: var(--color-primary-hover);
+    background: var(--color-primary-subtle);
+  }
+
+  .care-button-danger {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50;
+    background: var(--color-danger);
+  }
+
+  .care-button-danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-danger) 82%, var(--color-text-heading));
+  }
+
+  .care-button-sm {
+    @apply min-h-8 px-3 py-1.5 text-xs;
+  }
+
+  .care-button-lg {
+    @apply min-h-12 px-5 py-3 text-base;
+  }
+
+  .care-tab-panel {
+    animation: care-tab-enter 220ms ease-out both;
+  }
+
+  .care-eyebrow {
+    @apply text-xs font-semibold;
+    color: var(--color-primary-hover);
+  }
+
+  .care-muted {
+    color: var(--care-muted);
+  }
+
+  .care-segmented {
+    @apply flex w-fit max-w-full gap-1 overflow-x-auto rounded-lg border p-1;
+    background: var(--color-surface);
+    border-color: var(--care-border);
+  }
+
+  .care-segment {
+    @apply inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold;
+    color: var(--color-text-muted);
+  }
+
+  .care-segment:hover {
+    color: var(--color-text-heading);
+    background: var(--color-neutral-bg);
+  }
+
+  .care-segment-active {
+    color: var(--color-primary-hover);
+    background: var(--color-primary-subtle);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 28%, var(--color-border));
+  }
+
+  .public-header-motion {
+    transition:
+      box-shadow 220ms ease,
+      border-color 220ms ease,
+      background-color 220ms ease;
+  }
+
+  .public-header-scrolled {
+    border-color: var(--color-border);
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--color-text-heading) 8%, transparent);
+  }
+
+  .care-modal-backdrop {
+    background: color-mix(in srgb, var(--color-text-heading) 55%, transparent);
+  }
+
+  .care-modal-backdrop-strong {
+    background: color-mix(in srgb, var(--color-text-heading) 65%, transparent);
+  }
+
+  .care-hero-overlay {
+    background: color-mix(in srgb, var(--color-text-heading) 76%, transparent);
+  }
+
+  .care-token-dot-pattern {
+    background-image: radial-gradient(circle, var(--color-primary) 1.2px, transparent 1.4px);
+    background-size: 12px 12px;
+  }
+
+  .care-logo-pulse-base {
+    opacity: 0.3;
+  }
+
+  .care-logo-pulse-scan {
+    clip-path: inset(0 100% 0 0);
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--color-surface) 85%, transparent));
+    animation: care-logo-scan 2.6s ease-in-out infinite;
+  }
+
+  .care-logo-word-shine {
+    --care-logo-word-color: var(--color-text-heading);
+    --care-logo-word-glint: var(--color-surface);
+    --care-logo-word-accent: var(--color-primary);
+    display: inline-block;
+    background: linear-gradient(
+      100deg,
+      var(--care-logo-word-color) 0%,
+      var(--care-logo-word-color) 34%,
+      var(--care-logo-word-glint) 45%,
+      var(--care-logo-word-accent) 52%,
+      var(--care-logo-word-color) 62%,
+      var(--care-logo-word-color) 100%
+    );
+    background-size: 260% 100%;
+    background-position: 130% 0;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: care-word-shine 3.8s ease-in-out infinite;
+  }
+
+  .care-logo-word-shine-light {
+    --care-logo-word-color: var(--color-surface);
+    --care-logo-word-glint: var(--color-primary-subtle);
+    --care-logo-word-accent: var(--color-primary);
+  }
+
+  .public-hero-image {
+    animation: care-image-breathe 18s ease-in-out infinite alternate;
+    transform-origin: 70% 45%;
+  }
+
+  .public-hero-content {
+    animation: care-hero-settle 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .public-search-dock {
+    animation: care-dock-settle 760ms 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .care-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 620ms ease,
+      transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .care-reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .care-hover {
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease,
+      border-color 220ms ease,
+      background-color 220ms ease;
+  }
+
+  .care-hover:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--color-text-heading) 10%, transparent);
+  }
+
+  .care-hover img {
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .care-hover:hover img {
+    transform: scale(1.025);
+  }
+
+  .care-action svg:last-child {
+    transition: transform 180ms ease;
+  }
+
+  .care-action:hover svg:last-child {
+    transform: translateX(3px);
+  }
+
+  .care-stagger > * {
+    animation: care-card-settle 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .care-stagger > *:nth-child(2) { animation-delay: 55ms; }
+  .care-stagger > *:nth-child(3) { animation-delay: 110ms; }
+  .care-stagger > *:nth-child(4) { animation-delay: 165ms; }
+  .care-stagger > *:nth-child(5) { animation-delay: 220ms; }
+  .care-stagger > *:nth-child(6) { animation-delay: 275ms; }
+  .care-stagger > *:nth-child(7) { animation-delay: 330ms; }
+  .care-stagger > *:nth-child(8) { animation-delay: 385ms; }
+
+  :is(.patient-dashboard, .portal-dashboard) {
+    color-scheme: light;
+    background: var(--color-neutral-bg);
+    color: var(--color-text-body);
+  }
+
+  :is(.patient-dashboard, .portal-dashboard) .care-header {
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+    border-color: var(--color-border);
+    box-shadow: 0 8px 28px color-mix(in srgb, var(--color-text-heading) 6%, transparent);
+  }
+
+  :is(.patient-dashboard, .portal-dashboard) .care-surface {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-text-heading) 4.5%, transparent);
+  }
+
+  :is(.patient-dashboard, .portal-dashboard) .care-surface:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--color-text-heading) 8%, transparent);
+  }
+
+  :is(.patient-dashboard, .portal-dashboard) .care-segmented {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--color-text-heading) 4.5%, transparent);
+  }
+
+  :is(.patient-dashboard, .portal-dashboard) .care-segment {
+    color: var(--color-text-muted);
+  }
+
+  :is(.patient-dashboard, .portal-dashboard) .care-segment:hover {
+    color: var(--color-text-heading);
+    background: var(--color-neutral-bg);
+  }
+
+  :is(.patient-dashboard, .portal-dashboard) .care-segment-active {
+    color: var(--color-primary-hover);
+    background: var(--color-primary-subtle);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 28%, var(--color-border));
+  }
+
+  .patient-dashboard .patient-input {
+    color-scheme: light;
+    color: var(--color-text-body);
+    background: var(--color-surface);
+    border: 1px solid var(--care-border-strong);
+    outline: none;
+  }
+
+  .patient-dashboard .patient-input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .patient-dashboard .patient-input:hover {
+    border-color: var(--care-border-strong);
+  }
+
+  .patient-dashboard .patient-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 13%, transparent);
+  }
+
+  .patient-dashboard .patient-button-secondary {
+    color: var(--color-text-body);
+    background: var(--color-surface);
+    border-color: var(--care-border-strong);
+  }
+
+  .patient-dashboard .patient-button-secondary:hover {
+    color: var(--color-primary-hover);
+    border-color: var(--color-primary);
+    background: var(--color-primary-subtle);
+  }
+
+  .patient-dashboard .patient-chip {
+    color: var(--color-text-muted);
+    background: var(--color-neutral-bg);
+    border-color: var(--color-border);
+  }
+
+  .patient-dashboard .patient-chip:hover {
+    color: var(--color-primary-hover);
+    border-color: var(--color-primary);
+    background: var(--color-primary-subtle);
+  }
+
+  .patient-dashboard select option {
+    color: var(--color-text-body);
+    background: var(--color-surface);
+  }
+
+  .portal-dashboard .portal-page-header {
+    @apply mb-7 border-b pb-6;
+    border-color: var(--color-border);
+  }
+
+  .portal-dashboard .portal-panel-title {
+    color: var(--color-text-heading);
+  }
+
+  .portal-dashboard .portal-empty-state {
+    @apply rounded-lg border border-dashed px-5 py-14 text-center text-sm;
+    color: var(--color-text-muted);
+    background: var(--color-neutral-bg);
+    border-color: var(--color-border);
+  }
+
+  .care-alert-success,
+  .care-alert-warning,
+  .care-alert-danger {
+    @apply rounded-lg border p-3 text-sm;
+  }
+
+  .care-alert-success {
+    color: var(--color-primary-hover);
+    background: var(--color-primary-subtle);
+    border-color: color-mix(in srgb, var(--color-success) 32%, var(--color-border));
+  }
+
+  .care-alert-warning {
+    color: color-mix(in srgb, var(--color-warning-accent) 62%, var(--color-text-heading));
+    background: color-mix(in srgb, var(--color-warning-accent) 10%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--color-warning-accent) 34%, var(--color-border));
+  }
+
+  .care-alert-danger {
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 6%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--color-danger) 28%, var(--color-border));
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) {
+    min-height: 100vh;
+    color-scheme: light;
+    color: var(--color-text-body);
+    background: var(--color-neutral-bg);
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) header {
+    border-color: var(--color-border) !important;
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) input:not([type="checkbox"]):not([type="radio"]),
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) textarea,
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) select {
+    color-scheme: light;
+    color: var(--color-text-body) !important;
+    background-color: var(--color-surface) !important;
+    border-color: var(--care-border-strong) !important;
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) input::placeholder,
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) textarea::placeholder {
+    color: var(--color-text-muted) !important;
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) input:focus,
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) textarea:focus,
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) select:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 13%, transparent);
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) select option {
+    color: var(--color-text-body);
+    background: var(--color-surface);
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) table {
+    color: var(--color-text-body);
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) thead {
+    color: var(--color-text-muted);
+    background: var(--color-neutral-bg) !important;
+  }
+
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) tr,
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) td,
+  :is(.portal-theme, .care-shell:not(.patient-dashboard)) th {
+    border-color: var(--color-border) !important;
+  }
+
+}
+
+@keyframes care-hero-settle {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes care-dock-settle {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes care-card-settle {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes care-image-breathe {
+  from { transform: scale(1); }
+  to { transform: scale(1.035); }
+}
+
+@keyframes care-logo-scan {
+  0%,
+  16% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.25;
+  }
+
+  68%,
+  84% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+}
+
+@keyframes care-word-shine {
+  0%,
+  34% {
+    background-position: 130% 0;
+  }
+
+  72%,
+  100% {
+    background-position: -130% 0;
+  }
+}
+
+@keyframes care-tab-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.leaflet-tooltip.care-map-facility-tooltip {
+  max-width: 260px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--color-text-heading);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-text-heading) 18%, transparent);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  padding: 6px 9px;
+  white-space: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .care-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "import:india:hospitals": "node import_india_hospitals.js",
+    "import:india:health-centres": "node import_india_health_centres.js",
+    "import:india:all": "npm run import:india:hospitals && npm run import:india:health-centres",
+    "repair:hospitals": "node repair_hospital_directory.js --dry-run",
+    "repair:hospitals:apply": "node repair_hospital_directory.js --apply",
+    "repair:facility-names": "node repair_government_facility_names.js --dry-run",
+    "repair:facility-names:apply": "node repair_government_facility_names.js --apply",
+    "repair:curated-facilities": "node repair_curated_facilities.js --dry-run",
+    "repair:curated-facilities:apply": "node repair_curated_facilities.js --apply",
+    "repair:missing-coordinates": "node repair_missing_hospital_coordinates.js --dry-run",
+    "repair:missing-coordinates:apply": "node repair_missing_hospital_coordinates.js --apply",
+    "governance:public-eligibility": "node enforce_public_directory_eligibility.js --dry-run",
+    "governance:public-eligibility:apply": "node enforce_public_directory_eligibility.js --apply",
+    "governance:dedupe-hospitals": "node mark_duplicate_hospitals_excluded.js",
+    "governance:dedupe-hospitals:apply": "node mark_duplicate_hospitals_excluded.js --apply",
+    "audit:hospitals": "node audit_hospital_database.js",
+    "audit:directory": "node audit_directory_consistency.js",
+    "audit:directory:all-states": "node audit_directory_consistency.js --all-states",
+    "seed:bokaro:doctors": "node seed_bokaro_verified_directory.js",
+    "seed:bokaro:community": "node seed_bokaro_community_facilities.js",
+    "seed:test:appointment": "node seed_test_appointment.js",
+    "seed:test:doctor2": "node ensure_test_doctor_2.js",
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.0",
+    "cors": "^2.8.6",
+    "csv-parse": "^6.2.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "resend": "^6.17.1",
+    "twilio": "^6.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
