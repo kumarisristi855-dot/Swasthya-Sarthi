@@ -818,16 +818,16 @@ export default function LandingPage() {
         </div>
       )}
       <header className={`public-header-motion sticky top-0 z-40 border-b border-care-border bg-care-surface/95 backdrop-blur-md ${headerScrolled ? 'public-header-scrolled' : ''}`}>
-        <div className="care-navbar-inner">
+        <div className="public-navbar-inner">
           <PublicLogo />
-          <nav className="hidden items-center gap-7 text-sm font-semibold text-care-muted lg:flex" aria-label="Primary navigation">
-            <a href="#services" className="hover:text-care-primary-hover">Services</a>
-            <a href="#search-results" className="hover:text-care-primary-hover">Doctors</a>
-            <a href="#facilities" className="hover:text-care-primary-hover">Hospitals</a>
-            <a href="#health-guides" className="hover:text-care-primary-hover">Health guides</a>
-            <a href="#trust" className="hover:text-care-primary-hover">Why Swasthya Sarthi</a>
+          <nav className="public-navbar-links" aria-label="Primary navigation">
+            <a href="#services" className="public-navbar-link">Services</a>
+            <a href="#search-results" className="public-navbar-link">Doctors</a>
+            <a href="#facilities" className="public-navbar-link">Hospitals</a>
+            <a href="#health-guides" className="public-navbar-link">Health guides</a>
+            <a href="#trust" className="public-navbar-link">Why Swasthya Sarthi</a>
           </nav>
-          <div className="hidden items-center gap-2 sm:flex">
+          <div className="public-navbar-actions">
             <Link to="/login/patient" className="rounded-lg px-4 py-2.5 text-sm font-semibold text-care-body hover:bg-care-neutral">Sign in</Link>
             <Link to="/signup/patient" className="rounded-lg bg-care-primary px-4 py-2.5 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">Create account</Link>
           </div>
@@ -837,11 +837,14 @@ export default function LandingPage() {
         </div>
         {mobileMenuOpen && (
           <nav className="border-t border-care-border bg-care-surface px-5 py-4 lg:hidden" aria-label="Mobile navigation">
-            <div className="grid gap-1 text-sm font-semibold text-care-body">
+            <div className="mx-auto grid max-w-7xl gap-1 text-sm font-semibold text-care-body sm:grid-cols-2">
               <a href="#services" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Services</a>
-              <a href="#search-results" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Find care</a>
+              <a href="#search-results" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Doctors</a>
+              <a href="#facilities" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Hospitals</a>
               <a href="#health-guides" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Health guides</a>
-              <Link to="/login/patient" className="mt-2 rounded-lg bg-care-primary px-3 py-3 text-center text-care-surface hover:bg-care-primary-hover">Sign in</Link>
+              <a href="#trust" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Why Swasthya Sarthi</a>
+              <Link to="/login/patient" onClick={() => setMobileMenuOpen(false)} className="mt-2 rounded-lg border border-care-border px-3 py-3 text-center text-care-heading hover:bg-care-neutral sm:mt-0">Sign in</Link>
+              <Link to="/signup/patient" onClick={() => setMobileMenuOpen(false)} className="rounded-lg bg-care-primary px-3 py-3 text-center text-care-surface hover:bg-care-primary-hover">Create account</Link>
             </div>
           </nav>
         )}
