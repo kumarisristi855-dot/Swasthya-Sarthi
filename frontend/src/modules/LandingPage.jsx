@@ -837,7 +837,7 @@ export default function LandingPage() {
         </div>
         {mobileMenuOpen && (
           <nav className="border-t border-care-border bg-care-surface px-5 py-4 lg:hidden" aria-label="Mobile navigation">
-            <div className="mx-auto grid max-w-7xl gap-1 text-sm font-semibold text-care-body sm:grid-cols-2">
+            <div className="grid w-full gap-1 text-sm font-semibold text-care-body sm:grid-cols-2">
               <a href="#services" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Services</a>
               <a href="#search-results" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Doctors</a>
               <a href="#facilities" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 hover:bg-care-neutral">Hospitals</a>

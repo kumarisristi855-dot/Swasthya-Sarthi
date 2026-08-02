@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export default function PublicHeader({ backLabel = 'Back to search' }) {
   return (
     <header className="sticky top-0 z-30 border-b border-care-border bg-care-surface/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
+      <div className="flex w-full items-center justify-between gap-4 px-3 py-3 sm:px-5">
         <div className="flex items-center gap-5">
           <Link to="/" className="inline-flex items-center gap-3" aria-label="Swasthya Sarthi home">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-care-primary text-care-surface">
