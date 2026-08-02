@@ -223,7 +223,7 @@ router.post('/patient/login', async (req, res) => {
 
 // Doctor Signup
 router.post('/doctor/signup', async (req, res) => {
-  const { email, password, fullName, phone, specializationId, licenseNo, yearsExperience, bio, hospitalId } = req.body;
+  const { email, password, fullName, phone, specializationId, licenseNo, yearsExperience, bio, hospitalId, hospitalName } = req.body;
 
   if (!email || !password || !fullName || !specializationId || !licenseNo) {
     return res.status(400).json({
@@ -300,13 +300,29 @@ router.post('/doctor/signup', async (req, res) => {
       });
     }
 
-    // 4. Create hospital affiliation if hospitalId is selected
-    if (hospitalId) {
+    let resolvedHospitalId = hospitalId || null;
+    const typedHospitalName = String(hospitalName || '').trim();
+    if (!resolvedHospitalId && typedHospitalName) {
+      const { data: matchedHospital, error: hospitalLookupError } = await supabase
+        .from('hospitals')
+        .select('id')
+        .ilike('name', typedHospitalName)
+        .limit(1)
+        .maybeSingle();
+
+      if (hospitalLookupError) {
+        console.warn('Could not resolve typed hospital during doctor signup:', hospitalLookupError.message);
+      }
+      resolvedHospitalId = matchedHospital?.id || null;
+    }
+
+    // 4. Create hospital affiliation if the typed hospital matches an existing hospital.
+    if (resolvedHospitalId) {
       const { error: affError } = await supabase
         .from('doctor_hospital_affiliations')
         .insert({
           doctor_id: authUser.id,
-          hospital_id: hospitalId,
+          hospital_id: resolvedHospitalId,
           status: 'invited'
         });
 

@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Stethoscope, Mail, Lock, Phone, Award, Clock, FileText, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { productionSafe } from '../../lib/developmentFixtures';
+import { ArrowLeft, Stethoscope, Mail, Lock, Phone, Award, Clock, FileText, AlertCircle, Eye, EyeOff, Building2 } from 'lucide-react';
 
 export default function DoctorSignup() {
   const { signup } = useAuth();
@@ -19,17 +18,16 @@ export default function DoctorSignup() {
     yearsExperience: '',
     consultationFee: '',
     bio: '',
-    hospitalId: ''
+    hospitalName: ''
   });
 
   const [specializations, setSpecializations] = useState([]);
-  const [hospitals, setHospitals] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Fetch specializations and hospitals from Supabase on mount
+  // Fetch specializations from Supabase on mount.
   useEffect(() => {
     async function loadLookupData() {
       try {
@@ -44,20 +42,9 @@ export default function DoctorSignup() {
           setSpecializations(specs);
           setFormData(prev => ({ ...prev, specializationId: specs[0].id.toString() }));
         }
-
-        const { data: hosps, error: hospError } = await supabase
-          .from('hospitals')
-          .select('id, name')
-          .order('name', { ascending: true });
-
-        if (hospError) throw hospError;
-
-        if (hosps) {
-          setHospitals(productionSafe(hosps));
-        }
       } catch (err) {
-        console.error('Failed to load form dropdown data:', err);
-        setError('Failed to load form options. Please reload page.');
+        console.error('Failed to load specialization options:', err);
+        setError('Failed to load specialization options. Please reload page.');
       }
     }
     loadLookupData();
@@ -239,17 +226,18 @@ export default function DoctorSignup() {
 
           <div>
             <label className="block text-xs font-semibold text-care-muted uppercase mb-1">Primary Hospital (Optional)</label>
-            <select
-              name="hospitalId"
-              value={formData.hospitalId}
-              onChange={handleChange}
-              className="w-full bg-care-surface border border-care-border rounded-lg py-2.5 px-4 text-care-body focus:outline-none focus:border-care-primary text-sm transition-colors"
-            >
-              <option value="">-- Select Hospital --</option>
-              {hospitals.map(hosp => (
-                <option key={hosp.id} value={hosp.id}>{hosp.name}</option>
-              ))}
-            </select>
+            <div className="relative">
+              <Building2 className="absolute left-3 top-3 w-4 h-4 text-care-muted" />
+              <input
+                type="text"
+                name="hospitalName"
+                value={formData.hospitalName}
+                onChange={handleChange}
+                placeholder="Type hospital name"
+                autoComplete="organization"
+                className="w-full bg-care-surface border border-care-border rounded-lg py-2.5 pl-10 pr-4 text-care-body placeholder:text-care-muted focus:outline-none focus:border-care-primary text-sm transition-colors"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
