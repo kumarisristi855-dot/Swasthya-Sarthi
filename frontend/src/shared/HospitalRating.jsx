@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader2, Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Badge from './ui/Badge';
 import { API_URL } from '../lib/api';
 
@@ -10,6 +11,7 @@ export function HospitalRatingSummary({
   className = '',
   inverse = false,
 }) {
+  const { t } = useTranslation(['landing']);
   const googleAverage = Number(googleRating?.rating);
   const googleCount = Number(googleRating?.ratingCount) || 0;
   const googleUnavailable = Boolean(googleRating?.unavailable);
@@ -20,21 +22,22 @@ export function HospitalRatingSummary({
       <Star className={`h-3.5 w-3.5 ${hasGoogleRating ? 'fill-care-warning text-care-warning' : 'text-care-muted'}`} />
       {hasGoogleRating ? (
         <>
-          <span>Google Maps</span>
+          <span>{t('landing:ratings.googleMaps')}</span>
           <span aria-hidden="true">&middot;</span>
           <strong className={inverse ? 'text-care-surface' : 'text-care-heading'}>{googleAverage.toFixed(1)}</strong>
-          <span>({googleCount} {googleCount === 1 ? 'rating' : 'ratings'})</span>
+          <span>({googleCount} {t(googleCount === 1 ? 'landing:ratings.rating' : 'landing:ratings.ratings')})</span>
         </>
       ) : googleUnavailable ? (
-        <span>{googleRating?.code === 'RESOURCE_EXHAUSTED' ? 'Google quota exhausted' : 'Google ratings unavailable'}</span>
+        <span>{googleRating?.code === 'RESOURCE_EXHAUSTED' ? t('landing:ratings.googleQuotaExhausted') : t('landing:ratings.googleUnavailable')}</span>
       ) : (
-        <span>Google Maps &middot; No rating found</span>
+        <span>{t('landing:ratings.googleNoRating')}</span>
       )}
     </Badge>
   );
 }
 
 export function GoogleHospitalRating({ googleRating, className = '' }) {
+  const { t } = useTranslation(['landing']);
   const count = Number(googleRating?.ratingCount) || 0;
   if (!googleRating || !Number.isFinite(Number(googleRating.rating)) || count < 1) return null;
 
@@ -43,7 +46,7 @@ export function GoogleHospitalRating({ googleRating, className = '' }) {
       <Star className="h-4 w-4 fill-care-warning text-care-warning" />
       <strong className="text-care-heading">{Number(googleRating.rating).toFixed(1)}</strong>
       <span>({count.toLocaleString()})</span>
-      <span className="ml-1 font-semibold text-care-body">Google Maps</span>
+      <span className="ml-1 font-semibold text-care-body">{t('landing:ratings.googleMaps')}</span>
     </>
   );
 
@@ -64,6 +67,7 @@ export function GoogleHospitalRating({ googleRating, className = '' }) {
 }
 
 export function DoctorRatingSummary({ ratingAvg = 0, ratingCount = 0, className = '' }) {
+  const { t } = useTranslation(['landing']);
   const count = Number(ratingCount) || 0;
   const average = Number(ratingAvg) || 0;
   const hasRating = count >= 1 && average > 0;
@@ -71,7 +75,9 @@ export function DoctorRatingSummary({ ratingAvg = 0, ratingCount = 0, className 
   return (
     <Badge variant={hasRating ? 'warning' : 'neutral'} className={className}>
       <Star className={`h-3.5 w-3.5 ${hasRating ? 'fill-care-warning text-care-warning' : 'text-care-muted'}`} />
-      {hasRating ? `${average.toFixed(1)} (${count} ${count === 1 ? 'review' : 'reviews'})` : 'No reviews yet'}
+      {hasRating
+        ? `${average.toFixed(1)} (${count} ${t(count === 1 ? 'landing:ratings.review' : 'landing:ratings.reviews')})`
+        : t('landing:ratings.noReviews')}
     </Badge>
   );
 }

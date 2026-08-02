@@ -1,16 +1,18 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Badge from './ui/Badge';
 
 export default function HospitalOperatingHours({ operatingHours, className = '', compact = false }) {
+  const { t } = useTranslation(['landing']);
   const status = operatingHours?.status || 'unpublished';
   const weekly = operatingHours?.weekly && typeof operatingHours.weekly === 'object'
     ? Object.entries(operatingHours.weekly).filter(([, hours]) => Boolean(hours))
     : [];
   const hasPublishedHours = status === 'published' && (weekly.length > 0 || operatingHours?.text || operatingHours?.label);
   const label = hasPublishedHours
-    ? (weekly.length > 0 ? 'Published hours' : (operatingHours.text || operatingHours.label))
-    : 'Hours not published';
+    ? (weekly.length > 0 ? t('landing:hours.published') : (operatingHours.text || operatingHours.label))
+    : t('landing:hours.notPublished');
 
   if (compact || weekly.length === 0) {
     return (
@@ -25,7 +27,7 @@ export default function HospitalOperatingHours({ operatingHours, className = '',
     <div className={className}>
       <Badge variant="info">
         <Clock className="h-3.5 w-3.5 text-care-muted" />
-        <span>Published hours</span>
+        <span>{t('landing:hours.published')}</span>
       </Badge>
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-7">
         {weekly.map(([day, hours]) => (

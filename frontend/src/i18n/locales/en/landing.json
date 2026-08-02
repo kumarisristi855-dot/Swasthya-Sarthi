@@ -105,6 +105,39 @@
     "findNearest": "Find nearest",
     "noFacilities": "No facilities matched this search. Try a nearby landmark, area, city, or district name."
   },
+  "ratings": {
+    "googleMaps": "Google Maps",
+    "rating": "rating",
+    "ratings": "ratings",
+    "review": "review",
+    "reviews": "reviews",
+    "noReviews": "No reviews yet",
+    "googleQuotaExhausted": "Google quota exhausted",
+    "googleUnavailable": "Google ratings unavailable",
+    "googleNoRating": "Google Maps · No rating found"
+  },
+  "hours": {
+    "published": "Published hours",
+    "notPublished": "Hours not published"
+  },
+  "facilityCard": {
+    "verified": "Verified",
+    "communityMapped": "Community mapped",
+    "publicDirectory": "Public directory",
+    "doctorListed": "{{count}} doctor listed",
+    "doctorsListed": "{{count}} doctors listed",
+    "viewFacilityDoctors": "View facility and doctors"
+  },
+  "facilityTypes": {
+    "hospital": "Hospital",
+    "healthcareFacility": "Healthcare facility",
+    "clinic": "Clinic",
+    "nursingHome": "Nursing home",
+    "diagnosticCentre": "Diagnostic centre",
+    "primaryHealthCentre": "Primary Health Centre",
+    "healthSubCentre": "Health Sub-Centre",
+    "communityHealthCentre": "Community Health Centre"
+  },
   "trust": {
     "cardTitle": "Transparent care information",
     "cardCopy": "Source, verification, and update status shown clearly",

@@ -105,6 +105,39 @@
     "findNearest": "सबसे पास खोजें",
     "noFacilities": "इस खोज से कोई सुविधा मेल नहीं खाई। पास का लैंडमार्क, क्षेत्र, शहर या जिला आजमाएं।"
   },
+  "ratings": {
+    "googleMaps": "Google Maps",
+    "rating": "रेटिंग",
+    "ratings": "रेटिंग",
+    "review": "समीक्षा",
+    "reviews": "समीक्षाएं",
+    "noReviews": "अभी कोई समीक्षा नहीं",
+    "googleQuotaExhausted": "Google कोटा समाप्त",
+    "googleUnavailable": "Google रेटिंग उपलब्ध नहीं",
+    "googleNoRating": "Google Maps · कोई रेटिंग नहीं मिली"
+  },
+  "hours": {
+    "published": "प्रकाशित घंटे",
+    "notPublished": "घंटे प्रकाशित नहीं"
+  },
+  "facilityCard": {
+    "verified": "सत्यापित",
+    "communityMapped": "समुदाय द्वारा मैप किया गया",
+    "publicDirectory": "सार्वजनिक डायरेक्टरी",
+    "doctorListed": "{{count}} डॉक्टर सूचीबद्ध",
+    "doctorsListed": "{{count}} डॉक्टर सूचीबद्ध",
+    "viewFacilityDoctors": "सुविधा और डॉक्टर देखें"
+  },
+  "facilityTypes": {
+    "hospital": "अस्पताल",
+    "healthcareFacility": "स्वास्थ्य सेवा सुविधा",
+    "clinic": "क्लिनिक",
+    "nursingHome": "नर्सिंग होम",
+    "diagnosticCentre": "डायग्नोस्टिक सेंटर",
+    "primaryHealthCentre": "प्राथमिक स्वास्थ्य केंद्र",
+    "healthSubCentre": "स्वास्थ्य उप-केंद्र",
+    "communityHealthCentre": "सामुदायिक स्वास्थ्य केंद्र"
+  },
   "trust": {
     "cardTitle": "पारदर्शी देखभाल जानकारी",
     "cardCopy": "स्रोत, सत्यापन और अपडेट स्थिति साफ दिखाई जाती है",

@@ -195,6 +195,27 @@ function hospitalDoctorCount(hospital) {
   return Number.isFinite(Number(hospital.doctorCount)) ? Number(hospital.doctorCount) : 0;
 }
 
+function formatFacilityType(type, t) {
+  const normalized = String(type || '').trim().toLowerCase();
+  const knownTypes = {
+    hospital: 'hospital',
+    'healthcare facility': 'healthcareFacility',
+    clinic: 'clinic',
+    'nursing home': 'nursingHome',
+    'diagnostic centre': 'diagnosticCentre',
+    'diagnostic center': 'diagnosticCentre',
+    'primary health centre': 'primaryHealthCentre',
+    'primary health center': 'primaryHealthCentre',
+    'health sub-centre': 'healthSubCentre',
+    'health sub-center': 'healthSubCentre',
+    'community health centre': 'communityHealthCentre',
+    'community health center': 'communityHealthCentre',
+  };
+  return knownTypes[normalized]
+    ? t(`landing:facilityTypes.${knownTypes[normalized]}`)
+    : type || t('landing:facilityTypes.healthcareFacility');
+}
+
 function LocationPin({ position, onChange }) {
   useMapEvents({
     click(event) {
@@ -1189,16 +1210,16 @@ export default function LandingPage() {
                             <HospitalOperatingHours operatingHours={hospital.operatingHours} compact className="mt-3" />
                             <div className="mt-4 flex flex-wrap gap-2">
                               <ResultBadge tone={hospital.verificationStatus === 'verified' ? 'teal' : 'blue'}>
-                                <BadgeCheck className="h-3 w-3" /> {hospital.verificationStatus === 'verified' ? 'Verified' : hospital.verificationStatus === 'community-mapped' ? 'Community mapped' : 'Public directory'}
+                                <BadgeCheck className="h-3 w-3" /> {hospital.verificationStatus === 'verified' ? t('landing:facilityCard.verified') : hospital.verificationStatus === 'community-mapped' ? t('landing:facilityCard.communityMapped') : t('landing:facilityCard.publicDirectory')}
                               </ResultBadge>
                               {hospital.distance != null && <ResultBadge tone="blue">{hospital.distance.toFixed(1)} km</ResultBadge>}
                               <ResultBadge tone="blue">
                                 <Stethoscope className="h-3 w-3" />
-                                {hospitalDoctorCount(hospital)} {hospitalDoctorCount(hospital) === 1 ? 'doctor' : 'doctors'} listed
+                                {t(hospitalDoctorCount(hospital) === 1 ? 'landing:facilityCard.doctorListed' : 'landing:facilityCard.doctorsListed', { count: hospitalDoctorCount(hospital) })}
                               </ResultBadge>
                             </div>
-                            <p className="mt-4 text-xs text-care-muted">{hospital.hospitalType || hospital.careType || 'Healthcare facility'}</p>
-                            <Link to={`/hospital/${hospital.id}`} className="mt-auto pt-5 text-sm font-semibold text-care-primary-hover hover:underline">View facility and doctors <ArrowRight className="ml-1 inline h-4 w-4" /></Link>
+                            <p className="mt-4 text-xs text-care-muted">{formatFacilityType(hospital.hospitalType || hospital.careType, t)}</p>
+                            <Link to={`/hospital/${hospital.id}`} className="mt-auto pt-5 text-sm font-semibold text-care-primary-hover hover:underline">{t('landing:facilityCard.viewFacilityDoctors')} <ArrowRight className="ml-1 inline h-4 w-4" /></Link>
                           </article>
                         ))}
                       </div>
