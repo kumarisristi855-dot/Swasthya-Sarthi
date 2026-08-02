@@ -17,6 +17,7 @@ import {
 import PublicAvailability from '../../../shared/PublicAvailability';
 import HospitalOperatingHours from '../../../shared/HospitalOperatingHours';
 import {
+  HospitalRatingForm,
   HospitalRatingSummary,
 } from '../../../shared/HospitalRating';
 import { enrichHospitalsWithGoogleRatings } from '../../../lib/googleHospitalRatings';
@@ -178,6 +179,22 @@ export default function HospitalProfile({ publicView = false }) {
               <span className="block text-xs font-semibold text-care-muted uppercase mb-3">Operating Hours</span>
               <HospitalOperatingHours operatingHours={hospital.operatingHours} />
             </div>
+
+            {!publicView && token && (
+              <div className="mt-6 border-t border-care-border/65 pt-6">
+                <HospitalRatingForm
+                  hospitalId={hospital.id}
+                  token={token}
+                  onSaved={ratingData => {
+                    setHospital(current => current ? {
+                      ...current,
+                      ratingAvg: ratingData.ratingAvg ?? current.ratingAvg,
+                      ratingCount: ratingData.ratingCount ?? current.ratingCount,
+                    } : current);
+                  }}
+                />
+              </div>
+            )}
           </Card>
 
           {/* Swasthya Sarthi Doctors */}
