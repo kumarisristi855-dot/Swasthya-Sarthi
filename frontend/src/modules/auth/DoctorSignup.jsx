@@ -90,9 +90,9 @@ export default function DoctorSignup() {
       setError('Years of experience must be a non-negative number');
       return;
     }
-    const fee = parseFloat(formData.consultationFee);
-    if (isNaN(fee) || fee < 0) {
-      setError('In-person visit fee must be a non-negative number');
+    const fee = Number(formData.consultationFee);
+    if (!Number.isInteger(fee) || fee < 0) {
+      setError('In-person visit fee must be entered in whole rupees');
       return;
     }
 
@@ -277,9 +277,11 @@ export default function DoctorSignup() {
             <label className="block text-xs font-semibold text-care-muted uppercase mb-1">In-Person Visit Fee (INR)</label>
             <input
               type="number"
-              step="0.01"
+              min="0"
+              step="1"
               name="consultationFee"
-              placeholder="75.00"
+              inputMode="numeric"
+              placeholder="500"
               value={formData.consultationFee}
               onChange={handleChange}
               className="w-full bg-care-surface border border-care-border rounded-lg py-2.5 px-4 text-care-body placeholder:text-care-muted focus:outline-none focus:border-care-primary text-sm transition-colors"

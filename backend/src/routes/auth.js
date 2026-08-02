@@ -231,6 +231,15 @@ router.post('/doctor/signup', async (req, res) => {
     });
   }
 
+  const consultationFee = req.body.consultationFee === '' || req.body.consultationFee == null
+    ? 0
+    : Number(req.body.consultationFee);
+  if (!Number.isInteger(consultationFee) || consultationFee < 0) {
+    return res.status(400).json({
+      error: { message: 'In-person visit fee must be entered in whole rupees', code: 'VALIDATION_ERROR' }
+    });
+  }
+
   let authUser = null;
 
   try {
@@ -282,7 +291,7 @@ router.post('/doctor/signup', async (req, res) => {
         specialization_id: parseInt(specializationId, 10),
         license_no: licenseNo,
         years_experience: yearsExperience ? parseInt(yearsExperience, 10) : 0,
-        consultation_fee: req.body.consultationFee ? parseFloat(req.body.consultationFee) : 0.0,
+        consultation_fee: consultationFee,
         bio: bio || '',
         status: 'pending' // default is pending anyway
       });
