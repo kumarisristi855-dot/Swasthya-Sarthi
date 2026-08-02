@@ -29,7 +29,6 @@ export default function AuthShell({ icon: Icon, title, subtitle, accent = 'teal'
         <div className="absolute -right-28 -top-24 h-72 w-72 rounded-full bg-care-primary-subtle" aria-hidden="true" />
         <div className="absolute left-[43%] top-20 h-28 w-28 rounded-full bg-care-surface/35" aria-hidden="true" />
         <div className="care-token-dot-pattern absolute left-[38%] top-24 h-28 w-28 opacity-25" aria-hidden="true" />
-        <div className="absolute bottom-10 right-8 h-28 w-56 rounded-[50%] border border-care-primary" aria-hidden="true" />
         <div className="relative z-10">
           <BrandMark />
         </div>
