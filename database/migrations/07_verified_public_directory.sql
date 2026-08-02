@@ -1,5 +1,5 @@
 -- Source-verified public doctor directory.
--- Directory doctors are deliberately separate from CareSync users: appearing in
+-- Directory doctors are deliberately separate from Swasthya Sarthi users: appearing in
 -- a hospital's public roster does not create an account or a bookable schedule.
 
 ALTER TABLE public.hospitals

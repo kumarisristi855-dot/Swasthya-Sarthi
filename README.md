@@ -1,77 +1,41 @@
 # Swasthya Sarthi Healthcare Platform
 
-A localized healthcare platform connecting **Patients**, **Doctors**, and **Hospital Admins**.
+A localized healthcare platform connecting **patients**, **doctors**, and
+**hospital administrators**.
 
-## Live Deployment
+## Live Website
 
-- Website: https://frontend-six-coral-82.vercel.app
-- Backend API: https://backend-woad-chi-26.vercel.app/api
-- GitHub repository: https://github.com/kumarisristi855-dot/Swasthya-Sarthi
+[Open Swasthya Sarthi](https://frontend-six-coral-82.vercel.app)
 
-## Repository Structure
+## What It Includes
 
-```
-healthcare-platform/
-├── frontend/                  (React, Vite, Tailwind CSS, React Router)
-│   ├── src/modules/auth/      (Login and signup components)
-│   ├── src/modules/patient/   (Patient dashboard and booking views)
-│   ├── src/modules/doctor/    (Doctor schedule & availability views)
-│   ├── src/modules/admin/     (Hospital admin operations)
-│   ├── src/shared/            (Shared UI components, hooks)
-│   └── src/lib/               (Supabase client, APIs)
-├── backend/                   (Node.js, Express)
-│   ├── src/routes/            (API endpoints)
-│   ├── src/services/          (AI, booking, notifications, geolocation logic)
-│   ├── src/middleware/        (Auth & role guards)
-│   └── src/lib/               (Supabase config)
-└── database/                  (SQL migrations & seeds)
-```
+- Patient portal for nearby hospital discovery, doctor lookup, symptom-guided search, appointments, and appointment history.
+- Doctor portal for profile management, availability, appointments, and consultation notes.
+- Hospital admin portal for doctor approvals, schedule oversight, and hospital operations.
+- India-focused healthcare directory data with source-aware hospital and doctor listings.
 
-## Setup Instructions
+## Local Development
 
-### Prerequisites
-- Node.js (v18 or higher recommended)
-- Supabase account & project
+Install dependencies separately for the frontend and backend:
 
-### 1. Environment Variables Configuration
-
-#### Frontend Setup:
-1. Navigate to `/frontend`
-2. Duplicate `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-3. Update the values with your Supabase credentials:
-   - `VITE_SUPABASE_URL`: Your Supabase Project API URL.
-   - `VITE_SUPABASE_ANON_KEY`: Your Supabase Client Anon Key.
-
-#### Backend Setup:
-1. Navigate to `/backend`
-2. Duplicate `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-3. Update the values with your local port and Supabase service key:
-   - `PORT`: Server listening port (default: 5000)
-   - `SUPABASE_URL`: Your Supabase Project API URL.
-   - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase Service Role Key (crucial for admin actions bypassing RLS).
-
----
-
-### 2. Development Setup
-
-#### Running the Backend Server
-```bash
-cd backend
-npm install
-npm run dev
-```
-The backend server will start at `http://localhost:5000`. Verify using GET `http://localhost:5000/api/health`.
-
-#### Running the Frontend Dev Server
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The frontend Vite server will start. Open the displayed URL in your browser to view the Swasthya Sarthi Landing Page.
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Environment values are intentionally not documented with real deployment details.
+Use the placeholder `.env.example` files in `frontend/` and `backend/`, and keep
+all real keys in local or hosting-provider environment settings only.
+
+## Security Note
+
+Do not commit `.env`, `.vercel`, API keys, service-role keys, tokens, passwords,
+or private deployment URLs. The public README should only expose the user-facing
+website link.

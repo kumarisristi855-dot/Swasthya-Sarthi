@@ -9,12 +9,12 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const email = process.env.TEST_ADMIN_EMAIL || 'admin@test.com';
+const email = process.env.TEST_ADMIN_EMAIL;
 const password = process.env.TEST_ADMIN_PASSWORD;
 
 async function ensureAdmin() {
-  if (!password) {
-    throw new Error('Set TEST_ADMIN_PASSWORD before running this development seed.');
+  if (!email || !password) {
+    throw new Error('Set TEST_ADMIN_EMAIL and TEST_ADMIN_PASSWORD before running this development seed.');
   }
   const { data: listed, error: listError } = await supabase.auth.admin.listUsers({
     page: 1,
@@ -50,7 +50,7 @@ async function ensureAdmin() {
     }, { onConflict: 'id' });
   if (userError) throw userError;
 
-  const sourceDataset = 'caresync-development';
+  const sourceDataset = 'swasthya-sarthi-development';
   const sourceRecordId = 'test-admin-clinic';
   const { data: existingHospital, error: lookupError } = await supabase
     .from('hospitals')
@@ -61,7 +61,7 @@ async function ensureAdmin() {
   if (lookupError) throw lookupError;
 
   const hospitalPayload = {
-    name: 'CareSync Test Clinic (Development)',
+    name: 'Swasthya Sarthi Test Clinic (Development)',
     address: 'Development-only clinic record, New Delhi',
     city: 'Delhi',
     district: 'Central Delhi',
@@ -100,7 +100,11 @@ async function ensureAdmin() {
   console.log(`Hospital admin ready: ${email}`);
   console.log(`Admin hospital: ${hospital.name} (${hospital.id})`);
 
-  const testDoctorEmail = process.env.TEST_DOCTOR_EMAIL || 'doctor@test.com';
+  const testDoctorEmail = process.env.TEST_DOCTOR_EMAIL;
+  if (!testDoctorEmail) {
+    console.log('TEST_DOCTOR_EMAIL is not set; booking fixture was skipped.');
+    return;
+  }
   const { data: testDoctor, error: doctorLookupError } = await supabase
     .from('users')
     .select('id, full_name')

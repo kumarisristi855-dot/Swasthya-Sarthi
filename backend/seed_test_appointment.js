@@ -10,9 +10,9 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const PATIENT_EMAIL = process.env.TEST_PATIENT_EMAIL || 'patient@test.com';
-const DOCTOR_EMAIL = process.env.TEST_DOCTOR_EMAIL || 'doctor@test.com';
-const FIXTURE_NOTE = 'CareSync timed test appointment';
+const PATIENT_EMAIL = process.env.TEST_PATIENT_EMAIL;
+const DOCTOR_EMAIL = process.env.TEST_DOCTOR_EMAIL;
+const FIXTURE_NOTE = 'Swasthya Sarthi timed test appointment';
 const INDIA_OFFSET = '+05:30';
 
 function indiaDateParts(date) {
@@ -69,6 +69,10 @@ async function findFirstOpenSlot(doctorId) {
 }
 
 async function seedTestAppointment() {
+  if (!PATIENT_EMAIL || !DOCTOR_EMAIL) {
+    throw new Error('Set TEST_PATIENT_EMAIL and TEST_DOCTOR_EMAIL before seeding a test appointment.');
+  }
+
   const { data: users, error: userError } = await supabase
     .from('users')
     .select('id,email,full_name,role')

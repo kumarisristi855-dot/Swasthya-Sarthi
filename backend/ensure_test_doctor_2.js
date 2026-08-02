@@ -9,9 +9,9 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const email = process.env.TEST_DOCTOR_2_EMAIL || 'doctor2@test.com';
+const email = process.env.TEST_DOCTOR_2_EMAIL;
 const password = process.env.TEST_DOCTOR_2_PASSWORD;
-const hospitalSourceDataset = 'caresync-development';
+const hospitalSourceDataset = 'swasthya-sarthi-development';
 const hospitalSourceRecordId = 'test-admin-clinic';
 
 async function findAuthUserByEmail(targetEmail) {
@@ -26,8 +26,8 @@ async function findAuthUserByEmail(targetEmail) {
 }
 
 async function ensureTestDoctor2() {
-  if (!password) {
-    throw new Error('Set TEST_DOCTOR_2_PASSWORD before running this development seed.');
+  if (!email || !password) {
+    throw new Error('Set TEST_DOCTOR_2_EMAIL and TEST_DOCTOR_2_PASSWORD before running this development seed.');
   }
 
   const [{ data: hospital, error: hospitalError }, { data: specialization, error: specializationError }] = await Promise.all([

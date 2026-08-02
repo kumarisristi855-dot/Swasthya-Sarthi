@@ -182,7 +182,7 @@ async function main() {
   }
 
   console.log(`Imported ${doctors.length} source-labelled Bokaro doctors across ${hospitals.length} hospitals.`);
-  console.log('These records are public directory profiles; no live CareSync slots were claimed.');
+  console.log('These records are public directory profiles; no live Swasthya Sarthi slots were claimed.');
 }
 
 try {

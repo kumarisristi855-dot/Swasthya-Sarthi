@@ -27,20 +27,8 @@ cd backend
 node seed_delhi_data.js
 ```
 
-The JS seed requires:
-
-```text
-SUPABASE_URL
-SUPABASE_SERVICE_ROLE_KEY
-```
-
-Optional:
-
-```text
-DELHI_SEED_PASSWORD=TestPass123!
-```
-
-The JS seed creates 15 Delhi doctor auth accounts, marks their profiles active, links them to Delhi hospitals, and creates weekly availability slots.
+The JS seed uses backend environment variables from your private local
+configuration. Do not commit the seed password or service credentials.
 
 ## Patient UI
 
@@ -52,15 +40,5 @@ After logging in as a patient, open:
 
 The page supports doctor name search, specialization, hospital name, Delhi district, and working-day filters.
 
-## API Endpoints
-
-```text
-GET /api/doctors/delhi
-GET /api/hospitals/delhi
-GET /api/hospitals/delhi/:district
-POST /api/doctors-hospitals/associate
-PUT /api/doctors-hospitals/:id
-DELETE /api/doctors-hospitals/:id
-```
-
-Association write endpoints require a hospital admin and only allow Delhi hospitals owned by that admin.
+Association write actions require a hospital admin and only allow hospitals
+owned by that admin.

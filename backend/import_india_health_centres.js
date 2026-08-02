@@ -163,7 +163,7 @@ async function loadCsv() {
         console.log(`Downloading official health-centre directory (attempt ${attempt}/3)...`);
         const response = await fetch(url, {
           headers: {
-            'User-Agent': 'CareSync-Healthcare-Platform/1.0',
+            'User-Agent': 'SwasthyaSarthiHealthcarePlatform/1.0',
             Accept: 'text/csv,text/plain;q=0.9,*/*;q=0.8',
             Referer: sourcePage
           },

@@ -102,7 +102,7 @@ async function geocode(hospital) {
   const response = await fetch(url, {
     headers: {
       Accept: 'application/json',
-      'User-Agent': process.env.NOMINATIM_USER_AGENT || 'CareSyncHealthcarePlatform/1.0'
+      'User-Agent': process.env.NOMINATIM_USER_AGENT || 'SwasthyaSarthiHealthcarePlatform/1.0'
     },
     signal: AbortSignal.timeout(15000)
   });

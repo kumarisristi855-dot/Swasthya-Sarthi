@@ -1,6 +1,6 @@
 -- Canonical directory governance and verification tracking.
 -- This keeps one canonical facility table (`hospitals`) and makes both doctor
--- surfaces auditable: bookable CareSync doctors (`doctor_profiles`) and
+-- surfaces auditable: bookable Swasthya Sarthi doctors (`doctor_profiles`) and
 -- source-linked public roster doctors (`verified_doctors`).
 
 ALTER TABLE public.hospitals
@@ -164,7 +164,7 @@ UNION ALL
 
 SELECT
   dp.user_id::text AS canonical_id,
-  'bookable_caresync_doctor'::text AS source_type,
+  'bookable_swasthya_sarthi_doctor'::text AS source_type,
   u.full_name,
   dp.credentials,
   dp.license_no,

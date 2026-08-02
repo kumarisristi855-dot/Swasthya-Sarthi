@@ -54,17 +54,17 @@ async function signUpUser(email, password, metadata) {
 
 async function runTests() {
   console.log('='.repeat(60));
-  console.log('CareSync Platform — Final RLS Verification');
+  console.log('Swasthya Sarthi Platform — Final RLS Verification');
   console.log('Using Anon key (RLS-enforcing) client');
   console.log('='.repeat(60));
 
   // ── Step 1: Create test users ──────────────────────────────────
   console.log('\n--- Step 1: Creating test users ---');
 
-  const patientAEmail = `rls_test_patient_a_${Date.now()}@test.caresync`;
-  const patientBEmail = `rls_test_patient_b_${Date.now()}@test.caresync`;
-  const doctorAEmail = `rls_test_doctor_a_${Date.now()}@test.caresync`;
-  const testPassword = 'TestPass123!';
+  const patientAEmail = `rls_test_patient_a_${Date.now()}@test.swasthya-sarthi.invalid`;
+  const patientBEmail = `rls_test_patient_b_${Date.now()}@test.swasthya-sarthi.invalid`;
+  const doctorAEmail = `rls_test_doctor_a_${Date.now()}@test.swasthya-sarthi.invalid`;
+  const testPassword = process.env.RLS_TEST_PASSWORD || `RlsTest-${Date.now()}!Aa1`;
 
   const patientAResult = await signUpUser(patientAEmail, testPassword, { role: 'patient' });
   if (patientAResult.error) {
@@ -279,7 +279,7 @@ async function runTests() {
   console.log(`    Patient A: ${patientAEmail} (ID: ${patientAUserId})`);
   console.log(`    Patient B: ${patientBEmail} (ID: ${patientBUserId})`);
   console.log('  To delete these users, use Supabase Auth dashboard or SQL:');
-  console.log('  DELETE FROM auth.users WHERE email LIKE \'rls_test_%@test.caresync\';');
+  console.log('  DELETE FROM auth.users WHERE email LIKE \'rls_test_%@test.swasthya-sarthi.invalid\';');
 
   // ── Summary ────────────────────────────────────────────────────
   console.log('\n' + '='.repeat(60));

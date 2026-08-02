@@ -20,7 +20,10 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
   }
 });
 
-const password = process.env.DELHI_SEED_PASSWORD || 'TestPass123!';
+const password = process.env.DELHI_SEED_PASSWORD;
+if (!password) {
+  throw new Error('DELHI_SEED_PASSWORD is required before creating Delhi seed doctor accounts.');
+}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -571,7 +574,7 @@ async function main() {
 
   console.log(`Seeded ${hospitalSeedRows.length} Delhi hospitals and ${doctors.length} Delhi doctors.`);
   console.log(`Verified active doctor coverage for all ${coveredHospitalIds.size} dataset hospitals.`);
-  console.log(`Seed doctor password: ${password}`);
+  console.log('Seed doctor password was read from DELHI_SEED_PASSWORD and was not printed.');
 }
 
 try {
