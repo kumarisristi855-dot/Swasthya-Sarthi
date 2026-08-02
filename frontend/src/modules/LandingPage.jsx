@@ -73,29 +73,29 @@ const symptomSpecialties = [
 ];
 
 const quickServices = [
-  { title: 'Find a doctor', copy: 'Browse by specialty and availability', icon: Stethoscope, mode: 'doctors' },
-  { title: 'Find hospitals', copy: 'Explore clinics and hospitals near you', icon: Building2, mode: 'hospitals' },
-  { title: 'Symptom guidance', copy: 'Match symptoms to a suitable specialty', icon: Sparkles, mode: 'symptoms' },
-  { title: 'Book a clinic visit', copy: 'Reserve an in-person appointment', icon: CalendarCheck2, mode: 'doctors' },
-  { title: 'Diagnostic centres', copy: 'Find testing and imaging facilities', icon: FlaskConical, mode: 'hospitals' },
-  { title: 'Emergency care', copy: 'Locate urgent medical help quickly', icon: HeartPulse, href: '#emergency' },
+  { titleKey: 'quickServices.findDoctor.title', copyKey: 'quickServices.findDoctor.copy', icon: Stethoscope, mode: 'doctors' },
+  { titleKey: 'quickServices.findHospitals.title', copyKey: 'quickServices.findHospitals.copy', icon: Building2, mode: 'hospitals' },
+  { titleKey: 'quickServices.symptomGuidance.title', copyKey: 'quickServices.symptomGuidance.copy', icon: Sparkles, mode: 'symptoms' },
+  { titleKey: 'quickServices.clinicVisit.title', copyKey: 'quickServices.clinicVisit.copy', icon: CalendarCheck2, mode: 'doctors' },
+  { titleKey: 'quickServices.diagnostics.title', copyKey: 'quickServices.diagnostics.copy', icon: FlaskConical, mode: 'hospitals' },
+  { titleKey: 'quickServices.emergency.title', copyKey: 'quickServices.emergency.copy', icon: HeartPulse, href: '#emergency' },
 ];
 
 const guides = [
   {
-    tag: 'Seasonal health',
-    title: 'Fever: when home care is enough and when to seek help',
-    copy: 'Understand warning signs, hydration basics, and when a clinician should evaluate persistent fever.',
+    tagKey: 'guides.seasonal.tag',
+    titleKey: 'guides.seasonal.title',
+    copyKey: 'guides.seasonal.copy',
   },
   {
-    tag: 'Heart health',
-    title: 'Recognising symptoms that need urgent cardiac attention',
-    copy: 'Chest pressure, breathlessness, fainting, and radiating pain should never be ignored.',
+    tagKey: 'guides.heart.tag',
+    titleKey: 'guides.heart.title',
+    copyKey: 'guides.heart.copy',
   },
   {
-    tag: 'Family care',
-    title: 'Preparing for a child’s first doctor appointment',
-    copy: 'Bring symptom timing, current medicines, vaccination records, and questions for the pediatrician.',
+    tagKey: 'guides.family.tag',
+    titleKey: 'guides.family.title',
+    copyKey: 'guides.family.copy',
   },
 ];
 
@@ -212,7 +212,7 @@ function LocationPin({ position, onChange }) {
 }
 
 export default function LandingPage() {
-  const { t } = useTranslation(['common', 'nav']);
+  const { t } = useTranslation(['common', 'nav', 'landing']);
   const initialLocationRef = useRef(loadLocationSelection());
   const initialLocation = initialLocationRef.current;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -221,7 +221,7 @@ export default function LandingPage() {
   const [query, setQuery] = useState('');
   const [location, setLocation] = useState(initialLocation?.location || 'Delhi');
   const [coordinates, setCoordinates] = useState(initialLocation?.coordinates || null);
-  const [locationLabel, setLocationLabel] = useState(initialLocation?.locationLabel || 'Choose current location or enter another locality');
+  const [locationLabel, setLocationLabel] = useState(initialLocation?.locationLabel || t('landing:search.chooseOrEnter'));
   const [locationStatus, setLocationStatus] = useState(initialLocation?.locationStatus || 'prompt');
   const [locationAccuracy, setLocationAccuracy] = useState(initialLocation?.locationAccuracy || null);
   const [locationPromptOpen, setLocationPromptOpen] = useState(!initialLocation);
@@ -239,7 +239,7 @@ export default function LandingPage() {
   const [locationSuggestions, setLocationSuggestions] = useState([]);
   const [locationSuggestionOpen, setLocationSuggestionOpen] = useState(false);
   const [searchError, setSearchError] = useState('');
-  const [searchSummary, setSearchSummary] = useState('Care around India');
+  const [searchSummary, setSearchSummary] = useState(t('landing:directory.headingAround', { location: t('landing:location.india') }));
   const locationInputRef = useRef(null);
   const tomorrow = useMemo(formatTomorrow, []);
 
@@ -370,7 +370,7 @@ export default function LandingPage() {
               : [];
 
             if (!officialHospitals.length && !communityHospitals.length && officialResult && !officialResult.response.ok) {
-              throw new Error(officialResult.data.error?.message || 'Could not load facilities');
+              throw new Error(officialResult.data.error?.message || t('landing:directory.loadFacilitiesError'));
             }
 
             const mergedHospitals = mergeHospitalResults(officialHospitals, communityHospitals).slice(0, 80);
@@ -414,13 +414,14 @@ export default function LandingPage() {
 
       await Promise.all(requests);
       const matchedSpecialty = doctorSpecialty ? ` · ${doctorSpecialty.name}` : '';
-      setSearchSummary(`${requestedCoordinates ? `Care near ${requestedLocation || 'your current location'}` : `Care around ${requestedLocation || 'India'}`}${matchedSpecialty}`);
+      const summaryLocation = requestedLocation || (requestedCoordinates ? t('landing:search.currentLocation', { defaultValue: 'your current location' }) : t('landing:location.india'));
+      setSearchSummary(`${t(requestedCoordinates ? 'landing:directory.headingNear' : 'landing:directory.headingAround', { location: summaryLocation })}${matchedSpecialty}`);
     } catch (error) {
-      setSearchError(error.message || 'Search is temporarily unavailable');
+      setSearchError(error.message || t('landing:directory.searchUnavailable'));
     } finally {
       setSearching(false);
     }
-  }, [coordinates, location, query, searchMode, specializations, tomorrow]);
+  }, [coordinates, location, query, searchMode, specializations, t, tomorrow]);
 
   useEffect(() => {
     fetch(`${API_URL}/specializations`)
@@ -611,9 +612,9 @@ export default function LandingPage() {
   const requestLocation = useCallback(({ fallbackToDelhi = false } = {}) => {
     if (!navigator.geolocation) {
       setLocationStatus('unavailable');
-      setLocationLabel('Location is not supported. Enter a city or locality.');
+      setLocationLabel(t('landing:search.locationUnsupported'));
       setLocationLoading(false);
-      setSearchError('Location is not supported by this browser. Enter a city instead.');
+      setSearchError(t('landing:search.locationUnsupportedBrowser'));
       if (fallbackToDelhi) {
         setLocation('Delhi');
         setLocationLabel('Delhi');
@@ -624,7 +625,7 @@ export default function LandingPage() {
 
     setSearchError('');
     setLocationStatus('requesting');
-    setLocationLabel('Allow location access to find care near you');
+    setLocationLabel(t('landing:search.allowLocation'));
     setLocationLoading(true);
     navigator.geolocation.getCurrentPosition(
       async position => {
@@ -633,7 +634,7 @@ export default function LandingPage() {
           longitude: position.coords.longitude,
         };
         const accuracy = Math.round(position.coords.accuracy);
-        let resolvedLabel = 'Current location';
+        let resolvedLabel = t('landing:search.currentLocation');
 
         try {
           const response = await fetch(
@@ -711,7 +712,7 @@ export default function LandingPage() {
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
-  }, [query, runSearch, searchMode]);
+  }, [query, runSearch, searchMode, t]);
 
   const confirmMapLocation = async () => {
     if (!mapPickerPosition) return;
@@ -757,10 +758,10 @@ export default function LandingPage() {
 
   const alert = alerts[0];
   const resultCount = hospitals.length + doctors.length + directoryDoctors.length;
-  const activeLocationName = coordinates ? locationLabel : location || 'India';
+  const activeLocationName = coordinates ? locationLabel : location || t('landing:location.india');
   const directoryHeading = searchSummary.includes(activeLocationName)
     ? searchSummary
-    : `${coordinates ? 'Care near' : 'Care around'} ${activeLocationName}`;
+    : t(coordinates ? 'landing:directory.headingNear' : 'landing:directory.headingAround', { location: activeLocationName });
   const visibleHospitals = showAllHospitals ? hospitals : hospitals.slice(0, 8);
   const hiddenHospitalCount = Math.max(hospitals.length - visibleHospitals.length, 0);
 
@@ -772,17 +773,17 @@ export default function LandingPage() {
             <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover">
               <LocateFixed className="h-6 w-6" />
             </span>
-            <h2 id="location-permission-title" className="mt-5 text-2xl font-bold text-care-heading">Find care near your live location?</h2>
-            <p className="mt-3 text-sm leading-6 text-care-muted">Allow Swasthya Sarthi to use your device location for accurate nearby hospitals and doctors. Your browser will ask for permission next. If GPS is blocked, Swasthya Sarthi will use your approximate city, and you can still enter another location.</p>
+            <h2 id="location-permission-title" className="mt-5 text-2xl font-bold text-care-heading">{t('landing:locationPrompt.title')}</h2>
+            <p className="mt-3 text-sm leading-6 text-care-muted">{t('landing:locationPrompt.copy')}</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <button type="button" onClick={() => { setLocationPromptOpen(false); requestLocation(); }} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-care-primary px-4 text-sm font-bold text-care-surface hover:bg-care-primary-hover">
-                <Navigation className="h-4 w-4" /> Use current location
+                <Navigation className="h-4 w-4" /> {t('landing:locationPrompt.useCurrent')}
               </button>
-              <button type="button" onClick={() => { window.sessionStorage.removeItem(LOCATION_SESSION_KEY); setLocationPromptOpen(false); setLocation(''); setCoordinates(null); setLocationStatus('manual'); setLocationLabel('Enter an exact area, neighbourhood, landmark, or address'); window.setTimeout(() => locationInputRef.current?.focus(), 50); }} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-care-border px-4 text-sm font-semibold text-care-body hover:bg-care-neutral">
-                <MapPin className="h-4 w-4" /> Choose another
+              <button type="button" onClick={() => { window.sessionStorage.removeItem(LOCATION_SESSION_KEY); setLocationPromptOpen(false); setLocation(''); setCoordinates(null); setLocationStatus('manual'); setLocationLabel(t('landing:search.enterExactArea')); window.setTimeout(() => locationInputRef.current?.focus(), 50); }} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-care-border px-4 text-sm font-semibold text-care-body hover:bg-care-neutral">
+                <MapPin className="h-4 w-4" /> {t('landing:locationPrompt.chooseAnother')}
               </button>
             </div>
-            <p className="mt-4 text-xs leading-5 text-care-muted">Location is used for this care search. Personal health information remains protected behind sign-in.</p>
+            <p className="mt-4 text-xs leading-5 text-care-muted">{t('landing:locationPrompt.note')}</p>
           </div>
         </div>
       )}
@@ -873,14 +874,14 @@ export default function LandingPage() {
             <div className="public-hero-content max-w-2xl">
               <span className="mb-5 inline-flex items-center gap-2 rounded-lg border border-care-border/25 bg-care-surface/10 px-3 py-2 text-xs font-semibold text-care-primary-subtle">
                 <ShieldCheck className="h-4 w-4" />
-                Verified healthcare discovery across India
+                {t('landing:hero.badge')}
               </span>
-              <h1 className="text-4xl font-bold leading-[1.08] text-care-surface sm:text-5xl lg:text-6xl">The right care, closer than you think.</h1>
-              <p className="mt-5 max-w-xl text-lg leading-8 text-care-primary-subtle">Search doctors, hospitals, specialists, or symptoms. Review trustworthy public information before you create an account.</p>
+              <h1 className="text-4xl font-bold leading-[1.08] text-care-surface sm:text-5xl lg:text-6xl">{t('landing:hero.title')}</h1>
+              <p className="mt-5 max-w-xl text-lg leading-8 text-care-primary-subtle">{t('landing:hero.copy')}</p>
               <div className="mt-8 hidden flex-wrap gap-4 text-sm text-care-primary-subtle sm:flex">
-                <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-care-primary" /> Source-labelled providers</span>
-                <span className="inline-flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-care-primary" /> Availability previews</span>
-                <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-care-primary" /> Location-aware results</span>
+                <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-care-primary" /> {t('landing:hero.sourceLabelled')}</span>
+                <span className="inline-flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-care-primary" /> {t('landing:hero.availability')}</span>
+                <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-care-primary" /> {t('landing:hero.locationAware')}</span>
               </div>
             </div>
           </div>
@@ -889,17 +890,17 @@ export default function LandingPage() {
             <form onSubmit={handleSearch} className="public-search-dock overflow-visible rounded-lg border border-care-border bg-care-surface p-5 shadow-xl sm:p-8">
               <div className="grid gap-3 lg:grid-cols-[minmax(280px,1.08fr)_minmax(280px,1.08fr)_minmax(250px,0.94fr)]">
                 <label className="relative">
-                  <span className="sr-only">Search for doctor or specialty</span>
+                  <span className="sr-only">{t('landing:search.doctorSr')}</span>
                   <Search className="pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-care-heading" />
                   <input
                     value={query}
                     onChange={event => setQuery(event.target.value)}
-                    placeholder={searchMode === 'symptoms' ? 'Describe your symptoms' : 'Search for Doctor or Speciality'}
+                    placeholder={searchMode === 'symptoms' ? t('landing:search.symptomPlaceholder') : t('landing:search.doctorPlaceholder')}
                     className="h-16 w-full rounded-md border border-care-border bg-care-surface pl-14 pr-4 text-base text-care-body outline-none placeholder:text-care-muted focus:border-care-primary focus:ring-4 focus:ring-care-primary"
                   />
                 </label>
                 <label className="relative">
-                  <span className="sr-only">Select location</span>
+                  <span className="sr-only">{t('landing:search.locationSr')}</span>
                   <MapPin className="pointer-events-none absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-care-heading" />
                   <input
                     ref={locationInputRef}
@@ -912,10 +913,10 @@ export default function LandingPage() {
                       setCoordinates(null);
                       setLocationAccuracy(null);
                       setLocationStatus('manual');
-                      setLocationLabel(nextLocation || 'Enter an exact area, neighbourhood, landmark, or address');
+                      setLocationLabel(nextLocation || t('landing:search.enterExactArea'));
                       setLocationSuggestionOpen(true);
                     }}
-                    placeholder="Select Location"
+                    placeholder={t('landing:search.locationPlaceholder')}
                     className="h-16 w-full rounded-md border border-care-border bg-care-surface pl-14 pr-12 text-base text-care-body outline-none placeholder:text-care-muted focus:border-care-primary focus:ring-4 focus:ring-care-primary"
                   />
                   <button
@@ -923,8 +924,8 @@ export default function LandingPage() {
                     onClick={() => requestLocation()}
                     disabled={locationLoading}
                     className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center text-care-heading hover:text-care-primary-hover disabled:opacity-50"
-                    aria-label={locationStatus === 'granted' ? 'Refresh current location' : 'Use my current location'}
-                    title={locationStatus === 'granted' ? 'Refresh current location' : 'Use my current location'}
+                    aria-label={locationStatus === 'granted' ? t('landing:search.refreshLocation') : t('landing:search.useLocation')}
+                    title={locationStatus === 'granted' ? t('landing:search.refreshLocation') : t('landing:search.useLocation')}
                   >
                     {locationLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <LocateFixed className="h-5 w-5" />}
                   </button>
@@ -932,19 +933,19 @@ export default function LandingPage() {
                 <button type="submit" disabled={searching} className="inline-flex h-16 min-w-52 items-center justify-center gap-2 rounded-md bg-care-primary px-7 text-base font-bold text-care-surface hover:bg-care-primary-hover disabled:opacity-60">
                   {searching && <Loader2 className="h-5 w-5 animate-spin" />}
                   {searchMode === 'hospitals'
-                    ? 'Find Hospitals'
+                    ? t('landing:search.findHospitals')
                     : searchMode === 'symptoms'
-                      ? 'Check Symptoms'
-                      : 'Book an Appointment'}
+                      ? t('landing:search.checkSymptoms')
+                      : t('landing:search.bookAppointment')}
                 </button>
               </div>
               <div className="mt-4 flex flex-col gap-3 border-t border-care-border pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-wrap gap-1" role="tablist" aria-label="Search type">
                   {[
-                    ['all', 'All care'],
-                    ['doctors', 'Doctors'],
-                    ['hospitals', 'Hospitals'],
-                    ['symptoms', 'Symptoms'],
+                    ['all', t('landing:search.allCare')],
+                    ['doctors', t('nav:doctors')],
+                    ['hospitals', t('nav:hospitals')],
+                    ['symptoms', t('landing:search.symptoms')],
                   ].map(([value, label]) => (
                     <button
                       key={value}
@@ -970,14 +971,14 @@ export default function LandingPage() {
                     onClick={() => setMapPickerOpen(true)}
                     className="shrink-0 font-semibold text-care-primary-hover hover:underline"
                   >
-                    Set on map
+                    {t('landing:search.setOnMap')}
                   </button>
                 </div>
               </div>
               {locationSuggestionOpen && normalizeLocationInput(location).length >= 2 && (
                 <div className="relative z-[90] mt-2 overflow-hidden rounded-lg border border-care-primary bg-care-surface shadow-2xl ring-1 ring-care-border">
                   <div className="border-b border-care-border bg-care-primary-subtle px-4 py-2 text-xs font-bold uppercase text-care-primary-hover">
-                    Select a location
+                    {t('landing:search.selectLocation')}
                   </div>
                   {locationSuggestions.length ? (
                     <div className="max-h-72 overflow-y-auto py-1">
@@ -994,14 +995,14 @@ export default function LandingPage() {
                             <span className="block text-sm font-semibold leading-5 text-care-heading">{suggestion.name}</span>
                             <span className="mt-0.5 block text-xs text-care-muted">
                               {suggestion.provider === 'google'
-                                ? 'Google Maps location'
+                                ? t('landing:search.googleMapsLocation')
                                 : suggestion.provider === 'openstreetmap'
-                                  ? 'Map location'
+                                  ? t('landing:search.mapLocation')
                                   : suggestion.type
                                     ? Number.isFinite(suggestion.hospitalCount)
-                                      ? `${suggestion.type} - ${suggestion.hospitalCount} nearby directory listings`
-                                      : `${suggestion.type} location`
-                                    : 'Directory location'}
+                                      ? t('landing:search.nearbyDirectoryListings', { type: suggestion.type, count: suggestion.hospitalCount })
+                                      : t('landing:search.typedLocation', { type: suggestion.type })
+                                    : t('landing:search.directoryLocation')}
                             </span>
                           </span>
                         </button>
@@ -1009,7 +1010,7 @@ export default function LandingPage() {
                     </div>
                   ) : (
                     <div className="px-4 py-3 text-sm text-care-muted">
-                      Keep typing a locality, landmark, village, or city.
+                      {t('landing:search.keepTyping')}
                     </div>
                   )}
                 </div>
@@ -1023,10 +1024,10 @@ export default function LandingPage() {
           <div className="care-reveal mx-auto max-w-7xl px-5 py-16 sm:px-8">
             <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
               <div>
-                <span className="text-xs font-bold text-care-primary-hover">START WITH WHAT YOU NEED</span>
-                <h2 className="mt-2 text-3xl font-bold text-care-heading">Healthcare without the runaround</h2>
+                <span className="text-xs font-bold text-care-primary-hover">{t('landing:services.eyebrow')}</span>
+                <h2 className="mt-2 text-3xl font-bold text-care-heading">{t('landing:services.title')}</h2>
               </div>
-              <p className="max-w-xl text-sm leading-6 text-care-muted">Explore real public directory information first. Sign in only when you are ready to book or manage personal health information.</p>
+              <p className="max-w-xl text-sm leading-6 text-care-muted">{t('landing:services.copy')}</p>
             </div>
             <div className="care-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {quickServices.map(service => {
@@ -1035,16 +1036,16 @@ export default function LandingPage() {
                   <>
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover"><Icon className="h-5 w-5" /></span>
                     <span className="min-w-0 flex-1">
-                      <strong className="block text-sm text-care-heading">{service.title}</strong>
-                      <span className="mt-1 block text-xs leading-5 text-care-muted">{service.copy}</span>
+                      <strong className="block text-sm text-care-heading">{t(`landing:${service.titleKey}`)}</strong>
+                      <span className="mt-1 block text-xs leading-5 text-care-muted">{t(`landing:${service.copyKey}`)}</span>
                     </span>
                     <ArrowRight className="h-4 w-4 shrink-0 text-care-muted" />
                   </>
                 );
                 return service.href ? (
-                  <a key={service.title} href={service.href} className="care-action care-hover flex items-center gap-4 rounded-lg border border-care-border p-4 text-left hover:border-care-primary hover:bg-care-primary-subtle/40">{content}</a>
+                  <a key={service.titleKey} href={service.href} className="care-action care-hover flex items-center gap-4 rounded-lg border border-care-border p-4 text-left hover:border-care-primary hover:bg-care-primary-subtle/40">{content}</a>
                 ) : (
-                  <button key={service.title} type="button" onClick={() => chooseService(service)} className="care-action care-hover flex items-center gap-4 rounded-lg border border-care-border p-4 text-left hover:border-care-primary hover:bg-care-primary-subtle/40">{content}</button>
+                  <button key={service.titleKey} type="button" onClick={() => chooseService(service)} className="care-action care-hover flex items-center gap-4 rounded-lg border border-care-border p-4 text-left hover:border-care-primary hover:bg-care-primary-subtle/40">{content}</button>
                 );
               })}
             </div>
@@ -1055,13 +1056,17 @@ export default function LandingPage() {
           <div className="care-reveal mx-auto max-w-7xl px-5 py-16 sm:px-8">
             <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
               <div>
-                <span className="text-xs font-bold text-care-primary-hover">PUBLIC CARE DIRECTORY</span>
+                <span className="text-xs font-bold text-care-primary-hover">{t('landing:directory.eyebrow')}</span>
                 <h2 className="mt-2 text-3xl font-bold text-care-heading">{directoryHeading}</h2>
-                <p className="mt-2 text-sm text-care-muted">{searching ? 'Checking current directory information...' : `${resultCount} relevant listings shown · ${activeLocationName}`}</p>
+                <p className="mt-2 text-sm text-care-muted">
+                  {searching
+                    ? t('landing:directory.checking')
+                    : t('landing:directory.resultSummary', { count: resultCount, location: activeLocationName })}
+                </p>
               </div>
               <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-care-border bg-care-surface px-3 py-2 text-xs font-semibold text-care-muted">
                 <BadgeCheck className="h-4 w-4 text-care-primary-hover" />
-                Every listing shows its verification source
+                {t('landing:directory.sourceNote')}
               </div>
             </div>
 
@@ -1073,14 +1078,14 @@ export default function LandingPage() {
             )}
 
             {searching ? (
-              <div className="flex min-h-52 items-center justify-center gap-3 text-care-muted"><Loader2 className="h-6 w-6 animate-spin text-care-primary" /> Searching Swasthya Sarthi directory...</div>
+              <div className="flex min-h-52 items-center justify-center gap-3 text-care-muted"><Loader2 className="h-6 w-6 animate-spin text-care-primary" /> {t('landing:directory.searching')}</div>
             ) : (
               <div className="space-y-14">
                 {(searchMode === 'all' || searchMode === 'doctors' || searchMode === 'symptoms') && (
                   <div>
                     <div className="mb-5 flex items-center justify-between">
-                      <h3 className="text-xl font-bold text-care-heading">Doctors and specialists</h3>
-                      <Link to="/login/patient" className="text-sm font-semibold text-care-primary-hover hover:underline">View full directory</Link>
+                      <h3 className="text-xl font-bold text-care-heading">{t('landing:directory.doctorsTitle')}</h3>
+                      <Link to="/login/patient" className="text-sm font-semibold text-care-primary-hover hover:underline">{t('landing:directory.viewFull')}</Link>
                     </div>
                     {doctors.length || directoryDoctors.length ? (
                       <div className="care-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -1091,7 +1096,7 @@ export default function LandingPage() {
                               <div className="min-w-0">
                                 <h4 className="font-bold text-care-heading">{doctor.fullName}</h4>
                                 <p className="mt-1 text-sm font-semibold text-care-primary-hover">{doctor.specialization}</p>
-                                <p className="mt-1 truncate text-xs text-care-muted">{doctor.hospital?.name || 'Affiliated clinic'}</p>
+                                <p className="mt-1 truncate text-xs text-care-muted">{doctor.hospital?.name || t('landing:directory.affiliatedClinic')}</p>
                                 <DoctorRatingSummary
                                   ratingAvg={doctor.ratingAvg}
                                   ratingCount={doctor.ratingCount}
@@ -1100,20 +1105,20 @@ export default function LandingPage() {
                               </div>
                             </div>
                             <div className="mt-4 flex flex-wrap gap-2">
-                              <ResultBadge><BadgeCheck className="h-3 w-3" /> Swasthya Sarthi active</ResultBadge>
+                              <ResultBadge><BadgeCheck className="h-3 w-3" /> {t('landing:directory.activeProvider')}</ResultBadge>
                               {doctor.distance != null && <ResultBadge tone="blue">{doctor.distance.toFixed(1)} km</ResultBadge>}
                               {doctor.consultationFee > 0 && <ResultBadge tone="amber">INR {doctor.consultationFee}</ResultBadge>}
                             </div>
                             <div className="mt-5 border-t border-care-border pt-4">
-                              <span className="text-[11px] font-bold text-care-muted">NEXT AVAILABLE</span>
+                              <span className="text-[11px] font-bold text-care-muted">{t('landing:directory.nextAvailable')}</span>
                               <div className="mt-2 flex min-h-8 flex-wrap gap-2">
                                 {doctor.nextAvailableSlots?.length ? doctor.nextAvailableSlots.map((slot, index) => (
-                                  <span key={`${doctor.id}-${index}`} className="rounded-md bg-care-primary-subtle px-2 py-1 text-xs font-semibold text-care-primary-hover">Tomorrow {formatSlot(slot)}</span>
-                                )) : <span className="text-xs text-care-muted">Contact clinic for the next opening</span>}
+                                  <span key={`${doctor.id}-${index}`} className="rounded-md bg-care-primary-subtle px-2 py-1 text-xs font-semibold text-care-primary-hover">{t('landing:directory.tomorrowSlot', { slot: formatSlot(slot) })}</span>
+                                )) : <span className="text-xs text-care-muted">{t('landing:directory.contactClinic')}</span>}
                               </div>
                             </div>
                             <Link to={`/doctor/${doctor.id}`} className="care-action mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-care-primary text-sm font-semibold text-care-surface hover:bg-care-primary-hover">
-                              View profile and slots <ArrowRight className="h-4 w-4" />
+                              {t('landing:directory.viewProfileSlots')} <ArrowRight className="h-4 w-4" />
                             </Link>
                           </article>
                         ))}
@@ -1132,15 +1137,15 @@ export default function LandingPage() {
                                 />
                               </div>
                             </div>
-                            <div className="mt-4"><ResultBadge><BadgeCheck className="h-3 w-3" /> Source: {doctor.sourceName || 'Verified directory'}</ResultBadge></div>
+                            <div className="mt-4"><ResultBadge><BadgeCheck className="h-3 w-3" /> {t('landing:directory.source', { source: doctor.sourceName || t('landing:directory.verifiedDirectory') })}</ResultBadge></div>
                             <Link to={`/doctor/${doctor.id}`} className="mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-care-heading text-sm font-semibold text-care-heading hover:bg-care-primary-subtle">
-                              View profile <ArrowRight className="h-4 w-4" />
+                              {t('landing:directory.viewProfile')} <ArrowRight className="h-4 w-4" />
                             </Link>
                           </article>
                         ))}
                       </div>
                     ) : (
-                      <div className="rounded-lg border border-dashed border-care-border bg-care-surface p-10 text-center text-sm text-care-muted">No matching doctors were found. Try a broader specialty or nearby city.</div>
+                      <div className="rounded-lg border border-dashed border-care-border bg-care-surface p-10 text-center text-sm text-care-muted">{t('landing:directory.noDoctors')}</div>
                     )}
                   </div>
                 )}
@@ -1149,23 +1154,23 @@ export default function LandingPage() {
                   <div id="facilities">
                     <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <h3 className="text-xl font-bold text-care-heading">Hospitals and clinics</h3>
+                        <h3 className="text-xl font-bold text-care-heading">{t('landing:directory.hospitalsTitle')}</h3>
                         {hospitals.length > 0 && (
-                          <p className="mt-1 text-sm text-care-muted">Showing {visibleHospitals.length} of {hospitals.length} facilities near {activeLocationName}</p>
+                          <p className="mt-1 text-sm text-care-muted">{t('landing:directory.facilitySummary', { visible: visibleHospitals.length, total: hospitals.length, location: activeLocationName })}</p>
                         )}
                       </div>
                       <div className="flex flex-wrap items-center gap-4">
                         {hiddenHospitalCount > 0 && (
                           <button type="button" onClick={() => setShowAllHospitals(true)} className="inline-flex items-center gap-2 text-sm font-semibold text-care-heading hover:underline">
-                            Show all {hospitals.length}
+                            {t('landing:directory.showAll', { count: hospitals.length })}
                           </button>
                         )}
                         {showAllHospitals && hospitals.length > 8 && (
                           <button type="button" onClick={() => setShowAllHospitals(false)} className="inline-flex items-center gap-2 text-sm font-semibold text-care-heading hover:underline">
-                            Show less
+                            {t('landing:directory.showLess')}
                           </button>
                         )}
-                        <button type="button" onClick={requestLocation} className="inline-flex items-center gap-2 text-sm font-semibold text-care-primary-hover hover:underline"><Navigation className="h-4 w-4" /> Find nearest</button>
+                        <button type="button" onClick={requestLocation} className="inline-flex items-center gap-2 text-sm font-semibold text-care-primary-hover hover:underline"><Navigation className="h-4 w-4" /> {t('landing:directory.findNearest')}</button>
                       </div>
                     </div>
                     {hospitals.length ? (
@@ -1198,7 +1203,7 @@ export default function LandingPage() {
                         ))}
                       </div>
                     ) : (
-                      <div className="rounded-lg border border-dashed border-care-border bg-care-surface p-10 text-center text-sm text-care-muted">No facilities matched this search. Try a nearby landmark, area, city, or district name.</div>
+                      <div className="rounded-lg border border-dashed border-care-border bg-care-surface p-10 text-center text-sm text-care-muted">{t('landing:directory.noFacilities')}</div>
                     )}
                   </div>
                 )}
@@ -1214,20 +1219,20 @@ export default function LandingPage() {
               <div className="absolute bottom-4 left-4 right-4 rounded-lg border border-care-border/70 bg-care-surface/95 p-4 shadow-lg sm:right-auto sm:max-w-xs">
                 <div className="flex items-center gap-3">
                   <ShieldCheck className="h-7 w-7 text-care-primary-hover" />
-                  <div><strong className="block text-sm text-care-heading">Transparent care information</strong><span className="text-xs text-care-muted">Source, verification, and update status shown clearly</span></div>
+                  <div><strong className="block text-sm text-care-heading">{t('landing:trust.cardTitle')}</strong><span className="text-xs text-care-muted">{t('landing:trust.cardCopy')}</span></div>
                 </div>
               </div>
             </div>
             <div>
-              <span className="text-xs font-bold text-care-primary-hover">WHY SWASTHYA SARTHI</span>
-              <h2 className="mt-3 text-3xl font-bold leading-tight text-care-heading sm:text-4xl">Confidence begins before the appointment.</h2>
-              <p className="mt-5 text-base leading-7 text-care-muted">Swasthya Sarthi separates bookable providers, source-verified public listings, and community discovery leads so you always know what kind of information you are viewing.</p>
+              <span className="text-xs font-bold text-care-primary-hover">{t('landing:trust.eyebrow')}</span>
+              <h2 className="mt-3 text-3xl font-bold leading-tight text-care-heading sm:text-4xl">{t('landing:trust.title')}</h2>
+              <p className="mt-5 text-base leading-7 text-care-muted">{t('landing:trust.copy')}</p>
               <div className="mt-8 grid gap-5 sm:grid-cols-2">
                 {[
-                  ['Verified identities', 'Provider and facility verification is shown, never implied.'],
-                  ['Real availability', 'Published Swasthya Sarthi slots are separated from public clinic schedules.'],
-                  ['Privacy by design', 'Browsing is public; personal records remain behind secure sign-in.'],
-                  ['India-wide discovery', 'Search supports cities, districts, and location-based results.'],
+                  [t('landing:trust.verifiedTitle'), t('landing:trust.verifiedCopy')],
+                  [t('landing:trust.availabilityTitle'), t('landing:trust.availabilityCopy')],
+                  [t('landing:trust.privacyTitle'), t('landing:trust.privacyCopy')],
+                  [t('landing:trust.discoveryTitle'), t('landing:trust.discoveryCopy')],
                 ].map(([title, copy]) => (
                   <div key={title} className="flex gap-3">
                     <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-care-primary" />
@@ -1235,7 +1240,7 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <a href="#search-results" className="mt-8 inline-flex items-center gap-2 rounded-lg bg-care-primary px-5 py-3 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">Explore verified care <ArrowRight className="h-4 w-4" /></a>
+              <a href="#search-results" className="mt-8 inline-flex items-center gap-2 rounded-lg bg-care-primary px-5 py-3 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">{t('landing:trust.cta')} <ArrowRight className="h-4 w-4" /></a>
             </div>
           </div>
         </section>
@@ -1243,27 +1248,27 @@ export default function LandingPage() {
         <section className="bg-care-neutral">
           <div className="care-reveal mx-auto max-w-7xl px-5 py-20 sm:px-8">
             <div className="mx-auto mb-10 max-w-2xl text-center">
-              <span className="text-xs font-bold text-care-primary-hover">MORE WAYS TO GET CARE</span>
-              <h2 className="mt-3 text-3xl font-bold text-care-heading">Support for every step of your care journey</h2>
+              <span className="text-xs font-bold text-care-primary-hover">{t('landing:more.eyebrow')}</span>
+              <h2 className="mt-3 text-3xl font-bold text-care-heading">{t('landing:more.title')}</h2>
             </div>
             <div className="care-stagger grid gap-5 md:grid-cols-3">
               <article className="care-hover overflow-hidden rounded-lg border border-care-border bg-care-surface">
                 <img src={diagnosticsImage} alt="Clinical team reviewing diagnostic results" className="aspect-[16/10] w-full object-cover" />
-                <div className="p-5"><FlaskConical className="h-5 w-5 text-care-primary-hover" /><h3 className="mt-3 font-bold text-care-heading">Diagnostics and testing</h3><p className="mt-2 text-sm leading-6 text-care-muted">Discover hospitals and centres offering laboratory and imaging services.</p><button type="button" onClick={() => { setSearchMode('hospitals'); setQuery('diagnostic'); document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-4 text-sm font-semibold text-care-primary-hover">Find diagnostic care <ArrowRight className="ml-1 inline h-4 w-4" /></button></div>
+                <div className="p-5"><FlaskConical className="h-5 w-5 text-care-primary-hover" /><h3 className="mt-3 font-bold text-care-heading">{t('landing:more.diagnosticsTitle')}</h3><p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:more.diagnosticsCopy')}</p><button type="button" onClick={() => { setSearchMode('hospitals'); setQuery('diagnostic'); document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-4 text-sm font-semibold text-care-primary-hover">{t('landing:more.findDiagnostics')} <ArrowRight className="ml-1 inline h-4 w-4" /></button></div>
               </article>
               <article className="care-hover overflow-hidden rounded-lg border border-care-border bg-care-surface">
                 <img src={heroImage} alt="Doctor meeting a patient at a clinic" className="aspect-[16/10] w-full object-cover object-[70%_center]" />
-                <div className="p-5"><CalendarCheck2 className="h-5 w-5 text-care-primary-hover" /><h3 className="mt-3 font-bold text-care-heading">In-person appointments</h3><p className="mt-2 text-sm leading-6 text-care-muted">Choose a doctor, hospital or clinic, and an available time for a physical visit.</p><button type="button" onClick={() => { setSearchMode('doctors'); document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-4 text-sm font-semibold text-care-primary-hover">Find an appointment <ArrowRight className="ml-1 inline h-4 w-4" /></button></div>
+                <div className="p-5"><CalendarCheck2 className="h-5 w-5 text-care-primary-hover" /><h3 className="mt-3 font-bold text-care-heading">{t('landing:more.appointmentsTitle')}</h3><p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:more.appointmentsCopy')}</p><button type="button" onClick={() => { setSearchMode('doctors'); document.querySelector('#care-search')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-4 text-sm font-semibold text-care-primary-hover">{t('landing:more.findAppointment')} <ArrowRight className="ml-1 inline h-4 w-4" /></button></div>
               </article>
               <article id="emergency" className="care-hover flex flex-col justify-between rounded-lg border border-care-heading bg-care-heading p-6 text-care-surface">
                 <div>
                   <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-care-surface/12"><PhoneCall className="h-5 w-5" /></span>
-                  <h3 className="mt-6 text-xl font-bold">Need urgent medical care?</h3>
-                  <p className="mt-3 text-sm leading-6 text-care-primary-subtle">For severe chest pain, breathing difficulty, unconsciousness, major bleeding, or stroke symptoms, contact local emergency services immediately.</p>
+                  <h3 className="mt-6 text-xl font-bold">{t('landing:more.urgentTitle')}</h3>
+                  <p className="mt-3 text-sm leading-6 text-care-primary-subtle">{t('landing:more.urgentCopy')}</p>
                 </div>
                 <div className="mt-8 space-y-3">
-                  <button type="button" onClick={() => { setSearchMode('hospitals'); setQuery('emergency'); requestLocation(); }} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-care-surface px-4 py-3 text-sm font-bold text-care-heading"><Cross className="h-4 w-4" /> Find nearby emergency care</button>
-                  <p className="text-center text-xs text-care-primary-subtle">Swasthya Sarthi is not an emergency response service.</p>
+                  <button type="button" onClick={() => { setSearchMode('hospitals'); setQuery('emergency'); requestLocation(); }} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-care-surface px-4 py-3 text-sm font-bold text-care-heading"><Cross className="h-4 w-4" /> {t('landing:more.findEmergency')}</button>
+                  <p className="text-center text-xs text-care-primary-subtle">{t('landing:more.emergencyNote')}</p>
                 </div>
               </article>
             </div>
@@ -1273,16 +1278,16 @@ export default function LandingPage() {
         <section id="health-guides" className="bg-care-surface">
           <div className="care-reveal mx-auto max-w-7xl px-5 py-20 sm:px-8">
             <div className="mb-9 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-              <div><span className="text-xs font-bold text-care-primary-hover">HEALTH GUIDES</span><h2 className="mt-3 text-3xl font-bold text-care-heading">Clear information for everyday decisions</h2></div>
-              <div className="inline-flex items-center gap-2 text-xs text-care-muted"><ShieldCheck className="h-4 w-4 text-care-primary-hover" /> Editorial content requires clinical review before publication</div>
+              <div><span className="text-xs font-bold text-care-primary-hover">{t('landing:guides.eyebrow')}</span><h2 className="mt-3 text-3xl font-bold text-care-heading">{t('landing:guides.title')}</h2></div>
+              <div className="inline-flex items-center gap-2 text-xs text-care-muted"><ShieldCheck className="h-4 w-4 text-care-primary-hover" /> {t('landing:guides.reviewNote')}</div>
             </div>
             <div className="care-stagger grid gap-4 md:grid-cols-3">
               {guides.map(guide => (
-                <article key={guide.title} className="care-hover rounded-lg border border-care-border p-6">
-                  <span className="text-xs font-bold text-care-primary-hover">{guide.tag}</span>
-                  <h3 className="mt-3 text-lg font-bold leading-7 text-care-heading">{guide.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-care-muted">{guide.copy}</p>
-                  <Link to="/login/patient" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-care-heading">Read guide <ArrowRight className="h-4 w-4" /></Link>
+                <article key={guide.titleKey} className="care-hover rounded-lg border border-care-border p-6">
+                  <span className="text-xs font-bold text-care-primary-hover">{t(`landing:${guide.tagKey}`)}</span>
+                  <h3 className="mt-3 text-lg font-bold leading-7 text-care-heading">{t(`landing:${guide.titleKey}`)}</h3>
+                  <p className="mt-3 text-sm leading-6 text-care-muted">{t(`landing:${guide.copyKey}`)}</p>
+                  <Link to="/login/patient" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-care-heading">{t('landing:guides.readGuide')} <ArrowRight className="h-4 w-4" /></Link>
                 </article>
               ))}
             </div>
@@ -1291,11 +1296,11 @@ export default function LandingPage() {
 
         <section className="border-y border-care-border bg-care-neutral">
           <div className="care-reveal mx-auto flex max-w-7xl flex-col gap-7 px-5 py-12 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl"><span className="text-xs font-bold text-care-primary-hover">CARE TEAMS</span><h2 className="mt-2 text-2xl font-bold text-care-heading">A dedicated workspace for every role</h2><p className="mt-2 text-sm leading-6 text-care-muted">Patients book physical visits, doctors manage clinic appointments, and hospitals coordinate teams through separate secure portals.</p></div>
+            <div className="max-w-2xl"><span className="text-xs font-bold text-care-primary-hover">{t('landing:teams.eyebrow')}</span><h2 className="mt-2 text-2xl font-bold text-care-heading">{t('landing:teams.title')}</h2><p className="mt-2 text-sm leading-6 text-care-muted">{t('landing:teams.copy')}</p></div>
             <div className="flex flex-wrap gap-2">
-              <Link to="/login/patient" className="rounded-lg border border-care-border bg-care-surface px-4 py-2.5 text-sm font-semibold text-care-heading hover:bg-care-neutral">Patient portal</Link>
-              <Link to="/login/doctor" className="rounded-lg border border-care-border bg-care-surface px-4 py-2.5 text-sm font-semibold text-care-heading hover:bg-care-neutral">Doctor portal</Link>
-              <Link to="/login/admin" className="rounded-lg bg-care-primary px-4 py-2.5 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">Hospital portal</Link>
+              <Link to="/login/patient" className="rounded-lg border border-care-border bg-care-surface px-4 py-2.5 text-sm font-semibold text-care-heading hover:bg-care-neutral">{t('landing:teams.patientPortal')}</Link>
+              <Link to="/login/doctor" className="rounded-lg border border-care-border bg-care-surface px-4 py-2.5 text-sm font-semibold text-care-heading hover:bg-care-neutral">{t('landing:teams.doctorPortal')}</Link>
+              <Link to="/login/admin" className="rounded-lg bg-care-primary px-4 py-2.5 text-sm font-semibold text-care-surface hover:bg-care-primary-hover">{t('landing:teams.hospitalPortal')}</Link>
             </div>
           </div>
         </section>
@@ -1304,14 +1309,14 @@ export default function LandingPage() {
       <footer className="bg-care-heading text-care-surface">
         <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
           <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-            <div><PublicLogo light /><p className="mt-4 max-w-sm text-sm leading-6 text-care-primary-subtle">A transparent healthcare discovery and appointment network for patients, doctors, and hospitals across India.</p></div>
-            <div><h3 className="text-sm font-bold">Find care</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#search-results">Doctors</a><a href="#facilities">Hospitals</a><a href="#services">Services</a><a href="#emergency">Emergency guidance</a></div></div>
-            <div><h3 className="text-sm font-bold">Swasthya Sarthi</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#trust">How verification works</a><a href="#health-guides">Health guides</a><Link to="/login/doctor">For doctors</Link><Link to="/login/admin">For hospitals</Link></div></div>
-            <div><h3 className="text-sm font-bold">Language</h3><div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-care-border/20 px-3 py-2 text-sm text-care-primary-subtle"><Languages className="h-4 w-4" /> English · India</div></div>
+            <div><PublicLogo light /><p className="mt-4 max-w-sm text-sm leading-6 text-care-primary-subtle">{t('landing:footer.copy')}</p></div>
+            <div><h3 className="text-sm font-bold">{t('landing:footer.findCare')}</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#search-results">{t('nav:doctors')}</a><a href="#facilities">{t('nav:hospitals')}</a><a href="#services">{t('nav:services')}</a><a href="#emergency">{t('landing:footer.emergencyGuidance')}</a></div></div>
+            <div><h3 className="text-sm font-bold">Swasthya Sarthi</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#trust">{t('landing:footer.verification')}</a><a href="#health-guides">{t('nav:healthGuides')}</a><Link to="/login/doctor">{t('landing:footer.forDoctors')}</Link><Link to="/login/admin">{t('landing:footer.forHospitals')}</Link></div></div>
+            <div><h3 className="text-sm font-bold">{t('landing:footer.language')}</h3><div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-care-border/20 px-3 py-2 text-sm text-care-primary-subtle"><Languages className="h-4 w-4" /> {t('landing:footer.localeName')}</div></div>
           </div>
           <div className="mt-10 flex flex-col gap-4 border-t border-care-border/15 pt-6 text-xs text-care-primary-subtle sm:flex-row sm:items-center sm:justify-between">
-            <span>&copy; 2026 Swasthya Sarthi Platform. Healthcare information is not a substitute for medical advice.</span>
-            <nav className="flex gap-5" aria-label="Legal"><Link to="/legal/privacy">Privacy</Link><Link to="/legal/terms">Terms</Link><Link to="/legal/security">Security</Link></nav>
+            <span>{t('landing:footer.disclaimer')}</span>
+            <nav className="flex gap-5" aria-label={t('landing:footer.legal')}><Link to="/legal/privacy">{t('landing:footer.privacy')}</Link><Link to="/legal/terms">{t('landing:footer.terms')}</Link><Link to="/legal/security">{t('landing:footer.security')}</Link></nav>
           </div>
         </div>
       </footer>

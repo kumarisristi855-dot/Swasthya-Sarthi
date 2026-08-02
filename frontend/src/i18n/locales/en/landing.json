@@ -1,0 +1,182 @@
+{
+  "location": {
+    "india": "India"
+  },
+  "locationPrompt": {
+    "title": "Find care near your live location?",
+    "copy": "Allow Swasthya Sarthi to use your device location for accurate nearby hospitals and doctors. Your browser will ask for permission next. If GPS is blocked, Swasthya Sarthi will use your approximate city, and you can still enter another location.",
+    "useCurrent": "Use current location",
+    "chooseAnother": "Choose another",
+    "note": "Location is used for this care search. Personal health information remains protected behind sign-in."
+  },
+  "hero": {
+    "badge": "Verified healthcare discovery across India",
+    "title": "The right care, closer than you think.",
+    "copy": "Search doctors, hospitals, specialists, or symptoms. Review trustworthy public information before you create an account.",
+    "sourceLabelled": "Source-labelled providers",
+    "availability": "Availability previews",
+    "locationAware": "Location-aware results"
+  },
+  "search": {
+    "doctorSr": "Search for doctor or specialty",
+    "doctorPlaceholder": "Search for Doctor or Speciality",
+    "symptomPlaceholder": "Describe your symptoms",
+    "locationSr": "Select location",
+    "locationPlaceholder": "Select Location",
+    "refreshLocation": "Refresh current location",
+    "useLocation": "Use my current location",
+    "findHospitals": "Find Hospitals",
+    "checkSymptoms": "Check Symptoms",
+    "bookAppointment": "Book an Appointment",
+    "allCare": "All care",
+    "symptoms": "Symptoms",
+    "setOnMap": "Set on map",
+    "selectLocation": "Select a location",
+    "keepTyping": "Keep typing a locality, landmark, village, or city.",
+    "chooseOrEnter": "Choose current location or enter another locality",
+    "enterExactArea": "Enter an exact area, neighbourhood, landmark, or address",
+    "currentLocation": "your current location",
+    "locationUnsupported": "Location is not supported. Enter a city or locality.",
+    "locationUnsupportedBrowser": "Location is not supported by this browser. Enter a city instead.",
+    "allowLocation": "Allow location access to find care near you",
+    "googleMapsLocation": "Google Maps location",
+    "mapLocation": "Map location",
+    "nearbyDirectoryListings": "{{type}} - {{count}} nearby directory listings",
+    "typedLocation": "{{type}} location",
+    "directoryLocation": "Directory location"
+  },
+  "services": {
+    "eyebrow": "START WITH WHAT YOU NEED",
+    "title": "Healthcare without the runaround",
+    "copy": "Explore real public directory information first. Sign in only when you are ready to book or manage personal health information."
+  },
+  "quickServices": {
+    "findDoctor": {
+      "title": "Find a doctor",
+      "copy": "Browse by specialty and availability"
+    },
+    "findHospitals": {
+      "title": "Find hospitals",
+      "copy": "Explore clinics and hospitals near you"
+    },
+    "symptomGuidance": {
+      "title": "Symptom guidance",
+      "copy": "Match symptoms to a suitable specialty"
+    },
+    "clinicVisit": {
+      "title": "Book a clinic visit",
+      "copy": "Reserve an in-person appointment"
+    },
+    "diagnostics": {
+      "title": "Diagnostic centres",
+      "copy": "Find testing and imaging facilities"
+    },
+    "emergency": {
+      "title": "Emergency care",
+      "copy": "Locate urgent medical help quickly"
+    }
+  },
+  "directory": {
+    "eyebrow": "PUBLIC CARE DIRECTORY",
+    "headingNear": "Care near {{location}}",
+    "headingAround": "Care around {{location}}",
+    "checking": "Checking current directory information...",
+    "loadFacilitiesError": "Could not load facilities",
+    "searchUnavailable": "Search is temporarily unavailable",
+    "resultSummary": "{{count}} relevant listings shown · {{location}}",
+    "sourceNote": "Every listing shows its verification source",
+    "searching": "Searching Swasthya Sarthi directory...",
+    "doctorsTitle": "Doctors and specialists",
+    "viewFull": "View full directory",
+    "affiliatedClinic": "Affiliated clinic",
+    "activeProvider": "Swasthya Sarthi active",
+    "nextAvailable": "NEXT AVAILABLE",
+    "tomorrowSlot": "Tomorrow {{slot}}",
+    "contactClinic": "Contact clinic for the next opening",
+    "viewProfileSlots": "View profile and slots",
+    "source": "Source: {{source}}",
+    "verifiedDirectory": "Verified directory",
+    "viewProfile": "View profile",
+    "noDoctors": "No matching doctors were found. Try a broader specialty or nearby city.",
+    "hospitalsTitle": "Hospitals and clinics",
+    "facilitySummary": "Showing {{visible}} of {{total}} facilities near {{location}}",
+    "showAll": "Show all {{count}}",
+    "showLess": "Show less",
+    "findNearest": "Find nearest",
+    "noFacilities": "No facilities matched this search. Try a nearby landmark, area, city, or district name."
+  },
+  "trust": {
+    "cardTitle": "Transparent care information",
+    "cardCopy": "Source, verification, and update status shown clearly",
+    "eyebrow": "WHY SWASTHYA SARTHI",
+    "title": "Confidence begins before the appointment.",
+    "copy": "Swasthya Sarthi separates bookable providers, source-verified public listings, and community discovery leads so you always know what kind of information you are viewing.",
+    "verifiedTitle": "Verified identities",
+    "verifiedCopy": "Provider and facility verification is shown, never implied.",
+    "availabilityTitle": "Real availability",
+    "availabilityCopy": "Published Swasthya Sarthi slots are separated from public clinic schedules.",
+    "privacyTitle": "Privacy by design",
+    "privacyCopy": "Browsing is public; personal records remain behind secure sign-in.",
+    "discoveryTitle": "India-wide discovery",
+    "discoveryCopy": "Search supports cities, districts, and location-based results.",
+    "cta": "Explore verified care"
+  },
+  "more": {
+    "eyebrow": "MORE WAYS TO GET CARE",
+    "title": "Support for every step of your care journey",
+    "diagnosticsTitle": "Diagnostics and testing",
+    "diagnosticsCopy": "Discover hospitals and centres offering laboratory and imaging services.",
+    "findDiagnostics": "Find diagnostic care",
+    "appointmentsTitle": "In-person appointments",
+    "appointmentsCopy": "Choose a doctor, hospital or clinic, and an available time for a physical visit.",
+    "findAppointment": "Find an appointment",
+    "urgentTitle": "Need urgent medical care?",
+    "urgentCopy": "For severe chest pain, breathing difficulty, unconsciousness, major bleeding, or stroke symptoms, contact local emergency services immediately.",
+    "findEmergency": "Find nearby emergency care",
+    "emergencyNote": "Swasthya Sarthi is not an emergency response service."
+  },
+  "guides": {
+    "eyebrow": "HEALTH GUIDES",
+    "title": "Clear information for everyday decisions",
+    "reviewNote": "Editorial content requires clinical review before publication",
+    "readGuide": "Read guide",
+    "seasonal": {
+      "tag": "Seasonal health",
+      "title": "Fever: when home care is enough and when to seek help",
+      "copy": "Understand warning signs, hydration basics, and when a clinician should evaluate persistent fever."
+    },
+    "heart": {
+      "tag": "Heart health",
+      "title": "Recognising symptoms that need urgent cardiac attention",
+      "copy": "Chest pressure, breathlessness, fainting, and radiating pain should never be ignored."
+    },
+    "family": {
+      "tag": "Family care",
+      "title": "Preparing for a child's first doctor appointment",
+      "copy": "Bring symptom timing, current medicines, vaccination records, and questions for the pediatrician."
+    }
+  },
+  "teams": {
+    "eyebrow": "CARE TEAMS",
+    "title": "A dedicated workspace for every role",
+    "copy": "Patients book physical visits, doctors manage clinic appointments, and hospitals coordinate teams through separate secure portals.",
+    "patientPortal": "Patient portal",
+    "doctorPortal": "Doctor portal",
+    "hospitalPortal": "Hospital portal"
+  },
+  "footer": {
+    "copy": "A transparent healthcare discovery and appointment network for patients, doctors, and hospitals across India.",
+    "findCare": "Find care",
+    "emergencyGuidance": "Emergency guidance",
+    "verification": "How verification works",
+    "forDoctors": "For doctors",
+    "forHospitals": "For hospitals",
+    "language": "Language",
+    "localeName": "English · India",
+    "disclaimer": "© 2026 Swasthya Sarthi Platform. Healthcare information is not a substitute for medical advice.",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "security": "Security"
+  }
+}

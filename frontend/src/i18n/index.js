@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 
 import enCommon from './locales/en/common.json';
 import enNav from './locales/en/nav.json';
+import enLanding from './locales/en/landing.json';
 import enAuth from './locales/en/auth.json';
 import enPatientDashboard from './locales/en/patient-dashboard.json';
 import enSymptomChecker from './locales/en/symptom-checker.json';
@@ -12,6 +13,7 @@ import enHospitalAdmin from './locales/en/hospital-admin.json';
 
 import hiCommon from './locales/hi/common.json';
 import hiNav from './locales/hi/nav.json';
+import hiLanding from './locales/hi/landing.json';
 import hiAuth from './locales/hi/auth.json';
 import hiPatientDashboard from './locales/hi/patient-dashboard.json';
 import hiSymptomChecker from './locales/hi/symptom-checker.json';
@@ -21,6 +23,7 @@ import hiHospitalAdmin from './locales/hi/hospital-admin.json';
 
 import bnCommon from './locales/bn/common.json';
 import bnNav from './locales/bn/nav.json';
+import bnLanding from './locales/bn/landing.json';
 import bnAuth from './locales/bn/auth.json';
 import bnPatientDashboard from './locales/bn/patient-dashboard.json';
 import bnSymptomChecker from './locales/bn/symptom-checker.json';
@@ -30,6 +33,7 @@ import bnHospitalAdmin from './locales/bn/hospital-admin.json';
 
 import taCommon from './locales/ta/common.json';
 import taNav from './locales/ta/nav.json';
+import taLanding from './locales/ta/landing.json';
 import taAuth from './locales/ta/auth.json';
 import taPatientDashboard from './locales/ta/patient-dashboard.json';
 import taSymptomChecker from './locales/ta/symptom-checker.json';
@@ -39,6 +43,7 @@ import taHospitalAdmin from './locales/ta/hospital-admin.json';
 
 import teCommon from './locales/te/common.json';
 import teNav from './locales/te/nav.json';
+import teLanding from './locales/te/landing.json';
 import teAuth from './locales/te/auth.json';
 import tePatientDashboard from './locales/te/patient-dashboard.json';
 import teSymptomChecker from './locales/te/symptom-checker.json';
@@ -48,6 +53,7 @@ import teHospitalAdmin from './locales/te/hospital-admin.json';
 
 import knCommon from './locales/kn/common.json';
 import knNav from './locales/kn/nav.json';
+import knLanding from './locales/kn/landing.json';
 import knAuth from './locales/kn/auth.json';
 import knPatientDashboard from './locales/kn/patient-dashboard.json';
 import knSymptomChecker from './locales/kn/symptom-checker.json';
@@ -70,6 +76,7 @@ export const localeStorageKey = 'swasthya-sarthi-language';
 export const namespaces = [
   'common',
   'nav',
+  'landing',
   'auth',
   'patient-dashboard',
   'symptom-checker',
@@ -82,6 +89,7 @@ const resources = {
   en: {
     common: enCommon,
     nav: enNav,
+    landing: enLanding,
     auth: enAuth,
     'patient-dashboard': enPatientDashboard,
     'symptom-checker': enSymptomChecker,
@@ -92,6 +100,7 @@ const resources = {
   hi: {
     common: hiCommon,
     nav: hiNav,
+    landing: hiLanding,
     auth: hiAuth,
     'patient-dashboard': hiPatientDashboard,
     'symptom-checker': hiSymptomChecker,
@@ -102,6 +111,7 @@ const resources = {
   bn: {
     common: bnCommon,
     nav: bnNav,
+    landing: bnLanding,
     auth: bnAuth,
     'patient-dashboard': bnPatientDashboard,
     'symptom-checker': bnSymptomChecker,
@@ -112,6 +122,7 @@ const resources = {
   ta: {
     common: taCommon,
     nav: taNav,
+    landing: taLanding,
     auth: taAuth,
     'patient-dashboard': taPatientDashboard,
     'symptom-checker': taSymptomChecker,
@@ -122,6 +133,7 @@ const resources = {
   te: {
     common: teCommon,
     nav: teNav,
+    landing: teLanding,
     auth: teAuth,
     'patient-dashboard': tePatientDashboard,
     'symptom-checker': teSymptomChecker,
@@ -132,6 +144,7 @@ const resources = {
   kn: {
     common: knCommon,
     nav: knNav,
+    landing: knLanding,
     auth: knAuth,
     'patient-dashboard': knPatientDashboard,
     'symptom-checker': knSymptomChecker,
