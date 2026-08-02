@@ -142,7 +142,7 @@ export default function PatientPortalHeader() {
                 </span>
                 <span className="hidden min-w-0 lg:block">
                   <span className="block max-w-40 truncate text-sm font-semibold text-care-heading">{user?.full_name || 'Patient'}</span>
-                  <span className="mt-0.5 block text-[11px] font-medium text-care-primary-hover">Patient profile</span>
+                  <span className="mt-0.5 block text-[11px] font-medium text-care-primary-hover">{t('nav:patientProfile')}</span>
                 </span>
                 <span className="hidden h-7 w-7 items-center justify-center rounded-md bg-care-neutral text-care-muted transition-colors group-hover:bg-care-surface group-hover:text-care-primary-hover sm:flex">
                   <ChevronDown className={`h-4 w-4 transition-transform ${menuOpen ? 'rotate-180' : ''}`} />

@@ -14,6 +14,7 @@ import { productionSafe } from '../../lib/developmentFixtures';
 import PatientPortalHeader from '../../shared/PatientPortalHeader';
 import { LEGACY_LOCATION_KEY, patientLocationStorageKey } from '../../lib/patientSession';
 import { API_URL } from '../../lib/api';
+import { useTranslation } from 'react-i18next';
 
 function loadSavedLocation(userId) {
   try {
@@ -190,6 +191,7 @@ const mapFacilityIcon = L.icon({
 });
 
 export default function PatientDashboard() {
+  const { t } = useTranslation(['patient-dashboard']);
   const { user, token } = useAuth();
   const locationRequestedRef = useRef(false);
   const savedLocationRef = useRef(loadSavedLocation(user?.id));
@@ -1071,21 +1073,21 @@ export default function PatientDashboard() {
                   className={`care-segment flex-1 ${activeTab === 'hospitals' ? 'care-segment-active' : ''}`}
                 >
                   <MapPin className="w-4 h-4" />
-                  <span>Nearby Facilities</span>
+                  <span>{t('nearbyFacilities')}</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('symptoms')}
                   className={`care-segment flex-1 ${activeTab === 'symptoms' ? 'care-segment-active' : ''}`}
                 >
                   <Activity className="w-4 h-4" />
-                  <span>AI Symptom Checker</span>
+                  <span>{t('symptomChecker')}</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('browse')}
                   className={`care-segment flex-1 ${activeTab === 'browse' ? 'care-segment-active' : ''}`}
                 >
                   <SlidersHorizontal className="w-4 h-4" />
-                  <span>Browse</span>
+                  <span>{t('browse')}</span>
                 </button>
               </div>
 
@@ -1094,11 +1096,11 @@ export default function PatientDashboard() {
                 <div className="care-tab-panel">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl font-bold text-care-heading flex items-center">
-                      Explore Facilities
+                      {t('exploreFacilities')}
                     </h3>
                     {locationStatus === 'denied' && (
                       <span className="px-2 py-0.5 rounded-full bg-care-neutral border border-care-warning/20 text-[9px] text-care-warning font-semibold uppercase">
-                        GPS Offline
+                        {t('gpsOffline')}
                       </span>
                     )}
                   </div>
@@ -1107,8 +1109,8 @@ export default function PatientDashboard() {
                     <div className="flex items-start">
                       <Compass className="w-4 h-4 text-care-primary mr-2 mt-0.5 shrink-0" />
                       <div>
-                        <span className="text-xs text-care-muted leading-relaxed">Search hospitals anywhere in India</span>
-                        <span className="block text-[10px] text-care-primary mt-0.5">Searching near: {selectedLocationName}</span>
+                        <span className="text-xs text-care-muted leading-relaxed">{t('searchHospitals')}</span>
+                        <span className="block text-[10px] text-care-primary mt-0.5">{t('searchingNear', { location: selectedLocationName })}</span>
                       </div>
                     </div>
                     <form onSubmit={handleLocationSearch} className="space-y-2">
@@ -1121,7 +1123,7 @@ export default function PatientDashboard() {
                             setLocationQuery(event.target.value);
                             setLocationError('');
                           }}
-                          placeholder="Area, neighbourhood, landmark, or address"
+                          placeholder={t('locationPlaceholder')}
                           className="patient-input w-full rounded-lg py-2.5 pl-10 pr-3 text-sm"
                         />
                         <datalist id="searchable-locations">
@@ -1142,14 +1144,14 @@ export default function PatientDashboard() {
                           className="py-2.5 px-3 bg-care-primary hover:bg-care-primary-hover text-care-surface rounded-lg text-xs font-semibold transition-colors disabled:opacity-60 inline-flex items-center justify-center"
                         >
                           {locationSearching && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
-                          {locationSearching ? 'Searching...' : 'Search location'}
+                          {locationSearching ? t('searching') : t('searchLocation')}
                         </button>
                         <button
                           type="button"
                           onClick={requestLocation}
                           className="patient-button-secondary py-2.5 px-3 rounded-lg text-xs font-semibold border transition-colors inline-flex items-center justify-center"
                         >
-                          <Navigation className="w-3.5 h-3.5 mr-1.5" /> Use my location
+                          <Navigation className="w-3.5 h-3.5 mr-1.5" /> {t('useMyLocation')}
                         </button>
                       </div>
                     </form>
@@ -1175,7 +1177,7 @@ export default function PatientDashboard() {
                       <div className="flex items-start">
                         <Compass className="w-4 h-4 text-care-warning mr-2 mt-0.5 shrink-0" />
                         <span className="text-xs text-care-muted leading-relaxed">
-                          GPS offline. Search for any supported Indian city above instead.
+                          {t('gpsOfflineHelp')}
                         </span>
                       </div>
                     </div>
@@ -1192,7 +1194,7 @@ export default function PatientDashboard() {
                     <Search className="absolute left-3 top-3 w-4 h-4 text-care-muted" />
                     <input
                       type="text"
-                      placeholder="Search hospital or department..."
+                      placeholder={t('hospitalSearchPlaceholder')}
                       value={manualQuery}
                       onChange={(e) => setManualQuery(e.target.value)}
                       className="patient-input w-full rounded-lg py-2.5 pl-10 pr-4 text-sm"
@@ -1201,12 +1203,12 @@ export default function PatientDashboard() {
 
                   {/* List results */}
                   <div className="space-y-4">
-                    <span className="block text-xs font-semibold text-care-muted uppercase mb-2">Hospital Directory ({filteredHospitals.length})</span>
+                    <span className="block text-xs font-semibold text-care-muted uppercase mb-2">{t('hospitalDirectory')} ({filteredHospitals.length})</span>
                     {loading ? (
                       <CardSkeleton count={6} />
                     ) : filteredHospitals.length === 0 ? (
                       <div className="py-12 text-center text-care-muted text-sm border border-care-border rounded-lg">
-                        No facilities found matching details.
+                        {t('noFacilities')}
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -2093,7 +2095,7 @@ export default function PatientDashboard() {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-surface py-4 text-center text-xs text-care-muted">
-        &copy; 2026 Swasthya Sarthi Platform. AI Diagnostic & Location Node.
+        &copy; 2026 {t('footer')}
       </footer>
     </div>
   );

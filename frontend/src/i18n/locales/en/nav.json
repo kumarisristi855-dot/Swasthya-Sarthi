@@ -12,5 +12,6 @@
   "patientPortal": "Patient portal",
   "doctorPortal": "Doctor portal",
   "hospitalPortal": "Hospital portal",
-  "backToSearch": "Back to search"
+  "backToSearch": "Back to search",
+  "patientProfile": "Patient profile"
 }

@@ -1,12 +1,21 @@
 {
-  "nearbyFacilities": "নিকটবর্তী সুবিধা",
+  "nearbyFacilities": "কাছাকাছি সুবিধা",
   "symptomChecker": "AI উপসর্গ পরীক্ষক",
   "browse": "ব্রাউজ করুন",
-  "searchHospitals": "ভারতের যেকোনো স্থানে হাসপাতাল খুঁজুন",
+  "exploreFacilities": "সুবিধা দেখুন",
+  "gpsOffline": "GPS বন্ধ",
+  "searchHospitals": "ভারতের যেকোনো জায়গায় হাসপাতাল খুঁজুন",
+  "searchingNear": "এখানে খোঁজা হচ্ছে: {{location}}",
+  "locationPlaceholder": "এলাকা, পাড়া, ল্যান্ডমার্ক বা ঠিকানা",
+  "searching": "খোঁজা হচ্ছে...",
   "searchLocation": "স্থান খুঁজুন",
-  "useMyLocation": "আমার অবস্থান ব্যবহার করুন",
+  "useMyLocation": "আমার স্থান ব্যবহার করুন",
+  "gpsOfflineHelp": "GPS বন্ধ। উপরে কোনো সমর্থিত ভারতীয় শহর খুঁজুন।",
+  "hospitalSearchPlaceholder": "হাসপাতাল বা বিভাগ খুঁজুন...",
   "hospitalDirectory": "হাসপাতাল ডিরেক্টরি",
+  "noFacilities": "মিল থাকা কোনো সুবিধা পাওয়া যায়নি।",
+  "footer": "Swasthya Sarthi Platform. AI ডায়াগনস্টিক ও লোকেশন নোড.",
   "appointmentUpcoming": "আসন্ন",
   "appointmentCancelled": "বাতিল",
-  "appointmentCompleted": "সম্পন্ন"
+  "appointmentCompleted": "সম্পূর্ণ"
 }
