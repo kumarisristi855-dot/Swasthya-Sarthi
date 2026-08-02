@@ -12,6 +12,10 @@ import {
   getLocalHospitalRatingSummary,
   saveLocalHospitalRating
 } from '../services/ratings/localHospitalRatings.js';
+import {
+  getStorageHospitalRatingSummary,
+  saveStorageHospitalRating
+} from '../services/ratings/storageHospitalRatings.js';
 
 const router = Router();
 const communityFacilityCache = new Map();
@@ -1701,12 +1705,9 @@ router.get('/:id/ratings', async (req, res) => {
         );
       }
 
-      return res.status(503).json({
-        error: {
-          message: 'Hospital ratings are being configured. Apply database migration 09_hospital_ratings.sql.',
-          code: 'RATINGS_NOT_CONFIGURED'
-        }
-      });
+      return res.status(200).json(
+        await getStorageHospitalRatingSummary(hospitalId, patientId)
+      );
     }
 
     if (hospitalError || !hospital) {
@@ -1787,11 +1788,14 @@ router.put('/:id/ratings', authenticateUser, requireRole('patient'), async (req,
           });
         }
 
-        return res.status(503).json({
-          error: {
-            message: 'Hospital ratings are being configured. Apply database migration 09_hospital_ratings.sql.',
-            code: 'RATINGS_NOT_CONFIGURED'
-          }
+        const summary = await saveStorageHospitalRating(
+          hospitalId,
+          req.user.id,
+          rating
+        );
+        return res.status(200).json({
+          message: 'Hospital rating saved',
+          ...summary
         });
       }
       return res.status(400).json({
