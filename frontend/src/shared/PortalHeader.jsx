@@ -25,22 +25,22 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
   }, []);
 
   return (
-    <header className="care-header">
-      <div className="care-navbar-inner gap-4">
-        <div className="flex min-w-0 items-center gap-3">
+    <header className="patient-portal-header">
+      <div className="patient-portal-navbar">
+        <div className="flex min-w-0 shrink-0 items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-care-primary text-care-surface">
             <span className="relative h-6 w-6" aria-hidden="true">
               <Activity className="care-logo-pulse-base absolute inset-0 h-6 w-6" strokeWidth={2.5} />
               <Activity className="care-logo-pulse-scan absolute inset-0 h-6 w-6" strokeWidth={2.5} />
             </span>
           </div>
-          <div>
-            <span className="block text-lg font-bold text-care-heading">{t('nav:brand')}</span>
-            <span className="block text-[10px] font-semibold uppercase text-care-primary-hover">{role}</span>
+          <div className="leading-none">
+            <span className="block text-lg font-bold leading-5 text-care-heading">{t('nav:brand')}</span>
+            <span className="mt-1 block text-[10px] font-semibold uppercase leading-3 text-care-primary-hover">{role}</span>
           </div>
         </div>
 
-        <div className="ml-auto flex min-w-0 items-center justify-end gap-3">
+        <div className="ml-auto flex min-w-0 items-center justify-end gap-3 sm:gap-4 lg:gap-5">
           {context}
           <LanguageSwitcher compact />
           {profile ? (
