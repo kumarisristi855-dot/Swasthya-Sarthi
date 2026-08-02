@@ -499,13 +499,13 @@
   }
 
   .public-hero-section {
-    min-height: 660px;
+    min-height: 760px;
   }
 
   .public-hero-container {
-    min-height: 660px;
+    min-height: 760px;
     padding-top: 5rem;
-    padding-bottom: 17.5rem;
+    padding-bottom: 20rem;
   }
 
   .public-hero-content {
@@ -519,23 +519,23 @@
   @media (min-width: 640px) {
     .public-hero-section,
     .public-hero-container {
-      min-height: 575px;
+      min-height: 760px;
     }
 
     .public-hero-container {
       padding-top: 3.25rem;
-      padding-bottom: 8.5rem;
+      padding-bottom: 18rem;
     }
   }
 
   @media (min-width: 1024px) {
     .public-hero-section,
     .public-hero-container {
-      min-height: 595px;
+      min-height: 760px;
     }
 
     .public-hero-container {
-      padding-bottom: 9rem;
+      padding-bottom: 18rem;
     }
   }
 

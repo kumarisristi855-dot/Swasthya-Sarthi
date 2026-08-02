@@ -289,7 +289,7 @@ function PublicDoctorCard({ doctor, directoryOnly = false }) {
   const updatedDate = formatUpdatedDate(doctor.verifiedAt || doctor.updatedAt);
 
   return (
-    <article className="care-hover flex min-h-[360px] flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm focus-within:ring-2 focus-within:ring-care-primary">
+    <article className="care-hover flex flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm focus-within:ring-2 focus-within:ring-care-primary">
       <div className="flex items-start gap-4">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover"><Stethoscope className="h-6 w-6" aria-hidden="true" /></span>
         <div className="min-w-0">
@@ -327,7 +327,7 @@ function PublicDoctorCard({ doctor, directoryOnly = false }) {
         </div>
       )}
 
-      <div className="mt-auto flex flex-col gap-2 pt-5">
+      <div className="mt-5 flex flex-col gap-2">
         <Link to={`/doctor/${doctor.id}`} onClick={() => trackInteraction('doctor_result_opened', { listingType: directoryOnly ? 'public_directory' : 'bookable' })} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-care-primary px-4 text-sm font-semibold text-white hover:bg-care-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2">
           {t('landing:directory.viewProfile')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
@@ -1218,7 +1218,7 @@ export default function LandingPage() {
                 <ShieldCheck className="h-4 w-4" />
                 {t('landing:hero.badge')}
               </span>
-              <h1 className="max-w-[13ch] text-4xl font-bold leading-[1.08] text-care-surface sm:text-5xl lg:text-[3.6rem]">{t('landing:hero.title')}</h1>
+              <h1 className="max-w-[18ch] text-4xl font-bold leading-[1.08] text-care-surface sm:text-5xl lg:text-[3.6rem]">{t('landing:hero.title')}</h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-care-surface/90">{t('landing:hero.copy')}</p>
               <div className="mt-7 hidden flex-wrap gap-4 text-sm text-care-surface/90 sm:flex">
                 <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-care-primary" /> {t('landing:hero.sourceLabelled')}</span>
@@ -1463,7 +1463,7 @@ export default function LandingPage() {
                       <Link to="/login/patient" className="text-sm font-semibold text-care-primary-hover hover:underline">{t('landing:directory.viewFull')}</Link>
                     </div>
                     {doctors.length || directoryDoctors.length ? (
-                      <div className="care-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      <div className="care-stagger grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
                         {doctors.slice(0, 6).map(doctor => (
                           <PublicDoctorCard key={`bookable-${doctor.id}`} doctor={doctor} />
                         ))}
@@ -1568,9 +1568,9 @@ export default function LandingPage() {
                       </div>
                     </div>
                     {hospitals.length ? (
-                      <div className="care-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                      <div className="care-stagger grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
                         {visibleHospitals.map(hospital => (
-                          <article key={hospital.id} className="care-hover flex min-h-[390px] flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm focus-within:ring-2 focus-within:ring-care-primary">
+                          <article key={hospital.id} className="care-hover flex flex-col rounded-lg border border-care-border bg-care-surface p-5 shadow-sm focus-within:ring-2 focus-within:ring-care-primary">
                             <div className="flex items-start justify-between gap-3">
                               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-heading"><Building2 className="h-5 w-5" aria-hidden="true" /></span>
                               {hospital.distance != null && <ResultBadge tone="blue">{Number(hospital.distance).toFixed(1)} km</ResultBadge>}
@@ -1611,7 +1611,7 @@ export default function LandingPage() {
                               )}
                             </div>
 
-                            <div className="mt-auto flex flex-col gap-2 pt-5">
+                            <div className="mt-5 flex flex-col gap-2">
                               <Link
                                 to={`/hospital/${hospital.id}`}
                                 state={{ hospital }}
