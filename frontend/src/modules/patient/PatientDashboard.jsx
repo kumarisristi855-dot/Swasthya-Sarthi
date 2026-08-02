@@ -78,6 +78,20 @@ function hospitalDoctorCount(hospital) {
   return Number.isFinite(Number(hospital.doctorCount)) ? Number(hospital.doctorCount) : 0;
 }
 
+function hospitalDirectionsUrl(hospital) {
+  const latitude = Number(hospital?.latitude);
+  const longitude = Number(hospital?.longitude);
+  if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${latitude},${longitude}`)}`;
+  }
+  const destination = [hospital?.name, hospital?.address, hospital?.city, hospital?.district, hospital?.state, 'India']
+    .filter(Boolean)
+    .join(', ');
+  return destination
+    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`
+    : '';
+}
+
 const searchableLocations = [
   { name: 'Connaught Place, Central Delhi', coords: [28.6315, 77.2167] },
   { name: 'Saket, South Delhi', coords: [28.5245, 77.2066] },
@@ -1273,12 +1287,26 @@ export default function PatientDashboard() {
                               )}
                             </div>
                           </div>
-                          <Link
-                            to={`/patient/hospital/${h.id}`}
-                            className={buttonStyles({ block: true, size: 'sm' })}
-                          >
-                            View Facility Profile
-                          </Link>
+                          <div className="grid gap-2">
+                            <Link
+                              to={`/patient/hospital/${h.id}`}
+                              className={buttonStyles({ block: true, size: 'sm' })}
+                            >
+                              View Facility Profile
+                            </Link>
+                            {hospitalDirectionsUrl(h) && (
+                              <a
+                                href={hospitalDirectionsUrl(h)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={buttonStyles({ variant: 'secondary', block: true, size: 'sm' })}
+                              >
+                                <Navigation className="h-4 w-4" />
+                                Get directions
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
+                            )}
+                          </div>
                         </Card>
                         ))}
                       </div>
