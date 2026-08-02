@@ -2,7 +2,7 @@ export const outbreakSourceCatalog = {
   name: 'Government of India Integrated Disease Surveillance Programme (IDSP)',
   url: 'https://www.idsp.mohfw.gov.in/index4.php?lang=1&level=0&lid=3689&linkid=406',
   checkedAt: '2026-07-29T00:00:00.000Z',
-  freshnessPolicy: 'Notices are hidden after their CareSync review date unless the official source is rechecked.'
+  freshnessPolicy: 'Notices are hidden after their Swasthya Sarthi review date unless the official source is rechecked.'
 };
 
 export const publicHealthNotices = [

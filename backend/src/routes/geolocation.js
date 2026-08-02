@@ -359,7 +359,7 @@ async function fetchOpenStreetMapSuggestions(query) {
       const response = await fetch(url, {
         headers: {
           Accept: 'application/json',
-          'User-Agent': process.env.NOMINATIM_USER_AGENT || 'CareSyncHealthcarePlatform/1.0'
+          'User-Agent': process.env.NOMINATIM_USER_AGENT || 'SwasthyaSarthiHealthcarePlatform/1.0'
         },
         signal: AbortSignal.timeout(10000)
       });
@@ -501,7 +501,7 @@ router.get('/search', async (req, res) => {
       const response = await fetch(url, {
         headers: {
           Accept: 'application/json',
-          'User-Agent': process.env.NOMINATIM_USER_AGENT || 'CareSyncHealthcarePlatform/1.0'
+          'User-Agent': process.env.NOMINATIM_USER_AGENT || 'SwasthyaSarthiHealthcarePlatform/1.0'
         },
         signal: AbortSignal.timeout(12000)
       });
@@ -566,7 +566,7 @@ router.get('/reverse', async (req, res) => {
     const response = await fetch(url, {
       headers: {
         Accept: 'application/json',
-        'User-Agent': process.env.NOMINATIM_USER_AGENT || 'CareSyncHealthcarePlatform/1.0'
+        'User-Agent': process.env.NOMINATIM_USER_AGENT || 'SwasthyaSarthiHealthcarePlatform/1.0'
       },
       signal: AbortSignal.timeout(12000)
     });
@@ -621,7 +621,7 @@ router.get('/approximate', async (req, res) => {
     const response = await fetch('https://ipwho.is/', {
       headers: {
         Accept: 'application/json',
-        'User-Agent': process.env.NOMINATIM_USER_AGENT || 'CareSyncHealthcarePlatform/1.0'
+        'User-Agent': process.env.NOMINATIM_USER_AGENT || 'SwasthyaSarthiHealthcarePlatform/1.0'
       },
       signal: AbortSignal.timeout(10000)
     });

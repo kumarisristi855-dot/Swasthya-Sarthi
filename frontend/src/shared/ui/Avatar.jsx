@@ -7,7 +7,7 @@ const palettes = [
 ];
 
 function hashValue(value) {
-  return [...String(value || 'CareSync')].reduce((hash, character) => (
+  return [...String(value || 'Swasthya Sarthi')].reduce((hash, character) => (
     ((hash << 5) - hash) + character.charCodeAt(0)
   ) | 0, 0);
 }

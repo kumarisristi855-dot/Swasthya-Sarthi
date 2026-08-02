@@ -1,4 +1,4 @@
-export const EMERGENCY_SYMPTOM_PREFIX = '[CARESYNC_EMERGENCY] ';
+export const EMERGENCY_SYMPTOM_PREFIX = '[SWASTHYA SARTHI_EMERGENCY] ';
 
 export function isMissingAppointmentTypeColumn(error) {
   return error?.code === '42703' || (

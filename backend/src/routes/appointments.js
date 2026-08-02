@@ -685,7 +685,7 @@ router.post('/appointments', authenticateUser, requireRole('patient'), async (re
   if (visitType !== 'in_person') {
     return res.status(400).json({
       error: {
-        message: 'CareSync only supports in-person appointments at a hospital or clinic',
+        message: 'Swasthya Sarthi only supports in-person appointments at a hospital or clinic',
         code: 'IN_PERSON_ONLY'
       }
     });
@@ -804,7 +804,7 @@ router.post('/appointments', authenticateUser, requireRole('patient'), async (re
           const appointmentTimeFormatted = new Date(appointmentTime).toLocaleString();
           const locationText = hospital?.address ? `${hospital.name}, ${hospital.address}` : (hospital?.name || 'clinic');
           const priorityText = appointmentType === 'emergency' ? 'Emergency priority ' : '';
-          const body = `${priorityText}in-person appointment with ${doctor?.full_name || 'your practitioner'} at ${locationText} is confirmed for ${appointmentTimeFormatted}. Please arrive at the facility for your visit; CareSync does not provide a video consultation.`;
+          const body = `${priorityText}in-person appointment with ${doctor?.full_name || 'your practitioner'} at ${locationText} is confirmed for ${appointmentTimeFormatted}. Please arrive at the facility for your visit; Swasthya Sarthi does not provide a video consultation.`;
           
           sendSMS(req.user.id, patient.phone, body, 'booking_confirmed');
           sendEmail(req.user.id, patient.email, 'In-person Appointment Confirmed', `<p>${body}</p>`, 'booking_confirmed');

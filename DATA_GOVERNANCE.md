@@ -1,15 +1,15 @@
-# CareSync Directory Data Governance
+# Swasthya Sarthi Directory Data Governance
 
 ## Current Audit
 
-CareSync uses one canonical hospital table:
+Swasthya Sarthi uses one canonical hospital table:
 
 - `hospitals`: facilities used by Nearby Facilities, Browse hospital lists, maps, hospital profiles, ratings, and doctor affiliations.
 
 Doctor data is currently split by purpose:
 
-- `doctor_profiles` + `doctor_hospital_affiliations`: CareSync account doctors who can be booked when active and accepted by a hospital.
-- `verified_doctors` + `verified_doctor_hospital_affiliations`: public source-linked doctors from hospital or public directories. These do not imply a CareSync login or live appointment slots.
+- `doctor_profiles` + `doctor_hospital_affiliations`: Swasthya Sarthi account doctors who can be booked when active and accepted by a hospital.
+- `verified_doctors` + `verified_doctor_hospital_affiliations`: public source-linked doctors from hospital or public directories. These do not imply a Swasthya Sarthi login or live appointment slots.
 
 This split caused inconsistent behavior: bookable doctors and verified public roster doctors were not always surfaced through the same pages. The canonical read model is now:
 
@@ -64,7 +64,7 @@ Before publishing:
 
 For each state:
 
-1. Start with cities where CareSync already has data.
+1. Start with cities where Swasthya Sarthi already has data.
 2. Add the state capital and top 5-10 cities by population.
 3. For each city, collect government hospitals, PHCs, CHCs, health sub-centres, district hospitals, and major private hospitals.
 4. Add named doctors only when an official hospital roster or public verified directory lists them.

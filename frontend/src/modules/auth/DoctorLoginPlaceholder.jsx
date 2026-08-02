@@ -57,7 +57,7 @@ export default function DoctorLogin() {
         </button>
       </form>
       <p className="mt-6 text-center text-sm care-muted">
-        Joining CareSync? <Link to="/signup/doctor" className="font-semibold text-care-primary hover:text-care-primary-subtle">Register as a doctor</Link>
+        Joining Swasthya Sarthi? <Link to="/signup/doctor" className="font-semibold text-care-primary hover:text-care-primary-subtle">Register as a doctor</Link>
       </p>
     </AuthShell>
   );

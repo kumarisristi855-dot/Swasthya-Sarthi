@@ -59,7 +59,7 @@ export default function PatientLogin() {
       </form>
 
       <p className="mt-6 text-center text-sm care-muted">
-        New to CareSync? <Link to="/signup/patient" className="font-semibold text-care-primary hover:text-care-primary-subtle">Create an account</Link>
+        New to Swasthya Sarthi? <Link to="/signup/patient" className="font-semibold text-care-primary hover:text-care-primary-subtle">Create an account</Link>
       </p>
     </AuthShell>
   );

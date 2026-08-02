@@ -1,4 +1,4 @@
-const fixturePattern = /(?:test doctor|caresync test clinic|development-only)/i;
+const fixturePattern = /(?:test doctor|swasthya sarthi test clinic|development-only)/i;
 const isProductionMode = import.meta.env.MODE === 'production';
 
 export function isDevelopmentFixture(value) {
@@ -17,7 +17,7 @@ export function isDevelopmentFixture(value) {
     value.hospital?.name,
     value.hospital?.address
   ].filter(Boolean).join(' ');
-  return fixturePattern.test(text) || /@test\.com\b/i.test(text) || /caresync-development/i.test(text);
+  return fixturePattern.test(text) || /@test\.com\b/i.test(text) || /swasthya-sarthi-development/i.test(text);
 }
 
 export function productionSafe(items) {

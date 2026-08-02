@@ -599,7 +599,7 @@ router.post('/doctors/:id/emergency-leave', authenticateUser, requireRole('docto
       const location = appointment.hospital?.address
         ? `${appointment.hospital.name}, ${appointment.hospital.address}`
         : (appointment.hospital?.name || 'the clinic');
-      const message = `CareSync update: Your ${appointmentTime} appointment with ${doctor.full_name} at ${location} was cancelled because the doctor is on emergency leave. Please rebook another available slot.`;
+      const message = `Swasthya Sarthi update: Your ${appointmentTime} appointment with ${doctor.full_name} at ${location} was cancelled because the doctor is on emergency leave. Please rebook another available slot.`;
       return [
         sendSMS(appointment.patient_id, appointment.patient?.phone, message, 'emergency_leave_cancellation', { appointmentId: appointment.id }),
         sendEmail(appointment.patient_id, appointment.patient?.email, 'Appointment cancelled - doctor emergency leave', `<p>${message}</p>`, 'emergency_leave_cancellation', { appointmentId: appointment.id })

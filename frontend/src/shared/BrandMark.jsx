@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity } from 'lucide-react';
 
-export default function BrandMark({ label = 'CareSync', compact = false, light = false }) {
+export default function BrandMark({ label = 'Swasthya Sarthi', compact = false, light = false }) {
   return (
     <span className="inline-flex items-center gap-3">
       <span className={`${compact ? 'h-9 w-9' : 'h-10 w-10'} flex shrink-0 items-center justify-center rounded-lg bg-care-primary text-care-heading`}>

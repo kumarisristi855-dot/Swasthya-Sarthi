@@ -7,9 +7,9 @@ const documents = {
     title: 'Terms of Service',
     icon: Scale,
     sections: [
-      ['Platform purpose', 'CareSync helps patients discover healthcare facilities, review published provider information, and manage appointments. It does not replace professional medical advice, diagnosis, or emergency care.'],
+      ['Platform purpose', 'Swasthya Sarthi helps patients discover healthcare facilities, review published provider information, and manage appointments. It does not replace professional medical advice, diagnosis, or emergency care.'],
       ['Account responsibilities', 'Users must provide accurate information, protect their login credentials, and use only the portal assigned to their role. Appointment availability remains subject to confirmation by the participating clinic or hospital.'],
-      ['Medical emergencies', 'Do not use CareSync for an emergency. Contact local emergency services or proceed to the nearest emergency department.'],
+      ['Medical emergencies', 'Do not use Swasthya Sarthi for an emergency. Contact local emergency services or proceed to the nearest emergency department.'],
       ['Directory information', 'Facility and public doctor-directory information can change. Users should confirm services, schedules, fees, and credentials with the provider.'],
       ['Acceptable use', 'Users may not access another person’s health information, interfere with platform security, submit fraudulent bookings, or misuse provider contact information.']
     ]
@@ -18,7 +18,7 @@ const documents = {
     title: 'Privacy Policy',
     icon: LockKeyhole,
     sections: [
-      ['Information collected', 'CareSync stores account details, role profiles, appointment information, symptom-search text, in-person visit records, and notification delivery logs required to operate the service.'],
+      ['Information collected', 'Swasthya Sarthi stores account details, role profiles, appointment information, symptom-search text, in-person visit records, and notification delivery logs required to operate the service.'],
       ['How information is used', 'Information is used to authenticate users, match patients with care options, coordinate appointments, support clinical workflows, and send appointment communications.'],
       ['Role-based access', 'Patients, doctors, and hospital administrators receive different access. Clinical records are available only through authenticated, role-checked workflows connected to an appointment relationship.'],
       ['Location information', 'Browser location is used only when permission is granted. A patient can instead select a city or district manually.'],
@@ -29,11 +29,11 @@ const documents = {
     title: 'Security Overview',
     icon: ShieldCheck,
     sections: [
-      ['Authentication', 'CareSync uses Supabase Auth sessions and verifies the authenticated role on protected backend routes. Frontend role selection alone does not grant access.'],
+      ['Authentication', 'Swasthya Sarthi uses Supabase Auth sessions and verifies the authenticated role on protected backend routes. Frontend role selection alone does not grant access.'],
       ['Authorization', 'Patient, doctor, and hospital-admin operations are separated by server-side role and ownership checks. Doctors can access patient history only when an appointment relationship exists.'],
       ['Booking integrity', 'Appointment slots use a database uniqueness constraint to prevent double booking, with availability revalidated during booking.'],
       ['Secrets and transport', 'Provider credentials and API keys are read from environment variables and are not embedded in frontend code. Production deployments should enforce HTTPS.'],
-      ['Operational safeguards', 'Notification attempts are logged for auditing, and source-verified public directory data is kept separate from bookable CareSync practitioner accounts.']
+      ['Operational safeguards', 'Notification attempts are logged for auditing, and source-verified public directory data is kept separate from bookable Swasthya Sarthi practitioner accounts.']
     ]
   }
 };
@@ -52,11 +52,11 @@ export default function LegalPage() {
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="inline-flex items-center text-sm text-care-muted hover:text-care-surface transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to CareSync
+            Back to Swasthya Sarthi
           </Link>
           <div className="flex items-center gap-2 font-bold">
             <Activity className="w-5 h-5 text-care-primary" />
-            CareSync
+            Swasthya Sarthi
           </div>
         </div>
       </header>

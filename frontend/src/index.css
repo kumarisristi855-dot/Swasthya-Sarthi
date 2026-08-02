@@ -18,7 +18,7 @@
     --color-surface: #ffffff;
     --color-border: #dbe5ec;
 
-    /* Compatibility aliases for existing CareSync component styles. */
+    /* Compatibility aliases for existing Swasthya Sarthi component styles. */
     --care-bg: var(--color-neutral-bg);
     --care-surface: var(--color-surface);
     --care-surface-raised: var(--color-surface);

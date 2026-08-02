@@ -289,7 +289,7 @@ export default function PatientDashboard() {
       enrichHospitalsWithGoogleRatings(loadedHospitals)
         .then(items => setHospitals(productionSafe(items)))
         .catch(() => {
-          // Keep the CareSync directory visible if Google Places is unavailable.
+          // Keep the Swasthya Sarthi directory visible if Google Places is unavailable.
         });
     } catch (err) {
       setError(err.message || 'Error loading the India facilities directory');
@@ -1354,7 +1354,7 @@ export default function PatientDashboard() {
                       <div className="mt-5 grid gap-5 sm:grid-cols-3">
                         {[
                           { icon: ClipboardList, step: '1', title: 'Describe symptoms', text: 'Include duration, severity, and where you feel discomfort.' },
-                          { icon: UserRoundSearch, step: '2', title: 'Match the right care', text: 'CareSync maps your description to a verified specialty.' },
+                          { icon: UserRoundSearch, step: '2', title: 'Match the right care', text: 'Swasthya Sarthi maps your description to a verified specialty.' },
                           { icon: CheckCircle2, step: '3', title: 'Choose a provider', text: 'Review nearby doctors and hospitals before booking.' }
                         ].map(item => (
                           <div key={item.step} className="flex gap-3 sm:block">
@@ -1580,14 +1580,14 @@ export default function PatientDashboard() {
 
                   <div className="space-y-3">
                     <span className="block text-xs font-semibold text-care-muted uppercase">
-                      Bookable on CareSync ({bookableDoctors.length})
+                      Bookable on Swasthya Sarthi ({bookableDoctors.length})
                     </span>
 
                     {browseLoading ? (
                       <CardSkeleton count={2} />
                     ) : bookableDoctors.length === 0 ? (
                       <div className="p-4 text-xs text-care-muted border border-care-border rounded-lg leading-relaxed">
-                        No CareSync doctor has published appointment slots near this location yet.
+                        No Swasthya Sarthi doctor has published appointment slots near this location yet.
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -1636,7 +1636,7 @@ export default function PatientDashboard() {
                     ) : browseDoctors.length === 0 ? (
                       <div className="p-4 text-xs text-care-muted border border-care-border rounded-lg leading-relaxed">
                         No source-verified named doctor profiles are published near {selectedLocationName} yet.
-                        Check nearby hospitals below while CareSync adds hospital-roster verified doctors for this area.
+                        Check nearby hospitals below while Swasthya Sarthi adds hospital-roster verified doctors for this area.
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -2093,7 +2093,7 @@ export default function PatientDashboard() {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-surface py-4 text-center text-xs text-care-muted">
-        &copy; 2026 CareSync Platform. AI Diagnostic & Location Node.
+        &copy; 2026 Swasthya Sarthi Platform. AI Diagnostic & Location Node.
       </footer>
     </div>
   );

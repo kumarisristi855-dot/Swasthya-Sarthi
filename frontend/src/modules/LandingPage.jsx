@@ -25,7 +25,7 @@ import {
   User,
   X,
 } from 'lucide-react';
-import heroImage from '../assets/caresync-clinic-hero.jpg';
+import heroImage from '../assets/swasthya-sarthi-clinic-hero.jpg';
 import consultationImage from '../assets/care-consultation.jpg';
 import { DoctorRatingSummary, HospitalRatingSummary } from '../shared/HospitalRating';
 import HospitalOperatingHours from '../shared/HospitalOperatingHours';
@@ -33,7 +33,7 @@ import { enrichHospitalsWithGoogleRatings } from '../lib/googleHospitalRatings';
 import diagnosticsImage from '../assets/care-diagnostics.jpg';
 import { API_URL } from '../lib/api';
 
-const LOCATION_SESSION_KEY = 'caresync-public-location';
+const LOCATION_SESSION_KEY = 'swasthya-sarthi-public-location';
 
 function loadLocationSelection() {
   try {
@@ -162,14 +162,14 @@ function mergeHospitalResults(officialHospitals = [], communityHospitals = []) {
 
 function PublicLogo({ light = false }) {
   return (
-    <Link to="/" className="inline-flex items-center gap-3" aria-label="CareSync home">
+    <Link to="/" className="inline-flex items-center gap-3" aria-label="Swasthya Sarthi home">
       <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${light ? 'bg-care-surface text-care-heading' : 'bg-care-primary text-care-surface'}`}>
         <span className="relative h-6 w-6" aria-hidden="true">
           <Activity className="care-logo-pulse-base absolute inset-0 h-6 w-6" strokeWidth={2.5} />
           <Activity className="care-logo-pulse-scan absolute inset-0 h-6 w-6" strokeWidth={2.5} />
         </span>
       </span>
-      <span className={`care-logo-word-shine ${light ? 'care-logo-word-shine-light text-care-surface' : 'text-care-heading'} text-xl font-bold`}>CareSync</span>
+      <span className={`care-logo-word-shine ${light ? 'care-logo-word-shine-light text-care-surface' : 'text-care-heading'} text-xl font-bold`}>Swasthya Sarthi</span>
     </Link>
   );
 }
@@ -770,7 +770,7 @@ export default function LandingPage() {
               <LocateFixed className="h-6 w-6" />
             </span>
             <h2 id="location-permission-title" className="mt-5 text-2xl font-bold text-care-heading">Find care near your live location?</h2>
-            <p className="mt-3 text-sm leading-6 text-care-muted">Allow CareSync to use your device location for accurate nearby hospitals and doctors. Your browser will ask for permission next. If GPS is blocked, CareSync will use your approximate city, and you can still enter another location.</p>
+            <p className="mt-3 text-sm leading-6 text-care-muted">Allow Swasthya Sarthi to use your device location for accurate nearby hospitals and doctors. Your browser will ask for permission next. If GPS is blocked, Swasthya Sarthi will use your approximate city, and you can still enter another location.</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <button type="button" onClick={() => { setLocationPromptOpen(false); requestLocation(); }} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-care-primary px-4 text-sm font-bold text-care-surface hover:bg-care-primary-hover">
                 <Navigation className="h-4 w-4" /> Use current location
@@ -825,7 +825,7 @@ export default function LandingPage() {
             <a href="#search-results" className="hover:text-care-primary-hover">Doctors</a>
             <a href="#facilities" className="hover:text-care-primary-hover">Hospitals</a>
             <a href="#health-guides" className="hover:text-care-primary-hover">Health guides</a>
-            <a href="#trust" className="hover:text-care-primary-hover">Why CareSync</a>
+            <a href="#trust" className="hover:text-care-primary-hover">Why Swasthya Sarthi</a>
           </nav>
           <div className="hidden items-center gap-2 sm:flex">
             <Link to="/login/patient" className="rounded-lg px-4 py-2.5 text-sm font-semibold text-care-body hover:bg-care-neutral">Sign in</Link>
@@ -1065,7 +1065,7 @@ export default function LandingPage() {
             )}
 
             {searching ? (
-              <div className="flex min-h-52 items-center justify-center gap-3 text-care-muted"><Loader2 className="h-6 w-6 animate-spin text-care-primary" /> Searching CareSync directory...</div>
+              <div className="flex min-h-52 items-center justify-center gap-3 text-care-muted"><Loader2 className="h-6 w-6 animate-spin text-care-primary" /> Searching Swasthya Sarthi directory...</div>
             ) : (
               <div className="space-y-14">
                 {(searchMode === 'all' || searchMode === 'doctors' || searchMode === 'symptoms') && (
@@ -1092,7 +1092,7 @@ export default function LandingPage() {
                               </div>
                             </div>
                             <div className="mt-4 flex flex-wrap gap-2">
-                              <ResultBadge><BadgeCheck className="h-3 w-3" /> CareSync active</ResultBadge>
+                              <ResultBadge><BadgeCheck className="h-3 w-3" /> Swasthya Sarthi active</ResultBadge>
                               {doctor.distance != null && <ResultBadge tone="blue">{doctor.distance.toFixed(1)} km</ResultBadge>}
                               {doctor.consultationFee > 0 && <ResultBadge tone="amber">INR {doctor.consultationFee}</ResultBadge>}
                             </div>
@@ -1211,13 +1211,13 @@ export default function LandingPage() {
               </div>
             </div>
             <div>
-              <span className="text-xs font-bold text-care-primary-hover">WHY CARESYNC</span>
+              <span className="text-xs font-bold text-care-primary-hover">WHY SWASTHYA SARTHI</span>
               <h2 className="mt-3 text-3xl font-bold leading-tight text-care-heading sm:text-4xl">Confidence begins before the appointment.</h2>
-              <p className="mt-5 text-base leading-7 text-care-muted">CareSync separates bookable providers, source-verified public listings, and community discovery leads so you always know what kind of information you are viewing.</p>
+              <p className="mt-5 text-base leading-7 text-care-muted">Swasthya Sarthi separates bookable providers, source-verified public listings, and community discovery leads so you always know what kind of information you are viewing.</p>
               <div className="mt-8 grid gap-5 sm:grid-cols-2">
                 {[
                   ['Verified identities', 'Provider and facility verification is shown, never implied.'],
-                  ['Real availability', 'Published CareSync slots are separated from public clinic schedules.'],
+                  ['Real availability', 'Published Swasthya Sarthi slots are separated from public clinic schedules.'],
                   ['Privacy by design', 'Browsing is public; personal records remain behind secure sign-in.'],
                   ['India-wide discovery', 'Search supports cities, districts, and location-based results.'],
                 ].map(([title, copy]) => (
@@ -1255,7 +1255,7 @@ export default function LandingPage() {
                 </div>
                 <div className="mt-8 space-y-3">
                   <button type="button" onClick={() => { setSearchMode('hospitals'); setQuery('emergency'); requestLocation(); }} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-care-surface px-4 py-3 text-sm font-bold text-care-heading"><Cross className="h-4 w-4" /> Find nearby emergency care</button>
-                  <p className="text-center text-xs text-care-primary-subtle">CareSync is not an emergency response service.</p>
+                  <p className="text-center text-xs text-care-primary-subtle">Swasthya Sarthi is not an emergency response service.</p>
                 </div>
               </article>
             </div>
@@ -1298,11 +1298,11 @@ export default function LandingPage() {
           <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
             <div><PublicLogo light /><p className="mt-4 max-w-sm text-sm leading-6 text-care-primary-subtle">A transparent healthcare discovery and appointment network for patients, doctors, and hospitals across India.</p></div>
             <div><h3 className="text-sm font-bold">Find care</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#search-results">Doctors</a><a href="#facilities">Hospitals</a><a href="#services">Services</a><a href="#emergency">Emergency guidance</a></div></div>
-            <div><h3 className="text-sm font-bold">CareSync</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#trust">How verification works</a><a href="#health-guides">Health guides</a><Link to="/login/doctor">For doctors</Link><Link to="/login/admin">For hospitals</Link></div></div>
+            <div><h3 className="text-sm font-bold">Swasthya Sarthi</h3><div className="mt-4 grid gap-2 text-sm text-care-primary-subtle"><a href="#trust">How verification works</a><a href="#health-guides">Health guides</a><Link to="/login/doctor">For doctors</Link><Link to="/login/admin">For hospitals</Link></div></div>
             <div><h3 className="text-sm font-bold">Language</h3><div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-care-border/20 px-3 py-2 text-sm text-care-primary-subtle"><Languages className="h-4 w-4" /> English · India</div></div>
           </div>
           <div className="mt-10 flex flex-col gap-4 border-t border-care-border/15 pt-6 text-xs text-care-primary-subtle sm:flex-row sm:items-center sm:justify-between">
-            <span>&copy; 2026 CareSync Platform. Healthcare information is not a substitute for medical advice.</span>
+            <span>&copy; 2026 Swasthya Sarthi Platform. Healthcare information is not a substitute for medical advice.</span>
             <nav className="flex gap-5" aria-label="Legal"><Link to="/legal/privacy">Privacy</Link><Link to="/legal/terms">Terms</Link><Link to="/legal/security">Security</Link></nav>
           </div>
         </div>

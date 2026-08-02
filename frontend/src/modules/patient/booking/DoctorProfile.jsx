@@ -182,7 +182,7 @@ export default function DoctorProfile({ publicView = false }) {
           <header className="sticky top-0 z-20 border-b border-care-border bg-care-neutral/80 backdrop-blur">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
               <Link to="/" className="inline-flex items-center text-sm text-care-muted transition-colors hover:text-care-surface">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to CareSync
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Swasthya Sarthi
               </Link>
               <Link to="/login/patient" className="text-xs font-semibold text-care-success transition-colors hover:text-care-success">
                 Patient sign in
@@ -238,7 +238,7 @@ export default function DoctorProfile({ publicView = false }) {
               <div className="mb-5">
                 <h2 className="text-xl font-bold text-care-heading">Hospitals and OPD details</h2>
                 <p className="mt-1 text-xs leading-5 text-care-muted">
-                  This profile opens inside CareSync and is linked to verified hospital-directory sources.
+                  This profile opens inside Swasthya Sarthi and is linked to verified hospital-directory sources.
                 </p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
@@ -264,7 +264,7 @@ export default function DoctorProfile({ publicView = false }) {
               <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-care-primary-hover" />
               <div>
                 <strong className="block text-sm">In-person hospital or clinic appointment</strong>
-                <p className="mt-1 text-xs leading-5 text-care-primary-hover">CareSync reserves the appointment only. You must visit the facility shown with your selected time; no video or online consultation is provided.</p>
+                <p className="mt-1 text-xs leading-5 text-care-primary-hover">Swasthya Sarthi reserves the appointment only. You must visit the facility shown with your selected time; no video or online consultation is provided.</p>
               </div>
             </div>
             <div className="flex flex-col gap-4 border-b border-care-border pb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -500,7 +500,7 @@ export default function DoctorProfile({ publicView = false }) {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-neutral py-4 text-center text-xs text-care-muted">
-        &copy; 2026 CareSync Platform. Secure Scheduling Node.
+        &copy; 2026 Swasthya Sarthi Platform. Secure Scheduling Node.
       </footer>
     </div>
   );

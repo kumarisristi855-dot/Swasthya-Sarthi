@@ -321,7 +321,7 @@ export default function DelhiDoctorDirectory() {
               <div className="border border-dashed border-care-border px-6 py-16 text-center text-sm text-care-muted">
                 <h2 className="text-lg font-bold text-care-heading">No verified doctor roster is published here yet</h2>
                 <p className="mx-auto mt-3 max-w-xl leading-6">
-                  CareSync only shows named doctors after their hospital roster or official profile is source-verified.
+                  Swasthya Sarthi only shows named doctors after their hospital roster or official profile is source-verified.
                   We have not added source-verified doctor profiles for {location?.label || 'this location'} yet.
                 </p>
                 <Link

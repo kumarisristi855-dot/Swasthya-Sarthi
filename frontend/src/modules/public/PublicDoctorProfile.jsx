@@ -75,7 +75,7 @@ export default function PublicDoctorProfile() {
           <div className="flex flex-col gap-5 sm:flex-row">
             <Avatar name={doctor.fullName} id={doctor.id} src={doctor.profilePictureUrl} size="lg" />
             <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-2"><h1 className="text-2xl font-bold text-care-heading sm:text-3xl">{doctor.fullName}</h1><Badge variant={doctor.directoryOnly ? 'info' : 'success'}>{doctor.directoryOnly ? 'Verified directory' : 'CareSync active'}</Badge></div>
+              <div className="flex flex-wrap items-center gap-2"><h1 className="text-2xl font-bold text-care-heading sm:text-3xl">{doctor.fullName}</h1><Badge variant={doctor.directoryOnly ? 'info' : 'success'}>{doctor.directoryOnly ? 'Verified directory' : 'Swasthya Sarthi active'}</Badge></div>
               <p className="mt-2 font-semibold text-care-primary-hover">{doctor.specialization}</p>
               <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-care-muted">
                 <span className="inline-flex items-center gap-2"><Award className="h-4 w-4 text-care-muted" /> {doctor.yearsExperience || 0} years experience</span>
@@ -90,7 +90,7 @@ export default function PublicDoctorProfile() {
 
         {doctor.directoryOnly && doctor.hospitals?.length > 0 && (
           <Card as="section" padding="lg" className="mt-6">
-            <div className="flex items-center gap-3"><ShieldCheck className="h-6 w-6 text-care-primary-hover" /><div><h2 className="text-xl font-bold text-care-heading">Hospitals and OPD details</h2><p className="mt-1 text-sm text-care-muted">This public profile is kept inside CareSync and linked to verified hospital-directory sources.</p></div></div>
+            <div className="flex items-center gap-3"><ShieldCheck className="h-6 w-6 text-care-primary-hover" /><div><h2 className="text-xl font-bold text-care-heading">Hospitals and OPD details</h2><p className="mt-1 text-sm text-care-muted">This public profile is kept inside Swasthya Sarthi and linked to verified hospital-directory sources.</p></div></div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {doctor.hospitals.map(hospital => (
                 <div key={hospital.associationId || hospital.id} className="rounded-lg border border-care-border bg-care-neutral p-4">
@@ -106,7 +106,7 @@ export default function PublicDoctorProfile() {
         )}
 
         <Card as="section" padding="lg" className="mt-6">
-          <div className="flex items-center gap-3"><CalendarCheck2 className="h-6 w-6 text-care-primary-hover" /><div><h2 className="text-xl font-bold text-care-heading">In-person appointments</h2><p className="mt-1 text-sm text-care-muted">Choose a day and visit the hospital or clinic shown with the selected time. CareSync does not provide video consultations.</p></div></div>
+          <div className="flex items-center gap-3"><CalendarCheck2 className="h-6 w-6 text-care-primary-hover" /><div><h2 className="text-xl font-bold text-care-heading">In-person appointments</h2><p className="mt-1 text-sm text-care-muted">Choose a day and visit the hospital or clinic shown with the selected time. Swasthya Sarthi does not provide video consultations.</p></div></div>
           <div className="mt-6 flex gap-2 overflow-x-auto pb-2">
             {dates.map(date => <button key={date.value} type="button" onClick={() => setSelectedDate(date.value)} className={`flex min-w-16 shrink-0 flex-col items-center rounded-lg border px-3 py-3 ${selectedDate === date.value ? 'border-care-primary bg-care-primary-subtle text-care-primary-hover' : 'border-care-border text-care-muted hover:border-care-border'}`}><span className="text-[11px] font-semibold">{date.weekday}</span><strong className="mt-1">{date.day}</strong></button>)}
           </div>

@@ -635,7 +635,7 @@ async function fetchOverpassHealthcareFacilities(latitude, longitude, limit) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'User-Agent': 'CareSync local healthcare directory contact=local'
+        'User-Agent': 'Swasthya Sarthi local healthcare directory contact=local'
       },
       body: new URLSearchParams({ data: query }),
       signal: controller.signal
@@ -709,7 +709,7 @@ async function fetchCommunityFacilities({ location, latitude, longitude, limit }
       response = await fetch(`${baseUrl}/search?${params}`, {
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'CareSync local healthcare directory contact=local'
+          'User-Agent': 'Swasthya Sarthi local healthcare directory contact=local'
         },
         signal: controller.signal
       });

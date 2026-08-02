@@ -1,4 +1,4 @@
-# CareSync Platform — Login Test Results
+# Swasthya Sarthi Platform — Login Test Results
 
 This document summarizes the end-to-end testing results for email/password authentication (Patient and Doctor portals) after fixing environment configuration and RLS variables.
 

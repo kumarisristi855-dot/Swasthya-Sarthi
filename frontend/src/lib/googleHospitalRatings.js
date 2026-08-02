@@ -1,5 +1,5 @@
 import { API_URL } from './api';
-const GOOGLE_RATING_SESSION_KEY = 'caresync-google-hospital-ratings';
+const GOOGLE_RATING_SESSION_KEY = 'swasthya-sarthi-google-hospital-ratings';
 const GOOGLE_RATING_CACHE_MS = 24 * 60 * 60 * 1000;
 
 function readCachedRatings() {

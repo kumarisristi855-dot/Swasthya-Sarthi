@@ -1,4 +1,4 @@
-# CareSync Healthcare Platform
+# Swasthya Sarthi Healthcare Platform
 
 A localized healthcare platform connecting **Patients**, **Doctors**, and **Hospital Admins**.
 
@@ -74,4 +74,4 @@ cd frontend
 npm install
 npm run dev
 ```
-The frontend Vite server will start. Open the displayed URL in your browser to view the CareSync Landing Page.
+The frontend Vite server will start. Open the displayed URL in your browser to view the Swasthya Sarthi Landing Page.

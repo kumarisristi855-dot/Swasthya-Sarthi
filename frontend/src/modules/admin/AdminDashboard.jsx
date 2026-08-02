@@ -398,7 +398,7 @@ export default function AdminDashboard() {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-neutral py-4 text-center text-xs text-care-muted">
-        &copy; 2026 CareSync Platform. Secure Administration Node.
+        &copy; 2026 Swasthya Sarthi Platform. Secure Administration Node.
       </footer>
 
       {profileOpen && (

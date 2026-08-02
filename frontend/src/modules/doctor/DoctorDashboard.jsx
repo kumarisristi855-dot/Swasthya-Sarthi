@@ -1032,7 +1032,7 @@ export default function DoctorDashboard() {
                 </span>
                 <div>
                   <h2 id="doctor-profile-title" className="text-xl font-bold text-care-heading">Doctor profile picture</h2>
-                  <p className="text-sm text-care-muted">Add a clear professional photo for your CareSync profile.</p>
+                  <p className="text-sm text-care-muted">Add a clear professional photo for your Swasthya Sarthi profile.</p>
                 </div>
               </div>
               <button type="button" onClick={() => setProfileOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-lg text-care-muted transition-colors hover:bg-care-neutral hover:text-care-heading" aria-label="Close profile editor">
@@ -1129,7 +1129,7 @@ export default function DoctorDashboard() {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-neutral py-4 text-center text-xs text-care-muted">
-        &copy; 2026 CareSync Platform. Verified Practitioner Administration.
+        &copy; 2026 Swasthya Sarthi Platform. Verified Practitioner Administration.
       </footer>
     </div>
   );

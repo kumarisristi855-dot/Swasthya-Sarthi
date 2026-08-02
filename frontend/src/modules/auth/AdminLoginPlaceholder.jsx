@@ -56,7 +56,7 @@ export default function AdminLogin() {
           {loading ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
-      <p className="mt-6 text-center text-xs leading-5 care-muted">Hospital access is provisioned by your CareSync administrator.</p>
+      <p className="mt-6 text-center text-xs leading-5 care-muted">Hospital access is provisioned by your Swasthya Sarthi administrator.</p>
     </AuthShell>
   );
 }

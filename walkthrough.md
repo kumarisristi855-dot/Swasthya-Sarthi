@@ -1,7 +1,7 @@
-# CareSync Platform — End-to-End Walkthrough
+# Swasthya Sarthi Platform — End-to-End Walkthrough
 
 This document defines the acceptance criteria, known limitations, and security
-testing results for the CareSync healthcare platform.
+testing results for the Swasthya Sarthi healthcare platform.
 
 ---
 
@@ -172,14 +172,14 @@ Resend dashboard.
 
 ```
 ============================================================
-CareSync Platform — Final RLS Verification
+Swasthya Sarthi Platform — Final RLS Verification
 Using Anon key (RLS-enforcing) client
 ============================================================
 
 --- Step 1: Creating test users ---
-  Created Patient A: rls_test_patient_a_1783255673907@test.caresync
-  Created Patient B: rls_test_patient_b_1783255673907@test.caresync
-  Created Doctor A: rls_test_doctor_a_1783255673907@test.caresync
+  Created Patient A: rls_test_patient_a_1783255673907@test.swasthya-sarthi
+  Created Patient B: rls_test_patient_b_1783255673907@test.swasthya-sarthi
+  Created Doctor A: rls_test_doctor_a_1783255673907@test.swasthya-sarthi
 
 --- Step 2: Patient A — data isolation tests ---
   [FAIL] Patient A sees exactly 1 row in patient_profiles — permission denied for table patient_profiles
@@ -201,10 +201,10 @@ Using Anon key (RLS-enforcing) client
 
 --- Step 5: Cleanup ---
   Test users created (not deleted — for manual DB inspection if needed):
-    Patient A: rls_test_patient_a_1783255673907@test.caresync (ID: 8dd1197a-4e5f-485b-886b-5410a88c8dca)
-    Patient B: rls_test_patient_b_1783255673907@test.caresync (ID: 16f4fab4-8684-4072-bb2c-9176a26b0228)
+    Patient A: rls_test_patient_a_1783255673907@test.swasthya-sarthi (ID: 8dd1197a-4e5f-485b-886b-5410a88c8dca)
+    Patient B: rls_test_patient_b_1783255673907@test.swasthya-sarthi (ID: 16f4fab4-8684-4072-bb2c-9176a26b0228)
   To delete these users, use Supabase Auth dashboard or SQL:
-  DELETE FROM auth.users WHERE email LIKE 'rls_test_%@test.caresync';
+  DELETE FROM auth.users WHERE email LIKE 'rls_test_%@test.swasthya-sarthi';
 
 ============================================================
   Results:  6 passed  |  6 failed  |  12 total

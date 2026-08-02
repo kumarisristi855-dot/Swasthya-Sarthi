@@ -137,7 +137,7 @@ export default function DoctorSignup() {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-care-body">Doctor Registration</h2>
-            <p className="text-care-muted text-sm">Join CareSync medical practitioner team</p>
+            <p className="text-care-muted text-sm">Join Swasthya Sarthi medical practitioner team</p>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
-# CareSync Platform — Deployment Guide
+# Swasthya Sarthi Platform — Deployment Guide
 
-This guide details how to deploy the CareSync platform (React + Vite frontend, Express backend, Supabase DB) to production.
+This guide details how to deploy the Swasthya Sarthi platform (React + Vite frontend, Express backend, Supabase DB) to production.
 
 ---
 

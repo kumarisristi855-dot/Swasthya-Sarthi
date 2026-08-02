@@ -1,10 +1,10 @@
-const fixtureTextPattern = /(?:^|\b)(test doctor|caresync test clinic|development-only)(?:\b|$)/i;
+const fixtureTextPattern = /(?:^|\b)(test doctor|swasthya sarthi test clinic|development-only)(?:\b|$)/i;
 
 export const isProduction = process.env.NODE_ENV === 'production';
 
 export function isDevelopmentFixtureHospital(hospital) {
   if (!hospital) return false;
-  return hospital.source_dataset === 'caresync-development' ||
+  return hospital.source_dataset === 'swasthya-sarthi-development' ||
     hospital.verification_status === 'excluded' ||
     fixtureTextPattern.test(`${hospital.name || ''} ${hospital.address || ''}`);
 }

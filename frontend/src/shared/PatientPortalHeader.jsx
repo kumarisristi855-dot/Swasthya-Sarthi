@@ -103,7 +103,7 @@ export default function PatientPortalHeader() {
     <>
       <header className="patient-portal-header">
         <div className="patient-portal-navbar">
-          <Link to="/patient/dashboard" className="flex min-w-0 shrink-0 items-center gap-3" aria-label="CareSync patient dashboard">
+          <Link to="/patient/dashboard" className="flex min-w-0 shrink-0 items-center gap-3" aria-label="Swasthya Sarthi patient dashboard">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-care-primary text-care-surface">
               <span className="relative h-6 w-6" aria-hidden="true">
                 <Activity className="care-logo-pulse-base absolute inset-0 h-6 w-6" strokeWidth={2.5} />
@@ -111,7 +111,7 @@ export default function PatientPortalHeader() {
               </span>
             </span>
             <span className="leading-none">
-              <span className="block text-lg font-bold leading-5 text-care-heading">CareSync</span>
+              <span className="block text-lg font-bold leading-5 text-care-heading">Swasthya Sarthi</span>
               <span className="mt-1 block text-[10px] font-semibold uppercase leading-3 text-care-primary-hover">Patient portal</span>
             </span>
           </Link>

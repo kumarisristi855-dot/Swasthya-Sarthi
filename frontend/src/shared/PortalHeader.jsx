@@ -32,7 +32,7 @@ export default function PortalHeader({ role, userLabel, onLogout, context, profi
             </span>
           </div>
           <div>
-            <span className="block text-lg font-bold text-care-heading">CareSync</span>
+            <span className="block text-lg font-bold text-care-heading">Swasthya Sarthi</span>
             <span className="block text-[10px] font-semibold uppercase text-care-primary-hover">{role}</span>
           </div>
         </div>

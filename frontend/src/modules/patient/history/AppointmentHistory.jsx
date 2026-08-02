@@ -464,7 +464,7 @@ export default function AppointmentHistory() {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-neutral py-4 text-center text-xs text-care-muted">
-        &copy; 2026 CareSync Platform. Verified Appointment Record.
+        &copy; 2026 Swasthya Sarthi Platform. Verified Appointment Record.
       </footer>
     </div>
   );

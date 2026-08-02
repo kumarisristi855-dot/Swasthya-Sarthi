@@ -109,7 +109,7 @@ export default function HospitalProfile({ publicView = false }) {
           <header className="sticky top-0 z-20 border-b border-care-border bg-care-neutral/80 backdrop-blur">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
               <Link to="/" className="inline-flex items-center text-sm text-care-muted transition-colors hover:text-care-surface">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to CareSync
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Swasthya Sarthi
               </Link>
               {hospital.verificationStatus === 'verified' && (
                 <div className="flex items-center space-x-2 text-xs text-care-success">
@@ -180,7 +180,7 @@ export default function HospitalProfile({ publicView = false }) {
             </div>
           </Card>
 
-          {/* CareSync Doctors */}
+          {/* Swasthya Sarthi Doctors */}
           <div className="space-y-6 mb-10">
             <div className="flex items-center space-x-2.5">
               <div className="p-2 bg-care-primary-subtle text-care-primary rounded-lg border border-care-primary/20">
@@ -337,7 +337,7 @@ export default function HospitalProfile({ publicView = false }) {
 
       {/* Footer */}
       <footer className="w-full border-t border-care-border bg-care-neutral py-4 text-center text-xs text-care-muted">
-        &copy; 2026 CareSync Platform. Verified Healthcare Facility Node.
+        &copy; 2026 Swasthya Sarthi Platform. Verified Healthcare Facility Node.
       </footer>
     </div>
   );
