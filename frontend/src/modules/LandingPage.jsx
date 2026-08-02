@@ -381,7 +381,7 @@ export default function LandingPage() {
   const [query, setQuery] = useState('');
   const [location, setLocation] = useState(initialLocation?.location || DEFAULT_PUBLIC_LOCATION);
   const [coordinates, setCoordinates] = useState(initialLocation?.coordinates || null);
-  const [locationLabel, setLocationLabel] = useState(initialLocation?.locationLabel || t('landing:search.chooseOrEnter'));
+  const [locationLabel, setLocationLabel] = useState(initialLocation?.locationLabel || DEFAULT_PUBLIC_LOCATION);
   const [locationStatus, setLocationStatus] = useState(initialLocation?.locationStatus || 'prompt');
   const [locationAccuracy, setLocationAccuracy] = useState(initialLocation?.locationAccuracy || null);
   const [locationPromptOpen, setLocationPromptOpen] = useState(!initialLocation);
@@ -1100,7 +1100,7 @@ export default function LandingPage() {
               <button type="button" onClick={() => { setLocationPromptOpen(false); requestLocation(); }} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-care-primary px-4 text-sm font-bold text-care-surface hover:bg-care-primary-hover">
                 <Navigation className="h-4 w-4" /> {t('landing:locationPrompt.useCurrent')}
               </button>
-              <button type="button" onClick={() => { window.sessionStorage.removeItem(LOCATION_SESSION_KEY); setLocationPromptOpen(false); setLocation(''); setCoordinates(null); setLocationStatus('manual'); setLocationLabel(t('landing:search.enterExactArea')); window.setTimeout(() => locationInputRef.current?.focus(), 50); }} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-care-border px-4 text-sm font-semibold text-care-body hover:bg-care-neutral">
+              <button type="button" onClick={() => { window.sessionStorage.removeItem(LOCATION_SESSION_KEY); setLocationPromptOpen(false); setLocation(DEFAULT_PUBLIC_LOCATION); setCoordinates(null); setLocationStatus('manual'); setLocationLabel(DEFAULT_PUBLIC_LOCATION); window.setTimeout(() => { locationInputRef.current?.focus(); locationInputRef.current?.select(); }, 50); }} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-care-border px-4 text-sm font-semibold text-care-body hover:bg-care-neutral">
                 <MapPin className="h-4 w-4" /> {t('landing:locationPrompt.chooseAnother')}
               </button>
             </div>
@@ -1219,8 +1219,8 @@ export default function LandingPage() {
                 {t('landing:hero.badge')}
               </span>
               <h1 className="max-w-[18ch] text-4xl font-bold leading-[1.08] text-care-surface sm:text-5xl lg:text-[3.6rem]">{t('landing:hero.title')}</h1>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-care-surface/90">{t('landing:hero.copy')}</p>
-              <div className="mt-7 hidden flex-wrap gap-4 text-sm text-care-surface/90 sm:flex">
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-white/90">{t('landing:hero.copy')}</p>
+              <div className="mt-7 hidden flex-wrap gap-4 text-sm text-white/90 sm:flex">
                 <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-care-primary" /> {t('landing:hero.sourceLabelled')}</span>
                 <span className="inline-flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-care-primary" /> {t('landing:hero.availability')}</span>
                 <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-care-primary" /> {t('landing:hero.locationAware')}</span>
@@ -1228,7 +1228,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div id="care-search" className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-7xl px-5 sm:px-8">
+          <div id="care-search" className="relative z-10 mx-auto max-w-7xl px-5 pb-6 sm:absolute sm:inset-x-0 sm:bottom-0 sm:px-8 sm:pb-0">
             <form onSubmit={handleSearch} className="public-search-dock overflow-visible rounded-lg border border-care-border bg-care-surface p-5 shadow-xl sm:p-8">
               <div className="grid gap-4 lg:grid-cols-[minmax(280px,1.05fr)_minmax(320px,1.1fr)_minmax(210px,0.7fr)] lg:items-end">
                 <div className="space-y-2">
@@ -1613,7 +1613,10 @@ export default function LandingPage() {
 
                             <div className="mt-5 flex flex-col gap-2">
                               <Link
-                                to={`/hospital/${hospital.id}`}
+                                to={{
+                                  pathname: `/hospital/${hospital.id}`,
+                                  search: `?place=${encodeURIComponent(activeLocationName)}`,
+                                }}
                                 state={{ hospital }}
                                 onClick={() => trackInteraction('hospital_result_opened', { sourceType: hospital.sourceType || hospital.source_type || 'directory' })}
                                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-care-primary px-4 text-sm font-semibold text-white hover:bg-care-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-care-primary focus-visible:ring-offset-2"

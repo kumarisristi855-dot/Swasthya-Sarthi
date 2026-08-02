@@ -1,20 +1,23 @@
 import React from 'react';
 import { ArrowLeft, Building2, CalendarCheck2, MapPin, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import BrandMark from '../../shared/BrandMark';
+import LanguageSwitcher from '../../i18n/LanguageSwitcher';
 import authClinicImage from '../../assets/auth-clinic-consultation.png';
 
 export default function AuthShell({ icon: Icon, title, subtitle, accent = 'teal', children }) {
   const { pathname } = useLocation();
+  const { t } = useTranslation(['auth', 'common']);
   const iconTone = {
     blue: 'border-care-border bg-care-primary-subtle text-care-primary-hover',
     teal: 'border-care-primary bg-care-primary-subtle text-care-primary-hover',
     amber: 'border-care-warning bg-care-surface text-care-warning',
   }[accent];
   const signInRoles = [
-    { label: 'Patient', path: '/login/patient', icon: UserRound },
-    { label: 'Doctor', path: '/login/doctor', icon: Stethoscope },
-    { label: 'Hospital', path: '/login/admin', icon: Building2 },
+    { label: t('auth:patientRole'), path: '/login/patient', icon: UserRound },
+    { label: t('auth:doctorRole'), path: '/login/doctor', icon: Stethoscope },
+    { label: t('auth:hospitalRole'), path: '/login/admin', icon: Building2 },
   ];
 
   return (
@@ -37,17 +40,17 @@ export default function AuthShell({ icon: Icon, title, subtitle, accent = 'teal'
             <ShieldCheck className="h-6 w-6" />
           </span>
           <h2 className="text-5xl font-bold leading-[1.05] text-care-heading">
-            Care that <span className="block text-care-primary-hover">stays connected.</span>
+            {t('auth:heroTitle')} <span className="block text-care-primary-hover">{t('auth:heroAccent')}</span>
           </h2>
           <span className="mt-4 block h-1 w-12 rounded-full bg-care-primary" aria-hidden="true" />
           <p className="mt-5 font-medium leading-7 text-care-body">
-            Secure access to appointments, availability, and the information your role needs.
+            {t('auth:heroCopy')}
           </p>
           <div className="mt-8 space-y-5">
             {[
-              { title: 'Easy Appointments', copy: 'Book and manage with ease.', icon: CalendarCheck2 },
-              { title: 'Secure & Private', copy: 'Your data is always protected.', icon: ShieldCheck },
-              { title: 'Nearby Care', copy: 'Find care close to you.', icon: MapPin },
+              { title: t('auth:featureAppointmentsTitle'), copy: t('auth:featureAppointmentsCopy'), icon: CalendarCheck2 },
+              { title: t('auth:featurePrivacyTitle'), copy: t('auth:featurePrivacyCopy'), icon: ShieldCheck },
+              { title: t('auth:featureNearbyTitle'), copy: t('auth:featureNearbyCopy'), icon: MapPin },
             ].map(feature => (
               <div key={feature.title} className="flex items-center gap-4">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-care-primary-subtle text-care-primary-hover shadow-sm ring-1 ring-care-border">
@@ -61,7 +64,7 @@ export default function AuthShell({ icon: Icon, title, subtitle, accent = 'teal'
             ))}
           </div>
         </div>
-        <p className="relative z-10 text-xs font-semibold text-care-muted">Protected healthcare workspace</p>
+        <p className="relative z-10 text-xs font-semibold text-care-muted">{t('auth:protectedWorkspace')}</p>
       </aside>
 
       <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-care-primary-subtle px-5 py-10 sm:px-8">
@@ -70,13 +73,18 @@ export default function AuthShell({ icon: Icon, title, subtitle, accent = 'teal'
         <div className="w-full max-w-md relative z-10">
           <div className="mb-8 flex items-center justify-between lg:hidden">
             <BrandMark compact />
-            <span className="text-xs care-muted">Secure sign in</span>
+            <LanguageSwitcher compact />
           </div>
 
-          <Link to="/" className="mb-7 inline-flex items-center gap-2 text-sm care-muted hover:text-care-primary-hover">
-            <ArrowLeft className="h-4 w-4" />
-            Back to home
-          </Link>
+          <div className="mb-7 flex items-center justify-between gap-3">
+            <Link to="/" className="inline-flex items-center gap-2 text-sm care-muted hover:text-care-primary-hover">
+              <ArrowLeft className="h-4 w-4" />
+              {t('common:backToHome')}
+            </Link>
+            <div className="hidden lg:block">
+              <LanguageSwitcher compact />
+            </div>
+          </div>
 
           <section className="care-surface-raised p-6 sm:p-8">
             <nav aria-label="Choose sign-in role" className="mb-7 grid grid-cols-3 gap-1 rounded-lg border border-care-border bg-care-neutral p-1">

@@ -499,13 +499,13 @@
   }
 
   .public-hero-section {
-    min-height: 760px;
+    min-height: auto;
   }
 
   .public-hero-container {
-    min-height: 760px;
-    padding-top: 5rem;
-    padding-bottom: 20rem;
+    min-height: 430px;
+    padding-top: 4.5rem;
+    padding-bottom: 2rem;
   }
 
   .public-hero-content {

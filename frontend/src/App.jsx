@@ -46,6 +46,9 @@ export default function App() {
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
+          <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
+          <Route path="/security" element={<Navigate to="/legal/security" replace />} />
           <Route path="/legal/:document" element={<LegalPage />} />
           <Route path="/login/patient" element={<PatientLogin />} />
           <Route path="/login/doctor" element={<DoctorLogin />} />
@@ -53,6 +56,7 @@ export default function App() {
           <Route path="/signup/patient" element={<PatientSignup />} />
           <Route path="/signup/doctor" element={<DoctorSignup />} />
           <Route path="/doctor/pending" element={<DoctorPending />} />
+          <Route path="/hospital/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/hospital/:id" element={<PublicHospitalProfile />} />
           <Route path="/doctor/:doctorId" element={<PublicDoctorProfile />} />
 

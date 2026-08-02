@@ -31,6 +31,24 @@ export default function PublicHospitalProfile() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const loadCommunityHospital = async () => {
+      const place = new URLSearchParams(location.search).get('place');
+      if (!place) return false;
+
+      const params = new URLSearchParams({ location: place, limit: '40' });
+      const response = await fetch(`${API_URL}/hospitals/community?${params}`);
+      const data = await response.json();
+      if (!response.ok) return false;
+
+      const matchedHospital = (data.hospitals || data.facilities || []).find(item => String(item.id) === String(id));
+      if (!matchedHospital || !assertProductionSafe(matchedHospital)) return false;
+
+      setHospital(matchedHospital);
+      setDoctors(productionSafe(matchedHospital.doctors || []));
+      setBookableDoctors(productionSafe(matchedHospital.bookableDoctors || []));
+      return true;
+    };
+
     fetch(`${API_URL}/hospitals/${id}`)
       .then(async response => {
         const data = await response.json();
@@ -45,17 +63,20 @@ export default function PublicHospitalProfile() {
             // Facility details remain available without Google Places enrichment.
           });
       })
-      .catch(err => {
+      .catch(async err => {
         if (linkedHospital && assertProductionSafe(linkedHospital)) {
           setHospital(linkedHospital);
           setDoctors(productionSafe(linkedHospital.doctors || []));
           setBookableDoctors(productionSafe(linkedHospital.bookableDoctors || []));
           return;
         }
+
+        if (await loadCommunityHospital()) return;
+
         setError(err.message || 'Could not load facility');
       })
       .finally(() => setLoading(false));
-  }, [id, linkedHospital]);
+  }, [id, linkedHospital, location.search]);
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center gap-3 bg-care-neutral text-care-muted"><Loader2 className="h-6 w-6 animate-spin text-care-primary" /> Loading facility information...</div>;
