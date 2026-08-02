@@ -41,7 +41,7 @@ export const authenticateUser = async (req, res, next) => {
       });
     }
 
-    if (process.env.NODE_ENV === 'production' && /@test\.com$/i.test(dbUser.email || '')) {
+    if (process.env.DISABLE_DEVELOPMENT_ACCOUNTS === 'true' && /@test\.com$/i.test(dbUser.email || '')) {
       return res.status(403).json({
         error: {
           message: 'Development accounts are disabled in production',
