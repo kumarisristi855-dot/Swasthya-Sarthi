@@ -66,7 +66,6 @@ export default function AuthShell({ icon: Icon, title, subtitle, accent = 'teal'
 
       <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-care-primary-subtle px-5 py-10 sm:px-8">
         <div className="absolute -right-24 -top-24 h-80 w-96 rounded-[45%] bg-care-primary-subtle" aria-hidden="true" />
-        <div className="absolute -bottom-28 right-0 h-80 w-[30rem] rounded-[48%] bg-care-primary" aria-hidden="true" />
         <div className="care-token-dot-pattern absolute right-16 top-16 h-32 w-32 opacity-25" aria-hidden="true" />
         <div className="w-full max-w-md relative z-10">
           <div className="mb-8 flex items-center justify-between lg:hidden">
