@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700;800&family=Noto+Serif+Kannada:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&family=Tiro+Devanagari+Hindi:ital@0;1&family=Tiro+Tamil:ital@0;1&family=Tiro+Telugu:ital@0;1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,19 +7,39 @@
 @layer base {
   :root {
     color-scheme: light;
-    --color-primary: #18a889;
-    --color-primary-hover: #148e74;
-    --color-primary-subtle: #e7f7f2;
-    --color-text-heading: #12304a;
-    --color-text-body: #163149;
-    --color-text-muted: #526d80;
-    --color-warning-accent: #f59e0b;
-    --color-danger: #be123c;
-    --color-success: #18a889;
-    --color-neutral-bg: #f4f8fb;
-    --color-surface: #ffffff;
-    --color-border: #dbe5ec;
+
+    /* The Care Route palette: named product tokens first, semantic aliases below. */
+    --color-sarthi-teal: #0C7C7A;
+    --color-sarthi-teal-deep: #075E5D;
+    --color-deep-clinic-navy: #12343B;
+    --color-monsoon-blue: #D8EEF0;
+    --color-marigold-signal: #F2A83B;
+    --color-marigold-text: #6A4605;
+    --color-jasmine-white: #FAFBF8;
+    --color-madder-rose: #A43E4C;
+
+    --color-primary: var(--color-sarthi-teal);
+    --color-primary-hover: var(--color-sarthi-teal-deep);
+    --color-primary-subtle: var(--color-monsoon-blue);
+    --color-text-heading: var(--color-deep-clinic-navy);
+    --color-text-body: #183E43;
+    --color-text-muted: #5B7377;
+    --color-warning-accent: var(--color-marigold-signal);
+    --color-warning-text: var(--color-marigold-text);
+    --color-danger: var(--color-madder-rose);
+    --color-success: var(--color-sarthi-teal);
+    --color-neutral-bg: var(--color-jasmine-white);
+    --color-surface: #FFFFFF;
+    --color-border: #CFE0DD;
+    --font-display-base: "Tiro Devanagari Hindi", "Tiro Bangla", "Tiro Tamil", "Tiro Telugu", "Noto Serif Kannada", Georgia, serif;
+    --font-display-hi: "Tiro Devanagari Hindi", "Noto Sans Devanagari", serif;
+    --font-display-bn: "Tiro Bangla", "Noto Sans Bengali", serif;
+    --font-display-ta: "Tiro Tamil", "Noto Sans Tamil", serif;
+    --font-display-te: "Tiro Telugu", "Noto Sans Telugu", serif;
+    --font-display-kn: "Noto Serif Kannada", "Noto Sans Kannada", serif;
+    --font-body-base: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Kannada", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --locale-font-family: inherit;
+    --locale-display-font-family: var(--font-display-base);
 
     /* Compatibility aliases for existing Swasthya Sarthi component styles. */
     --care-bg: var(--color-neutral-bg);
@@ -97,7 +119,7 @@
 
   ::selection {
     background: color-mix(in srgb, var(--color-primary) 30%, transparent);
-    color: var(--color-surface);
+    color: var(--color-text-heading);
   }
 
   ::-webkit-scrollbar {
@@ -204,7 +226,7 @@
   }
 
   .care-badge-warning {
-    color: color-mix(in srgb, var(--color-warning-accent) 62%, var(--color-text-heading));
+    color: var(--color-warning-text);
     background: color-mix(in srgb, var(--color-warning-accent) 11%, var(--color-surface));
     border-color: color-mix(in srgb, var(--color-warning-accent) 36%, var(--color-border));
   }
@@ -717,7 +739,7 @@
   }
 
   .care-alert-warning {
-    color: color-mix(in srgb, var(--color-warning-accent) 62%, var(--color-text-heading));
+    color: var(--color-warning-text);
     background: color-mix(in srgb, var(--color-warning-accent) 10%, var(--color-surface));
     border-color: color-mix(in srgb, var(--color-warning-accent) 34%, var(--color-border));
   }

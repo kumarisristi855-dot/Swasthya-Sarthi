@@ -48,6 +48,7 @@ function upsertMeta(selector, attributes) {
 
 function routeMetadata(pathname) {
   const defaultDescription = 'Discover source-labelled doctors, hospitals, clinics and diagnostic centres near you. Compare healthcare information and check appointment availability.';
+  if (pathname.startsWith('/design/')) return { title: 'Care Route Design Validation | Swasthya Sarthi', description: 'Internal Swasthya Sarthi design validation workspace.', noIndex: true };
   if (/^\/(patient|admin)\//.test(pathname) || pathname.startsWith('/doctor/dashboard') || pathname.startsWith('/doctor/pending') || pathname.startsWith('/auth/')) {
     return { title: 'Secure Workspace | Swasthya Sarthi', description: 'Secure Swasthya Sarthi account workspace.', noIndex: true };
   }

@@ -22,6 +22,7 @@ const AuthCallback = lazy(() => import('./modules/auth/callback'));
 const LegalPage = lazy(() => import('./modules/LegalPage'));
 const PublicHospitalProfile = lazy(() => import('./modules/public/PublicHospitalProfile'));
 const PublicDoctorProfile = lazy(() => import('./modules/public/PublicDoctorProfile'));
+const TypographyValidation = lazy(() => import('./modules/design/TypographyValidation'));
 
 function RouteFallback() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
           <Route path="/security" element={<Navigate to="/legal/security" replace />} />
           <Route path="/legal/:document" element={<LegalPage />} />
+          <Route path="/design/care-route-typography" element={<TypographyValidation />} />
           <Route path="/login/patient" element={<PatientLogin />} />
           <Route path="/login/doctor" element={<DoctorLogin />} />
           <Route path="/login/admin" element={<AdminLogin />} />
